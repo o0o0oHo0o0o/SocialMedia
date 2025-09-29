@@ -67,6 +67,11 @@ ON Messaging.Messages (ConversationID, SentAt DESC);
 GO
 
 -- Index cho Likes: 
-CREATE NONCLUSTERED INDEX IX_CoreData_Likes_PostID 
-ON CoreData.Likes (PostID);
-GO
+CREATE NONCLUSTERED INDEX IX_Reactions_PostID
+ON CoreData.Reactions (PostID);
+
+CREATE NONCLUSTERED INDEX IX_Reactions_PostID_ReactionType
+ON CoreData.Reactions (PostID, ReactionType);
+
+CREATE NONCLUSTERED INDEX IX_Reactions_PostID_UserID
+ON CoreData.Reactions (PostID, UserID);

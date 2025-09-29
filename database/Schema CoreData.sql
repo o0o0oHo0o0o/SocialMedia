@@ -33,8 +33,6 @@ CREATE TABLE CoreData.Posts (
     PostID INT PRIMARY KEY IDENTITY(1,1),
     UserID INT NOT NULL, 
     Content NVARCHAR(MAX) NOT NULL, 
-    ImageURL NVARCHAR(255), 
-    VideoURL NVARCHAR(255), 
     PostType NVARCHAR(20) DEFAULT 'TEXT' NOT NULL, -- TEXT, PHOTO, VIDEO
     Location NVARCHAR(100),
     IsArchived BIT DEFAULT 0,
@@ -44,33 +42,53 @@ CREATE TABLE CoreData.Posts (
     FOREIGN KEY (UserID) REFERENCES CoreData.Users(UserID) ON DELETE CASCADE
 );
 GO
+-- *******************************************************************
+-- PostMedia
+-- *******************************************************************
+CREATE TABLE CoreData.PostMedia (
+    MediaID BIGINT PRIMARY KEY IDENTITY(1,1),
+    PostID INT NOT NULL, 
+    MediaURL NVARCHAR(255) NOT NULL, 
+    MediaType NVARCHAR(10) NOT NULL, 
+    SortOrder INT DEFAULT 0, 
+    FOREIGN KEY (PostID) REFERENCES CoreData.Posts(PostID) ON DELETE CASCADE,
+);
+GO
+
+-- Index quan trọng: Lấy tất cả media của một Post theo thứ tự
+CREATE NONCLUSTERED INDEX IX_CoreData_PostMedia_PostID_SortOrder 
+ON CoreData.PostMedia (PostID, SortOrder); 
+GO
 
 -- Comments (CoreData)
 CREATE TABLE CoreData.Comments (
     CommentID INT PRIMARY KEY IDENTITY(1,1),
     PostID INT NOT NULL, 
     UserID INT NOT NULL, 
+	ParentCommentID INT NULL,
     Content NVARCHAR(500) NOT NULL, 
     CreatedAt DATETIME DEFAULT GETDATE(),
     
     FOREIGN KEY (PostID) REFERENCES CoreData.Posts(PostID) ON DELETE CASCADE,
-    FOREIGN KEY (UserID) REFERENCES CoreData.Users(UserID)
+    FOREIGN KEY (UserID) REFERENCES CoreData.Users(UserID),
+	FOREIGN KEY (ParentCommentID) REFERENCES CoreData.Comments(CommentID)
+)
+GO
+
+CREATE TABLE CoreData.Reactions (
+    ReactionID INT PRIMARY KEY IDENTITY(1,1),
+    PostID INT NOT NULL, 
+    UserID INT NOT NULL, 
+    ReactionType NVARCHAR(20) NOT NULL,
+    ReactedAt DATETIME DEFAULT GETDATE(),
+
+    FOREIGN KEY (PostID) REFERENCES CoreData.Posts(PostID) ON DELETE CASCADE,
+    FOREIGN KEY (UserID) REFERENCES CoreData.Users(UserID),
+
+    UNIQUE (PostID, UserID)
 );
 GO
 
--- Likes (CoreData)
-CREATE TABLE CoreData.Likes (
-    LikeID INT PRIMARY KEY IDENTITY(1,1),
-    PostID INT NOT NULL, 
-    UserID INT NOT NULL, 
-    LikedAt DATETIME DEFAULT GETDATE(),
-    
-    FOREIGN KEY (PostID) REFERENCES CoreData.Posts(PostID) ON DELETE CASCADE,
-    FOREIGN KEY (UserID) REFERENCES CoreData.Users(UserID),
-    
-    UNIQUE (PostID, UserID) -- One like per one post for one person
-);
-GO
 
 -- Shares (CoreData)
 CREATE TABLE CoreData.Shares (
