@@ -3,7 +3,7 @@ package model;
 import jakarta.persistence.*;
 
 import java.util.Date;
-import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "Users")
@@ -35,5 +35,9 @@ public class User {
     private Date createdDate;
 
     @OneToMany(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.ALL)
-    private List<Post> posts;
+    private Set<Post> posts;
+
+    @OneToMany(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.ALL)
+    private Set<UserRole> userRoles;
+
 }
