@@ -24,6 +24,20 @@ CREATE TABLE CoreData.Users (
 );
 GO
 
+CREATE TABLE CoreData.Roles (
+	RoleID INT PRIMARY KEY IDENTITY(1,1),
+	Rolename NVARCHAR(50) UNIQUE NOT NULL	
+)
+GO
+
+CREATE TABLE CoreData.UserRole (
+	RoleID INT NOT NULL,
+	UserID INT NOT NULL,
+	PRIMARY KEY (RoleID, UserID),
+	FOREIGN KEY (RoleID) REFERENCES CoreData.Roles(RoleID),
+	FOREIGN KEY (UserID) REFERENCES CoreData.Users(UserID)
+)
+GO
 -- *******************************************************************
 -- 2. Posts and Interaction (Schema CoreData)
 -- *******************************************************************
