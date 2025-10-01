@@ -1,10 +1,9 @@
-package model;
+package coredata_module;
 
 import jakarta.persistence.*;
 
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
+import java.util.Date;
 
 @Entity
 @Table(name = "Comments")
@@ -18,15 +17,15 @@ public class Comment {
     private Post post;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "UserID", nullable = false)
+    @JoinColumn(name = "UserID")
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ParentCommentID", nullable = false)
+    @JoinColumn(name = "ParentCommentID")
     private Comment parentComment;
 
     @OneToMany(mappedBy = "parentComment", cascade = CascadeType.ALL)
-    private List<Comment> replies = new ArrayList<>();
+    private List<Comment> replies;
 
     @Column(name = "Content", nullable = false)
     private String content;

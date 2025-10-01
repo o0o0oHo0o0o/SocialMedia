@@ -1,24 +1,22 @@
-package model;
+package coredata_module;
 
-import Keys.ShareId;
 import jakarta.persistence.*;
-import org.hibernate.mapping.Join;
 
 import java.util.Date;
 
 @Entity
 @Table(name = "Shares")
 public class Share {
-    @EmbeddedId
-    private ShareId shareId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "ShareID")
+    private int shareId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("postId")
     @JoinColumn(name = "PostID", nullable = false)
     private Post post;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("userId")
     @JoinColumn(name = "UserID", nullable = false)
     private User user;
 

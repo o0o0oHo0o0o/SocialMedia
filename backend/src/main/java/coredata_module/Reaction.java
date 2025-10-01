@@ -1,6 +1,5 @@
-package model;
+package coredata_module;
 
-import Keys.ReactionId;
 import jakarta.persistence.*;
 
 import java.util.Date;
@@ -8,16 +7,16 @@ import java.util.Date;
 @Entity
 @Table(name = "Reactions")
 public class Reaction {
-    @EmbeddedId
-    private ReactionId reactionId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "ReactionID")
+    private int reactionId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("postId")
     @JoinColumn(name = "PostID", nullable = false)
     private Post post;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("userId")
     @JoinColumn(name = "UserID", nullable = false)
     private User user;
 
