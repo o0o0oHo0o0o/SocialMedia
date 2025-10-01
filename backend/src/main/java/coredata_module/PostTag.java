@@ -1,16 +1,15 @@
-package model;
+package coredata_module;
 
-import Keys.PostTagsId;
+import Keys.PostTagId;
 import jakarta.persistence.*;
-import org.hibernate.annotations.JoinFormula;
 
 import java.util.Date;
 
 @Entity
 @Table(name = "PostTags")
-public class PostTags {
+public class PostTag {
     @EmbeddedId
-    private PostTagsId postTagsId;
+    private PostTagId postTagsId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("postId")

@@ -1,4 +1,4 @@
-package model;
+package coredata_module;
 
 import Keys.UserRoleId;
 import jakarta.persistence.*;
