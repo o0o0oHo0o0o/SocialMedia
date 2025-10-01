@@ -1,8 +1,10 @@
-package model;
+package coredata_module;
 
 import jakarta.persistence.*;
+import messaging_module.ConversationMember;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -39,5 +41,11 @@ public class User {
 
     @OneToMany(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.ALL)
     private Set<UserRole> userRoles;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Share> shares;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ConversationMember> conversationMemberships;
 
 }

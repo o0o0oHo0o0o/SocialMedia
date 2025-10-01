@@ -1,4 +1,4 @@
-package model;
+package coredata_module;
 
 import Keys.PostTagId;
 import jakarta.persistence.*;

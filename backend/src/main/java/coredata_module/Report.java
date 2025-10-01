@@ -1,4 +1,4 @@
-package model;
+package coredata_module;
 
 import jakarta.persistence.*;
 import java.util.Date;
