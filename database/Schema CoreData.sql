@@ -42,7 +42,6 @@ CREATE TABLE CoreData.UserRole (
 	FOREIGN KEY (UserID) REFERENCES CoreData.Users(UserID)
 )
 GO
-
 -- *******************************************************************
 -- 2. Posts and Interaction (Schema CoreData)
 -- *******************************************************************

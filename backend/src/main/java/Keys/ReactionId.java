@@ -6,21 +6,21 @@ import java.io.Serializable;
 import java.util.Objects;
 
 @Embeddable
-public class PostTagsId implements Serializable {
+public class ReactionId implements Serializable {
     private int postId;
-    private int taggedUserId;
+    private int userId;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        PostTagsId postTagId = (PostTagsId) o;
-        if (postId != postTagId.postId) return false;
-        return taggedUserId == postTagId.taggedUserId;
+        ReactionId reactionId = (ReactionId) o;
+        if (postId != reactionId.postId) return false;
+        return userId == reactionId.userId;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(postId, taggedUserId);
+        return Objects.hash(postId, userId);
     }
 }
