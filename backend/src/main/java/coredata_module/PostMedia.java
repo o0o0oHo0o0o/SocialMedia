@@ -8,7 +8,7 @@ public class PostMedia {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "MediaID")
-    private int id;
+    private int postMediaId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "PostID")

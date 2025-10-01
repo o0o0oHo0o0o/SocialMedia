@@ -9,10 +9,10 @@ import java.util.Date;
 @Table(name = "Blocks")
 public class Block {
     @EmbeddedId
-    private BlockId blockerId;
+    private BlockId blockId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("blockId")
+    @MapsId("blockerId")
     @JoinColumn(name = "BlockerID", nullable = false)
     private User blocker;
 

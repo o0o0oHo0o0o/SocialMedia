@@ -24,7 +24,7 @@ public class Comment {
     @JoinColumn(name = "ParentCommentID")
     private Comment parentComment;
 
-    @OneToMany(mappedBy = "parentComment", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "parentComment", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Comment> replies;
 
     @Column(name = "Content", nullable = false)
@@ -32,4 +32,7 @@ public class Comment {
 
     @Column(name = "CreatedAt", nullable = false)
     private Date createdDate;
+
+    @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Report> reports;
 }

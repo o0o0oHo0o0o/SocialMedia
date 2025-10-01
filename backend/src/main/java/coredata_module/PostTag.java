@@ -9,7 +9,7 @@ import java.util.Date;
 @Table(name = "PostTags")
 public class PostTag {
     @EmbeddedId
-    private PostTagId postTagsId;
+    private PostTagId postTagId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("postId")

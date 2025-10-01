@@ -9,7 +9,7 @@ import java.util.Date;
 @Table(name = "Follows", schema = "CoreData")
 public class Follow {
     @EmbeddedId
-    private FollowId id;
+    private FollowId followId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("followerId")

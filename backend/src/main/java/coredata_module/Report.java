@@ -16,11 +16,11 @@ public class Report {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ReportedPostID", nullable = true)
-    private Post reportedPost;
+    private Post post;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ReportedCommentID", nullable = true)
-    private Comment reportedComment;
+    private Comment comment;
 
     @ManyToOne
     @JoinColumn(name = "ReportedUserID", nullable = true)
