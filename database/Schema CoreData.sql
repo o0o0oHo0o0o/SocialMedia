@@ -3,7 +3,7 @@ CREATE DATABASE SocialMedia;
 USE SocialMedia;
 
 -- *******************************************************************
--- UserTable Schema CoreData
+-- Schema CoreData
 -- *******************************************************************
 
 -- Schema CoreData 
@@ -11,6 +11,10 @@ IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = 'CoreData')
     EXEC('CREATE SCHEMA CoreData');
 GO
 
+
+-- *******************************************************************
+-- 1. User and Roles (Schema CoreData)
+-- *******************************************************************
 --  Users (CoreData)
 CREATE TABLE CoreData.Users (
     UserID INT PRIMARY KEY IDENTITY(1,1),
@@ -22,6 +26,21 @@ CREATE TABLE CoreData.Users (
     ProfilePictureURL NVARCHAR(255), 
     CreatedAt DATETIME DEFAULT GETDATE()
 );
+GO
+
+CREATE TABLE CoreData.Roles (
+	RoleID INT PRIMARY KEY IDENTITY(1,1),
+	Rolename NVARCHAR(50) UNIQUE NOT NULL	
+)
+GO
+
+CREATE TABLE CoreData.UserRole (
+	RoleID INT NOT NULL,
+	UserID INT NOT NULL,
+	PRIMARY KEY (RoleID, UserID),
+	FOREIGN KEY (RoleID) REFERENCES CoreData.Roles(RoleID),
+	FOREIGN KEY (UserID) REFERENCES CoreData.Users(UserID)
+)
 GO
 
 -- *******************************************************************
