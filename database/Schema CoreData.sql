@@ -51,7 +51,7 @@ CREATE TABLE CoreData.Posts (
     PostID INT PRIMARY KEY IDENTITY(1,1),
     UserID INT NOT NULL, 
     Content NVARCHAR(MAX) NOT NULL, 
-    PostType NVARCHAR(20) DEFAULT 'TEXT' NOT NULL, -- TEXT, PHOTO, VIDEO
+    PostType NVARCHAR(20) DEFAULT 'TEXT' NOT NULL, -- Education, Travel, Humor, Food, Art, Positive, Technology, DIY, Health
     Location NVARCHAR(100),
     IsArchived BIT DEFAULT 0,
     CreatedAt DATETIME DEFAULT GETDATE(),
