@@ -1,7 +1,8 @@
 ﻿-- *******************************************************************
--- SOCIAL MEDIA DATABASE - PHIÊN BẢN SỬA LỖI HOÀN CHỈNH
+-- SOCIAL MEDIA DATABASE
 -- *******************************************************************
-
+ALTER DATABASE SocialMedia SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+GO
 DROP DATABASE IF EXISTS SocialMedia;
 GO
 
@@ -31,10 +32,14 @@ CREATE TABLE CoreData.Users (
     FullName NVARCHAR(100),
     Bio NVARCHAR(500), 
     ProfilePictureURL NVARCHAR(255), 
-    CreatedAt DATETIME DEFAULT GETDATE()
+    CreatedAt DATETIME DEFAULT GETDATE(),
+	IsDeleted BIT NOT NULL DEFAULT 0,
+    DeletedAt DATETIME2 NULL
 );
 GO
-
+CREATE NONCLUSTERED INDEX IX_Users_ActiveUsers
+ON CoreData.Users(UserID) WHERE DeletedAt IS NULL;
+GO
 -- Roles
 CREATE TABLE CoreData.Roles (
     RoleID INT PRIMARY KEY IDENTITY(1,1),
@@ -62,7 +67,7 @@ GO
 CREATE TABLE CoreData.InteractableItems (
     InteractableItemID BIGINT PRIMARY KEY IDENTITY(1,1),
     ItemType NVARCHAR(20) NOT NULL 
-        CHECK (ItemType IN ('POST', 'MEDIA', 'COMMENT', 'SHARE')),
+        CHECK (ItemType IN ('POST', 'MEDIA', 'COMMENT', 'SHARE', 'MESSAGE')),
     CreatedAt DATETIME DEFAULT GETDATE()
 );
 GO
@@ -72,7 +77,7 @@ ON CoreData.InteractableItems(ItemType);
 GO
 
 -- *******************************************************************
--- 3. POSTS
+-- 3. POSTS, STORIES
 -- *******************************************************************
 
 CREATE TABLE CoreData.Posts (
@@ -85,10 +90,14 @@ CREATE TABLE CoreData.Posts (
     IsArchived BIT DEFAULT 0,
     CreatedAt DATETIME DEFAULT GETDATE(),
     UpdatedAt DATETIME,
-    
+    IsDeleted BIT NOT NULL DEFAULT 0,
+    DeletedAt DATETIME2 NULL,
     FOREIGN KEY (UserID) REFERENCES CoreData.Users(UserID) ON DELETE CASCADE,
     FOREIGN KEY (InteractableItemID) REFERENCES CoreData.InteractableItems(InteractableItemID)
 );
+GO
+CREATE NONCLUSTERED INDEX IX_Posts_ActivePosts
+ON CoreData.Posts(PostID, UserID, CreatedAt) WHERE DeletedAt IS NULL;
 GO
 
 CREATE INDEX IX_Posts_UserID_CreatedAt 
@@ -97,6 +106,23 @@ GO
 
 CREATE INDEX IX_Posts_InteractableItemID 
 ON CoreData.Posts(InteractableItemID);
+GO
+
+CREATE TABLE CoreData.Stories (
+    StoryID BIGINT PRIMARY KEY IDENTITY(1,1),
+    UserID INT NOT NULL,
+    MediaURL NVARCHAR(255) NOT NULL,
+    MediaType NVARCHAR(10) NOT NULL CHECK (MediaType IN ('IMAGE', 'VIDEO')),
+    CreatedAt DATETIME DEFAULT GETDATE(),
+    ExpiresAt AS DATEADD(hour, 24, CreatedAt) PERSISTED, -- Cột tính toán tự động
+	
+    FOREIGN KEY (UserID) REFERENCES CoreData.Users(UserID) ON DELETE CASCADE
+);
+GO
+
+-- Index để lấy story của user và để dọn dẹp story đã hết hạn
+CREATE INDEX IX_Stories_UserID_CreatedAt ON CoreData.Stories(UserID, CreatedAt DESC);
+CREATE INDEX IX_Stories_ExpiresAt ON CoreData.Stories(ExpiresAt);
 GO
 
 -- *******************************************************************
@@ -138,7 +164,7 @@ CREATE TABLE CoreData.Shares (
     ShareCaption NVARCHAR(500),
     CreatedAt DATETIME DEFAULT GETDATE(),
     
-    FOREIGN KEY (UserID) REFERENCES CoreData.Users(UserID) ON DELETE CASCADE,
+    FOREIGN KEY (UserID) REFERENCES CoreData.Users(UserID),
     FOREIGN KEY (OriginalPostID) REFERENCES CoreData.Posts(PostID),
     FOREIGN KEY (InteractableItemID) REFERENCES CoreData.InteractableItems(InteractableItemID),
     
@@ -172,10 +198,10 @@ CREATE TABLE CoreData.FeedItems (
     ShareID BIGINT NULL,
     CreatedAt DATETIME DEFAULT GETDATE(),
     
-    FOREIGN KEY (UserID) REFERENCES CoreData.Users(UserID) ON DELETE CASCADE,
+    FOREIGN KEY (UserID) REFERENCES CoreData.Users(UserID),
     FOREIGN KEY (PostID) REFERENCES CoreData.Posts(PostID),
-    FOREIGN KEY (ActorUserID) REFERENCES CoreData.Users(UserID) ON DELETE NO ACTION,
-    FOREIGN KEY (ShareID) REFERENCES CoreData.Shares(ShareID) ON DELETE CASCADE
+    FOREIGN KEY (ActorUserID) REFERENCES CoreData.Users(UserID),
+    FOREIGN KEY (ShareID) REFERENCES CoreData.Shares(ShareID)
 );
 GO
 
@@ -199,15 +225,20 @@ CREATE TABLE CoreData.Comments (
     ParentCommentID BIGINT NULL,
     Content NVARCHAR(1000) NOT NULL, 
     CreatedAt DATETIME DEFAULT GETDATE(),
-    
-    FOREIGN KEY (UserID) REFERENCES CoreData.Users(UserID),
+    IsDeleted BIT NOT NULL DEFAULT 0,
+    DeletedAt DATETIME2 NULL,
+    FOREIGN KEY (UserID) REFERENCES CoreData.Users(UserID) ON DELETE CASCADE,
     FOREIGN KEY (TargetInteractableItemID) 
-        REFERENCES CoreData.InteractableItems(InteractableItemID) ON DELETE NO ACTION,
+        REFERENCES CoreData.InteractableItems(InteractableItemID),
     FOREIGN KEY (OwnInteractableItemID) 
         REFERENCES CoreData.InteractableItems(InteractableItemID),
     FOREIGN KEY (ParentCommentID) 
-        REFERENCES CoreData.Comments(CommentID) ON DELETE NO ACTION
+        REFERENCES CoreData.Comments(CommentID)
 );
+GO
+
+CREATE NONCLUSTERED INDEX IX_Comments_ActiveComments
+ON CoreData.Comments(CommentID, TargetInteractableItemID) WHERE DeletedAt IS NULL;
 GO
 
 CREATE INDEX IX_Comments_TargetInteractableItemID_CreatedAt 
@@ -255,7 +286,7 @@ ON CoreData.Reactions(UserID);
 GO
 
 -- *******************************************************************
--- 9. POST TAGS
+-- 9. POST TAGS, HASHTAG
 -- *******************************************************************
 
 CREATE TABLE CoreData.PostTags (
@@ -273,6 +304,27 @@ CREATE INDEX IX_PostTags_TaggedUserID
 ON CoreData.PostTags(TaggedUserID);
 GO
 
+CREATE TABLE CoreData.Hashtags (
+    HashtagID INT PRIMARY KEY IDENTITY(1,1),
+    TagName NVARCHAR(100) UNIQUE NOT NULL
+);
+GO
+
+CREATE INDEX IX_Hashtags_TagName ON CoreData.Hashtags(TagName);
+GO
+
+CREATE TABLE CoreData.PostHashtags (
+    PostID INT NOT NULL,
+    HashtagID INT NOT NULL,
+
+    PRIMARY KEY (PostID, HashtagID),
+    FOREIGN KEY (PostID) REFERENCES CoreData.Posts(PostID) ON DELETE CASCADE,
+    FOREIGN KEY (HashtagID) REFERENCES CoreData.Hashtags(HashtagID) ON DELETE CASCADE
+);
+GO
+
+CREATE INDEX IX_PostHashtags_HashtagID ON CoreData.PostHashtags(HashtagID);
+GO
 -- *******************************************************************
 -- 10. RELATIONSHIPS
 -- *******************************************************************
@@ -286,7 +338,7 @@ CREATE TABLE CoreData.Follows (
     PRIMARY KEY (FollowerID, FollowingID),
     FOREIGN KEY (FollowerID) REFERENCES CoreData.Users(UserID),
     FOREIGN KEY (FollowingID) REFERENCES CoreData.Users(UserID),
-    
+  
     CHECK (FollowerID <> FollowingID)
 );
 GO
@@ -344,4 +396,26 @@ GO
 
 CREATE INDEX IX_Reports_ReportStatus 
 ON CoreData.Reports(ReportStatus);
+GO
+
+-- *******************************************************************
+-- 12. NOFITICATION
+-- *******************************************************************
+CREATE TABLE CoreData.Notifications (
+    NotificationID BIGINT PRIMARY KEY IDENTITY(1,1),
+    RecipientUserID INT NOT NULL,  
+    ActorUserID INT NOT NULL,      
+    NotificationType NVARCHAR(50) NOT NULL
+        CHECK (NotificationType IN ('NEW_COMMENT', 'NEW_REACTION', 'NEW_FOLLOWER', 'POST_TAG', 'COMMENT_MENTION')),
+    TargetItemID BIGINT NULL,      
+    IsRead BIT DEFAULT 0,
+    CreatedAt DATETIME DEFAULT GETDATE(),
+
+    FOREIGN KEY (RecipientUserID) REFERENCES CoreData.Users(UserID),
+    FOREIGN KEY (ActorUserID) REFERENCES CoreData.Users(UserID)
+);
+GO
+
+CREATE INDEX IX_Notifications_RecipientUserID_IsRead_CreatedAt
+ON CoreData.Notifications(RecipientUserID, IsRead, CreatedAt DESC);
 GO
