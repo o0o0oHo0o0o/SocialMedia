@@ -1,283 +1,534 @@
 USE SocialMedia
-INSERT INTO CoreData.Users (Username, Email, PasswordHash, FullName, Bio, ProfilePictureURL)
+-- 15 active users
+INSERT INTO CoreData.Users (Username, Email, PasswordHash, FullName, Bio, ProfilePictureURL, CreatedAt, IsDeleted, DeletedAt)
 VALUES
-    ('nguyenan', 'nguyenan@example.com', 'hashedpassword123', 'Nguyễn An', 'Mình yêu thích chia sẻ về công nghệ và học hỏi những điều mới!', 'https://example.com/profile/nguyenan.jpg'),
-    ('hoangbui', 'hoangbui@example.com', 'hashedpassword456', 'Hoàng Bùi', 'Mọi thứ đều có thể thay đổi, chỉ cần bạn dám thử!', 'https://example.com/profile/hoangbui.jpg'),
-    ('lanhien', 'lanhien@example.com', 'hashedpassword789', 'Lân Hiền', 'Chuyên gia thiết kế đồ họa và nhiếp ảnh!', 'https://example.com/profile/lanhien.jpg'),
-    ('minhhoang', 'minhhoang@example.com', 'hashedpassword001', 'Minh Hoàng', 'Mình là lập trình viên và đam mê công nghệ!', 'https://example.com/profile/minhhoang.jpg'),
-    ('thienthai', 'thienthai@example.com', 'hashedpassword002', 'Thiện Thái', 'Đam mê âm nhạc và chơi guitar!', 'https://example.com/profile/thienthai.jpg'),
-    ('quanghieu', 'quanghieu@example.com', 'hashedpassword003', 'Quang Hiếu', 'Chuyên gia phát triển web và ứng dụng di động!', 'https://example.com/profile/quanghieu.jpg'),
-    ('thuhoai', 'thuhoai@example.com', 'hashedpassword004', 'Thư Hoài', 'Tôi yêu nghệ thuật và thích sáng tạo!', 'https://example.com/profile/thuhoai.jpg'),
-    ('tuananh', 'tuananh@example.com', 'hashedpassword005', 'Tuấn Anh', 'Đam mê viết lách và chia sẻ kinh nghiệm sống!', 'https://example.com/profile/tuananh.jpg'),
-    ('hienle', 'hienle@example.com', 'hashedpassword006', 'Hiền Lê', 'Mình thích đi du lịch và khám phá các nền văn hóa!', 'https://example.com/profile/hienle.jpg'),
-    ('lananh', 'lananh@example.com', 'hashedpassword007', 'Làn Anh', 'Giới thiệu về các món ăn đặc sắc của Việt Nam!', 'https://example.com/profile/lananh.jpg'),
-    ('datluong', 'datluong@example.com', 'hashedpassword008', 'Đạt Lương', 'Mình là người đam mê thể thao và du lịch!', 'https://example.com/profile/datluong.jpg'),
-    ('xuonglinh', 'xuonglinh@example.com', 'hashedpassword009', 'Xương Linh', 'Chuyên gia về marketing và quảng cáo trực tuyến!', 'https://example.com/profile/xuonglinh.jpg'),
-    ('quyenle', 'quyenle@example.com', 'hashedpassword010', 'Quyền Lê', 'Mình yêu thích công việc sáng tạo và nghệ thuật!', 'https://example.com/profile/quyenle.jpg'),
-    ('huuthanh', 'huuthanh@example.com', 'hashedpassword011', 'Hữu Thành', 'Đam mê phát triển phần mềm và nghiên cứu công nghệ!', 'https://example.com/profile/huuthanh.jpg'),
-    ('kimlinh', 'kimlinh@example.com', 'hashedpassword012', 'Kim Linh', 'Mình thích đọc sách và học hỏi các kiến thức mới!', 'https://example.com/profile/kimlinh.jpg'),
-    ('vannhien', 'vannhien@example.com', 'hashedpassword013', 'Văn Nhiên', 'Tôi yêu thích chia sẻ về các chủ đề khoa học xã hội!', 'https://example.com/profile/vannhien.jpg'),
-    ('vuthao', 'vuthao@example.com', 'hashedpassword014', 'Vũ Thảo', 'Mình là người đam mê tự học và phát triển bản thân!', 'https://example.com/profile/vuthao.jpg'),
-    ('trongnhan', 'trongnhan@example.com', 'hashedpassword015', 'Trọng Nhân', 'Mình là sinh viên ngành kỹ thuật phần mềm!', 'https://example.com/profile/trongnhan.jpg'),
-    ('thucan', 'thucan@example.com', 'hashedpassword016', 'Thục An', 'Mình yêu thích thử nghiệm các món ăn mới!', 'https://example.com/profile/thucan.jpg'),
-    ('tuanminh', 'tuanminh@example.com', 'hashedpassword017', 'Tuấn Minh', 'Mình là người đam mê sáng tạo và phát triển phần mềm!', 'https://example.com/profile/tuanminh.jpg');
+    ('nguyenan', 'nguyenan@example.com', 'passwordhash1', 'Nguyễn An', 'Lập trình viên yêu thích công nghệ.', 'https://profilepic1.com', '2020-01-15 08:30:00', 0, NULL),
+    ('hoangbui', 'hoangbui@example.com', 'passwordhash2', 'Hoàng Bùi', 'Đam mê ẩm thực và nhiếp ảnh.', 'https://profilepic2.com', '2020-03-22 14:45:20', 0, NULL),
+    ('lanhien', 'lanhien@example.com', 'passwordhash3', 'Lân Hiền', 'Du lịch và âm nhạc là đam mê của tôi.', 'https://profilepic3.com', '2020-05-10 16:20:50', 0, NULL),
+    ('minhhoang', 'minhhoang@example.com', 'passwordhash4', 'Minh Hoàng', 'Nghiên cứu viên và giảng viên thể dục.', 'https://profilepic4.com', '2021-06-05 11:00:00', 0, NULL),
+    ('thienthai', 'thienthai@example.com', 'passwordhash5', 'Thiện Thái', 'Yêu thích thiên nhiên và du lịch.', 'https://profilepic5.com', '2021-08-18 13:10:10', 0, NULL),
+    ('quanghieu', 'quanghieu@example.com', 'passwordhash6', 'Quang Hiếu', 'Thiết kế đồ họa và sáng tạo nội dung.', 'https://profilepic6.com', '2021-10-25 09:30:05', 0, NULL),
+    ('thuhoi', 'thuhoi@example.com', 'passwordhash7', 'Thư Hoài', 'Chuyên gia marketing và cố vấn khởi nghiệp.', 'https://profilepic7.com', '2022-01-12 14:05:15', 0, NULL),
+    ('tuananh', 'tuananh@example.com', 'passwordhash8', 'Tuấn Anh', 'Sách và mèo là hai điều tôi yêu thích.', 'https://profilepic8.com', '2022-03-17 17:40:30', 0, NULL),
+    ('hienle', 'hienle@example.com', 'passwordhash9', 'Hiền Lê', 'Gamer và yêu thích công nghệ.', 'https://profilepic9.com', '2022-05-21 11:55:00', 0, NULL),
+    ('lananh', 'lananh@example.com', 'passwordhash10', 'Làn Anh', 'Nhà văn và người kể chuyện chuyên nghiệp.', 'https://profilepic10.com', '2022-07-25 08:25:50', 0, NULL),
+    ('datluong', 'datluong@example.com', 'passwordhash11', 'Đạt Lương', 'Đầu bếp và người phê bình ẩm thực.', 'https://profilepic11.com', '2022-09-12 13:00:00', 0, NULL),
+    ('xuanlinh', 'xuanlinh@example.com', 'passwordhash12', 'Xương Linh', 'Nhiếp ảnh gia và nhà thám hiểm.', 'https://profilepic12.com', '2023-01-02 15:30:45', 0, NULL),
+    ('quyenle', 'quyenle@example.com', 'passwordhash13', 'Quyền Lê', 'Kỹ sư phần mềm và doanh nhân.', 'https://profilepic13.com', '2023-03-14 18:15:10', 0, NULL),
+    ('huuthanh', 'huuthanh@example.com', 'passwordhash14', 'Hữu Thành', 'Họa sĩ và nhạc sĩ.', 'https://profilepic14.com', '2023-05-25 12:40:20', 0, NULL),
+    ('kimlinh', 'kimlinh@example.com', 'passwordhash15', 'Kim Linh', 'Nhà văn du lịch và tác giả sách.', 'https://profilepic15.com', '2023-07-30 09:25:00', 0, NULL);
+
+
+-- 5 deleted users
+INSERT INTO CoreData.Users (Username, Email, PasswordHash, FullName, Bio, ProfilePictureURL, CreatedAt, IsDeleted, DeletedAt)
+VALUES
+    ('khanhhoa', 'khanhhoa@example.com', 'passwordhash16', 'Khánh Hòa', 'Chuyên gia SEO và truyền thông.', 'https://profilepic16.com', '2021-02-20 10:30:00', 1, '2023-08-15 11:30:00'),
+    ('thiennguyen', 'thiennguyen@example.com', 'passwordhash17', 'Thiên Nguyễn', 'Đầu bếp và người yêu thích khám phá văn hóa.', 'https://profilepic17.com', '2021-05-25 14:20:00', 1, '2023-08-20 16:45:00'),
+    ('phuongtam', 'phuongtam@example.com', 'passwordhash18', 'Phương Tam', 'Nhiếp ảnh gia chuyên nghiệp, yêu thích nghệ thuật.', 'https://profilepic18.com', '2021-07-10 13:15:00', 1, '2023-08-22 09:00:00'),
+    ('tuananhx', 'tuananhx@example.com', 'passwordhash19', 'Tuấn Anh X', 'Kỹ sư phần mềm và người đam mê công nghệ.', 'https://profilepic19.com', '2022-01-18 15:40:00', 1, '2023-08-25 18:25:00'),
+    ('minhcuong', 'minhcuong@example.com', 'passwordhash20', 'Minh Cường', 'Blogger và reviewer sách.', 'https://profilepic20.com', '2022-03-12 10:50:00', 1, '2023-09-10 17:00:00');
+
 
 INSERT INTO CoreData.Roles (Rolename)
 VALUES
     ('Admin'),
     ('User'),
     ('Moderator');
-INSERT INTO CoreData.UserRole (RoleID, UserID)
+-- Dữ liệu mẫu cho bảng UserRole
+INSERT INTO CoreData.UserRole (RoleID, UserID, AssignedAt)
 VALUES
-    (1, 1),  -- Admin cho Nguyễn An
-    (2, 2),  -- User cho Hoàng Bùi
-    (3, 3),  -- Moderator cho Lân Hiền
-    (1, 4),  -- Admin cho Minh Hoàng
-    (2, 5),  -- User cho Thiện Thái
-    (3, 6),  -- Moderator cho Quang Hiếu
-    (1, 7),  -- Admin cho Thư Hoài
-    (2, 8),  -- User cho Tuấn Anh
-    (3, 9),  -- Moderator cho Hiền Lê
-    (1, 10), -- Admin cho Làn Anh
-    (2, 11), -- User cho Đạt Lương
-    (3, 12), -- Moderator cho Xương Linh
-    (1, 13), -- Admin cho Quyền Lê
-    (2, 14), -- User cho Hữu Thành
-    (3, 15), -- Moderator cho Kim Linh
-    (1, 16), -- Admin cho Văn Nhiên
-    (2, 17), -- User cho Vũ Thảo
-    (3, 18), -- Moderator cho Trọng Nhân
-    (1, 19), -- Admin cho Thục An
-    (2, 20); -- User cho Minh Tân
-INSERT INTO CoreData.Posts (UserID, Content, PostType, Location)
-VALUES
-    (1, N'Hôm nay mình đã hoàn thành khóa học về Machine Learning! Rất thú vị!', 'TEXT', N'Hà Nội'),
-    (2, N'Đây là bức ảnh mình chụp khi đi du lịch tại Sapa. Cảnh sắc quá đẹp!', 'PHOTO', 'Sapa'),
-    (3, N'Mới xem một bộ phim kinh dị cực kỳ hấp dẫn! Bạn nào thích thể loại này không?', 'TEXT', N'TP. Hồ Chí Minh'),
-    (4, N'Chào các bạn, đây là video chia sẻ về cách lập trình ứng dụng web với ReactJS.', 'VIDEO', N'Hà Nội'),
-    (5, N'Mình vừa thử món phở gà ở một quán mới, rất ngon!', 'TEXT', N'Đà Nẵng'),
-    (6, N'Mới quay xong một video hướng dẫn làm bánh mì. Mọi người vào xem nhé!', 'VIDEO', N'Hải Phòng'),
-    (7, N'Tối nay mình sẽ livestream chơi game. Ai muốn tham gia thì nhớ vào nhé!', 'TEXT', N'TP. Hồ Chí Minh'),
-    (8, N'Mình vừa học được một kỹ thuật vẽ mới, mọi người xem thử nhé!', 'PHOTO', N'Hà Nội'),
-    (9, N'Một buổi sáng đầy năng lượng! Hy vọng ngày mới sẽ thật tuyệt vời.', 'TEXT', N'Quảng Ninh'),
-    (10, N'Video hướng dẫn về cách sửa máy tính, các bạn có thể áp dụng để tự sửa tại nhà!', 'VIDEO',
-     N'TP. Hồ Chí Minh'),
-    (11, N'Mới mua được chiếc laptop mới, rất hài lòng với chất lượng và hiệu suất!', 'TEXT', N'Hà Nội'),
-    (12, N'Chuyến đi Đà Lạt tuyệt vời, cảnh đẹp không thể tin được!', 'PHOTO', N'Đà Lạt'),
-    (13, N'Tối nay sẽ có buổi chia sẻ về marketing trên Facebook, ai quan tâm thì đừng bỏ lỡ nhé!', 'TEXT',
-     N'TP. Hồ Chí Minh'),
-    (14, N'Video hướng dẫn cắt tóc tại nhà. Mọi người thử làm theo nhé!', 'VIDEO', N'Hà Nội'),
-    (15, N'Tập yoga vào mỗi sáng để tăng cường sức khỏe, bạn đã thử chưa?', 'TEXT', N'Hải Phòng'),
-    (16, N'Những khoảnh khắc đáng nhớ khi đi thăm quan cố đô Huế.', 'PHOTO', N'Huế'),
-    (17, N'Đọc sách để trau dồi kiến thức mỗi ngày. Bạn đang đọc sách gì?', 'TEXT', N'TP. Hồ Chí Minh'),
-    (18, N'Mới làm xong một video hướng dẫn về Photoshop, hi vọng mọi người sẽ thích!', 'VIDEO', N'Hà Nội'),
-    (19, N'Mới khám phá được một quán cà phê cực kỳ dễ thương, rất đáng để thử!', 'TEXT', N'Đà Nẵng'),
-    (20, N'Điều quan trọng trong cuộc sống là luôn giữ thái độ tích cực, hãy luôn mỉm cười!', 'TEXT',
-     N'TP. Hồ Chí Minh');
-INSERT INTO CoreData.Posts (UserID, Content, PostType, Location)
-VALUES
-    (1, N'Hôm nay mình đã hoàn thành khóa học về Machine Learning! Rất thú vị!', 'Education', N'Hà Nội'),
-    (2, N'Đây là bức ảnh mình chụp khi đi du lịch tại Sapa. Cảnh sắc quá đẹp!', 'Travel', 'Sapa'),
-    (3, N'Mới xem một bộ phim kinh dị cực kỳ hấp dẫn! Bạn nào thích thể loại này không?', 'Humor', N'TP. Hồ Chí Minh'),
-    (4, N'Chào các bạn, đây là video chia sẻ về cách lập trình ứng dụng web với ReactJS.', 'Education', N'Hà Nội'),
-    (5, N'Mình vừa thử món phở gà ở một quán mới, rất ngon!', 'Food', N'Đà Nẵng'),
-    (6, N'Mới quay xong một video hướng dẫn làm bánh mì. Mọi người vào xem nhé!', 'Food', N'Hải Phòng'),
-    (7, N'Tối nay mình sẽ livestream chơi game. Ai muốn tham gia thì nhớ vào nhé!', 'Humor', N'TP. Hồ Chí Minh'),
-    (8, N'Mình vừa học được một kỹ thuật vẽ mới, mọi người xem thử nhé!', 'Art', N'Hà Nội'),
-    (9, N'Một buổi sáng đầy năng lượng! Hy vọng ngày mới sẽ thật tuyệt vời.', 'Positive', N'Quảng Ninh'),
-    (10, N'Video hướng dẫn về cách sửa máy tính, các bạn có thể áp dụng để tự sửa tại nhà!', 'Education',
-     N'TP. Hồ Chí Minh'),
-    (11, N'Mới mua được chiếc laptop mới, rất hài lòng với chất lượng và hiệu suất!', 'Technology', N'Hà Nội'),
-    (12, N'Chuyến đi Đà Lạt tuyệt vời, cảnh đẹp không thể tin được!', 'Travel', N'Đà Lạt'),
-    (13, N'Tối nay sẽ có buổi chia sẻ về marketing trên Facebook, ai quan tâm thì đừng bỏ lỡ nhé!', 'Education',
-     N'TP. Hồ Chí Minh'),
-    (14, N'Video hướng dẫn cắt tóc tại nhà. Mọi người thử làm theo nhé!', 'DIY', N'Hà Nội'),
-    (15, N'Tập yoga vào mỗi sáng để tăng cường sức khỏe, bạn đã thử chưa?', 'Health', N'Hải Phòng'),
-    (16, N'Những khoảnh khắc đáng nhớ khi đi thăm quan cố đô Huế.', 'Travel', N'Huế'),
-    (17, N'Đọc sách để trau dồi kiến thức mỗi ngày. Bạn đang đọc sách gì?', 'Education', N'TP. Hồ Chí Minh'),
-    (18, N'Mới làm xong một video hướng dẫn về Photoshop, hi vọng mọi người sẽ thích!', 'Education', N'Hà Nội'),
-    (19, N'Mới khám phá được một quán cà phê cực kỳ dễ thương, rất đáng để thử!', 'Food', N'Đà Nẵng'),
-    (20, N'Điều quan trọng trong cuộc sống là luôn giữ thái độ tích cực, hãy luôn mỉm cười!', 'Positive',
-     N'TP. Hồ Chí Minh');
+    (1, 1, '2020-01-15 08:30:00'),  -- Admin cho Nguyễn An
+    (2, 2, '2020-03-22 14:45:20'),  -- User cho Hoàng Bùi
+    (3, 3, '2020-05-10 16:20:50'),  -- Moderator cho Lân Hiền
+    (1, 4, '2021-06-05 11:00:00'),  -- Admin cho Minh Hoàng
+    (2, 5, '2021-08-18 13:10:10'),  -- User cho Thiện Thái
+    (3, 6, '2021-10-25 09:30:05'),  -- Moderator cho Quang Hiếu
+    (1, 7, '2022-01-12 14:05:15'),  -- Admin cho Thư Hoài
+    (2, 8, '2022-03-17 17:40:30'),  -- User cho Tuấn Anh
+    (3, 9, '2022-05-21 11:55:00'),  -- Moderator cho Hiền Lê
+    (1, 10, '2022-07-25 08:25:50'), -- Admin cho Làn Anh
+    (2, 11, '2022-09-12 13:00:00'), -- User cho Đạt Lương
+    (3, 12, '2023-01-02 15:30:45'), -- Moderator cho Xương Linh
+    (1, 13, '2023-03-14 18:15:10'), -- Admin cho Quyền Lê
+    (2, 14, '2023-05-25 12:40:20'), -- User cho Hữu Thành
+    (3, 15, '2023-07-30 09:25:00'), -- Moderator cho Kim Linh
+    -- 5 người dùng đã bị xóa
+    (1, 16, '2021-02-20 10:30:00'),  -- Admin cho Khánh Hòa
+    (2, 17, '2021-05-25 14:20:00'),  -- User cho Thiên Nguyễn
+    (3, 18, '2021-07-10 13:15:00'),  -- Moderator cho Phương Tam
+    (1, 19, '2022-01-18 15:40:00'),  -- Admin cho Tuấn Anh X
+    (2, 20, '2022-03-12 10:50:00');  -- User cho Minh Cường
 
-INSERT INTO CoreData.PostMedia (PostID, MediaURL, MediaType, SortOrder)
+-- Dữ liệu mẫu cho bảng Posts với trạng thái đa dạng và UpdatedAt
+INSERT INTO CoreData.InteractableItems (ItemType, CreatedAt)
 VALUES
-    (1, 'https://example.com/media/photo1.jpg', 'PHOTO', 0),
-    (1, 'https://example.com/media/photo2.jpg', 'PHOTO', 1),
-    (2, 'https://example.com/media/photo3.jpg', 'PHOTO', 0),
-    (3, 'https://example.com/media/video1.mp4', 'VIDEO', 0),
-    (4, 'https://example.com/media/video2.mp4', 'VIDEO', 0),
-    (5, 'https://example.com/media/photo4.jpg', 'PHOTO', 0),
-    (6, 'https://example.com/media/photo5.jpg', 'PHOTO', 0),
-    (7, 'https://example.com/media/video3.mp4', 'VIDEO', 0),
-    (8, 'https://example.com/media/photo6.jpg', 'PHOTO', 0),
-    (9, 'https://example.com/media/photo7.jpg', 'PHOTO', 0),
-    (10, 'https://example.com/media/video4.mp4', 'VIDEO', 0),
-    (11, 'https://example.com/media/photo8.jpg', 'PHOTO', 0),
-    (12, 'https://example.com/media/photo9.jpg', 'PHOTO', 0),
-    (13, 'https://example.com/media/video5.mp4', 'VIDEO', 0),
-    (14, 'https://example.com/media/photo10.jpg', 'PHOTO', 0),
-    (15, 'https://example.com/media/photo11.jpg', 'PHOTO', 0),
-    (16, 'https://example.com/media/photo12.jpg', 'PHOTO', 0),
-    (17, 'https://example.com/media/video6.mp4', 'VIDEO', 0),
-    (18, 'https://example.com/media/photo13.jpg', 'PHOTO', 0),
-    (19, 'https://example.com/media/photo14.jpg', 'PHOTO', 0),
-    (20, 'https://example.com/media/video7.mp4', 'VIDEO', 0);
-INSERT INTO CoreData.Comments (PostID, UserID, ParentCommentID, Content)
+    -- Mục liên quan đến bài viết
+    ('POST', '2021-02-01 08:30:00'),
+    ('POST', '2021-03-05 12:45:00'),
+    ('POST', '2021-04-10 14:20:00'),
+    ('POST', '2021-05-15 16:00:00'),
+    ('POST', '2021-06-20 09:10:00'),
+    ('POST', '2021-07-25 11:30:00'),
+    ('POST', '2021-08-30 18:15:00'),
+    ('POST', '2021-09-10 13:45:00'),
+    ('POST', '2021-10-18 17:05:00'),
+    ('POST', '2021-11-25 15:25:00'),
+    ('POST', '2021-12-05 10:40:00'),
+    ('POST', '2022-01-10 09:55:00'),
+    ('POST', '2022-02-20 14:00:00'),
+    ('POST', '2022-03-05 16:30:00'),
+    ('POST', '2022-04-12 12:20:00'),
+    ('POST', '2022-05-15 08:40:00'),
+    ('POST', '2022-06-25 19:00:00'),
+    ('POST', '2022-07-18 11:10:00'),
+    ('POST', '2022-08-22 10:00:00'),
+    ('POST', '2022-09-30 14:50:00');
+INSERT INTO CoreData.Posts (UserID, InteractableItemID, Content, PostTopic, Location, IsArchived, CreatedAt, UpdatedAt, IsDeleted, DeletedAt)
 VALUES
-    (1, 2, NULL, N'Chúc mừng bạn đã hoàn thành khóa học!'),
-    (1, 3, NULL, N'Wow, nghe hấp dẫn quá! Có thể chia sẻ tài liệu được không?'),
-    (2, 4, NULL, N'Cảnh đẹp quá, mình cũng muốn đi Sapa!'),
-    (3, 5, NULL, N'Phim gì vậy bạn? Mình đang tìm phim mới để xem!'),
-    (4, 6, NULL, N'Video rất hay, mình đã thử theo cách của bạn và thành công!'),
-    (5, 7, NULL, N'Phở gà nghe hấp dẫn thật, mình sẽ ghé thử!'),
-    (6, 8, NULL, N'Mình cũng yêu thích làm bánh mì, chờ video hướng dẫn của bạn!'),
-    (7, 9, NULL, N'Mình sẽ tham gia livestream, bạn chơi game gì vậy?'),
-    (8, 10, NULL, N'Mình cũng đang học vẽ, video của bạn rất hữu ích!'),
-    (9, 11, NULL, N'Ngày mới tốt đẹp nhé bạn, luôn đầy năng lượng!'),
-    (10, 12, NULL, N'Video về sửa máy tính rất hay, cảm ơn bạn chia sẻ!'),
-    (11, 13, NULL, N'Chúc mừng bạn đã mua được laptop mới, nhìn xịn quá!'),
-    (12, 14, NULL, N'Đà Lạt đẹp quá, mình cũng muốn đi vào mùa này!'),
-    (13, 15, NULL, N'Chắc chắn sẽ tham gia buổi chia sẻ của bạn!'),
-    (14, 16, NULL, N'Mình sẽ thử cắt tóc theo hướng dẫn của bạn!'),
-    (15, 17, NULL, N'Tập yoga giúp sức khỏe rất tốt, mình cũng đang duy trì mỗi sáng!'),
-    (16, 18, NULL, N'Huế thật tuyệt vời, bạn có gợi ý gì cho chuyến đi không?'),
-    (17, 19, NULL, N'Mình cũng đang đọc một cuốn sách về phát triển bản thân!'),
-    (18, 20, NULL, N'Video Photoshop của bạn rất chi tiết, cảm ơn vì đã chia sẻ!'),
-    (19, 1, NULL, N'Quán cà phê đó mình cũng mới thử, quả thật rất đáng giá!'),
-    (20, 2, NULL, N'Đúng vậy, thái độ tích cực là chìa khóa để sống vui vẻ!');
-INSERT INTO CoreData.Reactions (PostID, UserID, ReactionType)
+    -- Bài viết hoạt động
+    (1, 1, 'Chào các bạn, mình là Nguyễn An!', 'Giới thiệu', 'Hà Nội', 0, '2021-02-01 08:30:00', '2021-02-02 09:00:00', 0, NULL),
+    (2, 2, 'Mình đang có một chuyến du lịch ở Sapa.', 'Du lịch', 'Sapa', 0, '2021-03-05 12:45:00', '2021-03-06 14:30:00', 0, NULL),
+    (3, 3, 'Bài viết về cuộc sống của mình!', 'Cuộc sống', 'Hồ Chí Minh', 0, '2021-04-10 14:20:00', '2021-04-11 15:00:00', 0, NULL),
+
+    -- Bài viết đã lưu trữ (IsArchived = 1)
+    (4, 4, 'Những suy nghĩ về công việc và cuộc sống.', 'Suy ngẫm', 'Đà Nẵng', 1, '2021-05-15 16:00:00', '2021-05-16 17:20:00', 0, NULL),
+    (5, 5, 'Mới làm một món ăn ngon tuyệt!', 'Ẩm thực', 'Hà Nội', 1, '2021-06-20 09:10:00', '2021-06-21 10:15:00', 0, NULL),
+    (6, 6, 'Sự kiện thú vị trong ngành công nghệ!', 'Công nghệ', 'Cần Thơ', 1, '2021-07-25 11:30:00', '2021-07-26 12:45:00', 0, NULL),
+
+    -- Bài viết đã xóa (IsDeleted = 1, DeletedAt không NULL)
+    (7, 7, 'Mới nhận được một giải thưởng từ cuộc thi!', 'Thành tựu', 'Hà Nội', 0, '2021-08-30 18:15:00', '2021-08-31 19:00:00', 1, '2021-09-01 09:00:00'),
+    (8, 8, 'Cảm nhận về một cuốn sách mới đọc.', 'Sách', 'Hồ Chí Minh', 0, '2021-09-10 13:45:00', '2021-09-11 14:10:00', 1, '2021-09-12 10:00:00'),
+
+    -- Bài viết đã xóa (IsDeleted = 1, DeletedAt không NULL)
+    (9, 9, 'Mình yêu thích việc học các ngôn ngữ mới!', 'Học tập', 'Hà Nội', 0, '2021-10-18 17:05:00', '2021-10-19 18:30:00', 1, '2021-10-20 14:30:00'),
+    (10, 10, 'Chia sẻ một số kinh nghiệm du lịch!', 'Du lịch', 'Sapa', 0, '2021-11-25 15:25:00', '2021-11-26 16:00:00', 1, '2021-11-28 13:00:00'),
+
+    -- Bài viết đã xóa và hết hạn (DeletedAt và IsDeleted = 1)
+    (11, 11, 'Thử nghiệm một công thức mới từ nhà bếp.', 'Ẩm thực', 'Hồ Chí Minh', 0, '2021-12-05 10:40:00', '2021-12-06 11:15:00', 1, '2021-12-10 16:00:00'),
+
+    -- Bài viết bình thường (IsArchived = 0, IsDeleted = 0)
+    (12, 12, 'Làm thế nào để nâng cao kỹ năng lập trình?', 'Lập trình', 'Đà Nẵng', 0, '2022-01-10 09:55:00', '2022-01-11 10:30:00', 0, NULL),
+    (13, 13, 'Chia sẻ về những bài học từ thất bại.', 'Học hỏi', 'Cần Thơ', 0, '2022-02-20 14:00:00', '2022-02-21 15:30:00', 0, NULL),
+
+    -- Bài viết đã xóa (IsDeleted = 1, DeletedAt không NULL)
+    (14, 14, 'Tham gia một dự án phát triển cộng đồng.', 'Cộng đồng', 'Hà Nội', 0, '2022-03-05 16:30:00', '2022-03-06 17:10:00', 1, '2022-03-07 12:00:00'),
+    (15, 15, 'Hướng dẫn cách tạo blog cá nhân với WordPress.', 'Hướng dẫn', 'Hồ Chí Minh', 0, '2022-04-12 12:20:00', '2022-04-13 13:00:00', 1, '2022-04-15 18:10:00'),
+
+    -- Bài viết đã lưu trữ (IsArchived = 1)
+    (16, 16, 'Mới mua chiếc máy tính mới, quá đã!', 'Công nghệ', 'Đà Nẵng', 1, '2022-05-15 08:40:00', '2022-05-16 09:30:00', 0, NULL),
+    (17, 17, 'Review về chuyến du lịch tại Phú Quốc.', 'Du lịch', 'Phú Quốc', 1, '2022-06-25 19:00:00', '2022-06-26 20:10:00', 0, NULL),
+
+    -- Bài viết bình thường (IsArchived = 0, IsDeleted = 0)
+    (18, 18, 'Sự kiện công nghệ sắp tới ở TP.HCM.', 'Công nghệ', 'Hồ Chí Minh', 0, '2022-07-18 11:10:00', '2022-07-19 12:25:00', 0, NULL),
+    (19, 19, 'Lập kế hoạch học tập cho năm mới.', 'Học tập', 'Hà Nội', 0, '2022-08-22 10:00:00', '2022-08-23 11:00:00', 0, NULL),
+
+    -- Bài viết đã xóa và hết hạn (IsDeleted = 1, DeletedAt không NULL)
+    (20, 20, 'Cảm nhận về bộ phim yêu thích gần đây.', 'Phim', 'Đà Nẵng', 0, '2022-09-30 14:50:00', '2022-10-01 15:30:00', 1, '2022-10-02 08:30:00');
+
+-- Dữ liệu mẫu cho bảng Stories
+INSERT INTO CoreData.Stories (UserID, MediaURL, MediaType, CreatedAt)
 VALUES
-    (1, 2, 'LIKE'),
-    (1, 3, 'LOVE'),
-    (2, 4, 'WOW'),
-    (3, 5, 'LIKE'),
-    (4, 6, 'WOW'),
-    (5, 7, 'LOVE'),
-    (6, 8, 'LIKE'),
-    (7, 9, 'LIKE'),
-    (8, 10, 'LOVE'),
-    (9, 11, 'LIKE'),
-    (10, 12, 'WOW'),
-    (11, 13, 'LOVE'),
-    (12, 14, 'WOW'),
-    (13, 15, 'LIKE'),
-    (14, 16, 'LOVE'),
-    (15, 17, 'WOW'),
-    (16, 18, 'LIKE'),
-    (17, 19, 'LOVE'),
-    (18, 20, 'WOW'),
-    (19, 1, 'LIKE'),
-    (20, 2, 'LOVE');
-INSERT INTO CoreData.Shares (PostID, UserID, SharedAt)
+    (1, 'https://example.com/images/story1.jpg', 'IMAGE', '2022-01-01 10:00:00'),
+    (2, 'https://example.com/videos/story2.mp4', 'VIDEO', '2022-02-10 14:30:00'),
+    (3, 'https://example.com/images/story3.jpg', 'IMAGE', '2022-03-20 08:15:00'),
+    (4, 'https://example.com/videos/story4.mp4', 'VIDEO', '2022-04-25 18:45:00'),
+    (5, 'https://example.com/images/story5.jpg', 'IMAGE', '2022-05-05 11:00:00'),
+    (6, 'https://example.com/videos/story6.mp4', 'VIDEO', '2022-06-15 16:25:00'),
+    (7, 'https://example.com/images/story7.jpg', 'IMAGE', '2022-07-20 07:50:00'),
+    (8, 'https://example.com/videos/story8.mp4', 'VIDEO', '2022-08-10 12:40:00'),
+    (9, 'https://example.com/images/story9.jpg', 'IMAGE', '2022-09-05 09:30:00'),
+    (10, 'https://example.com/videos/story10.mp4', 'VIDEO', '2022-10-12 17:15:00'),
+    (11, 'https://example.com/images/story11.jpg', 'IMAGE', '2022-11-01 13:00:00'),
+    (12, 'https://example.com/videos/story12.mp4', 'VIDEO', '2022-12-25 15:00:00'),
+    (13, 'https://example.com/images/story13.jpg', 'IMAGE', '2023-01-05 10:05:00'),
+    (14, 'https://example.com/videos/story14.mp4', 'VIDEO', '2023-02-10 14:10:00'),
+    (15, 'https://example.com/images/story15.jpg', 'IMAGE', '2023-03-03 19:20:00'),
+    (16, 'https://example.com/videos/story16.mp4', 'VIDEO', '2023-04-18 11:45:00'),
+    (17, 'https://example.com/images/story17.jpg', 'IMAGE', '2023-05-12 08:30:00'),
+    (18, 'https://example.com/videos/story18.mp4', 'VIDEO', '2023-06-25 13:00:00'),
+    (19, 'https://example.com/images/story19.jpg', 'IMAGE', '2023-07-30 10:10:00'),
+    (20, 'https://example.com/videos/story20.mp4', 'VIDEO', '2023-08-10 15:55:00');
+-- Dữ liệu cho bảng PostMedia với InteractableItemID bắt đầu từ 21
+INSERT INTO CoreData.InteractableItems (ItemType, CreatedAt)
 VALUES
-    (1, 2, GETDATE()),
-    (2, 3, GETDATE()),
-    (3, 4, GETDATE()),
-    (4, 5, GETDATE()),
-    (5, 6, GETDATE()),
-    (6, 7, GETDATE()),
-    (7, 8, GETDATE()),
-    (8, 9, GETDATE()),
-    (9, 10, GETDATE()),
-    (10, 11, GETDATE()),
-    (11, 12, GETDATE()),
-    (12, 13, GETDATE()),
-    (13, 14, GETDATE()),
-    (14, 15, GETDATE()),
-    (15, 16, GETDATE()),
-    (16, 17, GETDATE()),
-    (17, 18, GETDATE()),
-    (18, 19, GETDATE()),
-    (19, 20, GETDATE()),
-    (20, 1, GETDATE());
+    -- Mục liên quan đến ảnh/video của bài viết 1
+    ('MEDIA', '2021-02-01 08:30:00'),
+    ('MEDIA', '2021-02-01 08:40:00'),
+    ('MEDIA', '2021-03-05 12:45:00'),
+    ('MEDIA', '2021-03-05 12:55:00'),
+
+    -- Mục liên quan đến ảnh/video của bài viết 2
+    ('MEDIA', '2021-04-10 14:20:00'),
+    ('MEDIA', '2021-04-10 14:30:00'),
+
+    -- Mục liên quan đến ảnh/video của bài viết 3
+    ('MEDIA', '2021-05-15 16:00:00'),
+    ('MEDIA', '2021-05-15 16:10:00'),
+
+    -- Mục liên quan đến ảnh/video của bài viết 4
+    ('MEDIA', '2021-06-20 09:10:00'),
+    ('MEDIA', '2021-06-20 09:20:00'),
+
+    -- Mục liên quan đến ảnh/video của bài viết 5
+    ('MEDIA', '2021-07-25 11:30:00'),
+    ('MEDIA', '2021-07-25 11:40:00'),
+
+    -- Mục liên quan đến ảnh/video của bài viết 6
+    ('MEDIA', '2021-08-30 18:15:00'),
+    ('MEDIA', '2021-08-30 18:25:00'),
+
+    -- Mục liên quan đến ảnh/video của bài viết 7
+    ('MEDIA', '2021-09-10 13:45:00'),
+    ('MEDIA', '2021-09-10 13:55:00'),
+
+    -- Mục liên quan đến ảnh/video của bài viết 8
+    ('MEDIA', '2021-10-18 17:05:00'),
+    ('MEDIA', '2021-10-18 17:15:00'),
+
+    -- Mục liên quan đến ảnh/video của bài viết 9
+    ('MEDIA', '2021-11-25 15:25:00'),
+    ('MEDIA', '2021-11-25 15:35:00'),
+
+    -- Mục liên quan đến ảnh/video của bài viết 10
+    ('MEDIA', '2021-12-05 10:40:00'),
+    ('MEDIA', '2021-12-05 10:50:00'),
+
+    -- Mục liên quan đến ảnh/video của bài viết 11
+    ('MEDIA', '2022-01-10 09:55:00'),
+    ('MEDIA', '2022-01-10 10:05:00');
+INSERT INTO CoreData.PostMedia (PostID, InteractableItemID, MediaURL, MediaType, Caption, SortOrder)
+VALUES
+    (1, 21, 'https://example.com/media1.jpg', 'IMAGE', 'Ảnh đẹp từ chuyến đi biển', 0),
+    (1, 22, 'https://example.com/media2.jpg', 'IMAGE', 'Chuyến đi tuyệt vời', 1),
+    (2, 23, 'https://example.com/video1.mp4', 'VIDEO', 'Video giới thiệu sản phẩm mới', 0),
+    (2, 24, 'https://example.com/media3.jpg', 'IMAGE', 'Đừng bỏ lỡ sự kiện này!', 0),
+    (3, 25, 'https://example.com/media4.jpg', 'IMAGE', 'Cảnh hoàng hôn tuyệt vời', 0),
+    (3, 26, 'https://example.com/video2.mp4', 'VIDEO', 'Video vui nhộn từ buổi tiệc', 1),
+    (4, 27, 'https://example.com/media5.jpg', 'IMAGE', 'Cảm giác tuyệt vời khi leo núi', 0),
+    (4, 28, 'https://example.com/video3.mp4', 'VIDEO', 'Sự kiện thể thao cuối tuần', 0),
+    (5, 29, 'https://example.com/media6.jpg', 'IMAGE', 'Sản phẩm mới ra mắt', 0),
+    (6, 30, 'https://example.com/media7.jpg', 'IMAGE', 'Khám phá vẻ đẹp của thiên nhiên', 0),
+    (6, 31, 'https://example.com/video4.mp4', 'VIDEO', 'Buổi hòa nhạc mùa hè', 0),
+    (7, 32, 'https://example.com/media8.jpg', 'IMAGE', 'Bữa tiệc sinh nhật vui nhộn', 0),
+    (7, 33, 'https://example.com/video5.mp4', 'VIDEO', 'Phỏng vấn đặc biệt với diễn viên nổi tiếng', 1),
+    (8, 34, 'https://example.com/media9.jpg', 'IMAGE', 'Kỳ nghỉ hè tại Đà Lạt', 0),
+    (8, 35, 'https://example.com/video6.mp4', 'VIDEO', 'Chuyến du lịch sang trọng tại Phú Quốc', 0),
+    (9, 36, 'https://example.com/media10.jpg', 'IMAGE', 'Ảnh chụp từ sự kiện âm nhạc lớn', 0),
+    (9, 37, 'https://example.com/video7.mp4', 'VIDEO', 'Trải nghiệm thử xe mới', 1),
+    (10, 38, 'https://example.com/media11.jpg', 'IMAGE', 'Phong cảnh tuyệt đẹp ở Đà Nẵng', 0),
+    (10, 39, 'https://example.com/video8.mp4', 'VIDEO', 'Hướng dẫn sử dụng phần mềm mới', 0),
+    (11, 40, 'https://example.com/media12.jpg', 'IMAGE', 'Thưởng thức cà phê sáng tại Hà Nội', 0);
+
+
+-- Dữ liệu cho bảng Shares với InteractableItemID bắt đầu từ 41
+INSERT INTO CoreData.InteractableItems (ItemType, CreatedAt)
+VALUES
+    ('SHARE', '2023-10-01 12:00:00'),
+    ('SHARE', '2023-10-01 14:05:00'),
+    ('SHARE', '2023-10-01 15:30:00'),
+    ('SHARE', '2023-10-01 16:00:00'),
+    ('SHARE', '2023-10-02 09:10:00'),
+    ('SHARE', '2023-10-02 11:20:00'),
+    ('SHARE', '2023-10-02 12:30:00'),
+    ('SHARE', '2023-10-02 13:40:00'),
+    ('SHARE', '2023-10-02 14:50:00'),
+    ('SHARE', '2023-10-02 15:05:00'),
+    ('SHARE', '2023-10-03 08:00:00'),
+    ('SHARE', '2023-10-03 10:20:00'),
+    ('SHARE', '2023-10-03 11:30:00'),
+    ('SHARE', '2023-10-03 12:45:00'),
+    ('SHARE', '2023-10-03 13:50:00'),
+    ('SHARE', '2023-10-03 14:15:00'),
+    ('SHARE', '2023-10-03 14:40:00'),
+    ('SHARE', '2023-10-04 09:00:00'),
+    ('SHARE', '2023-10-04 10:30:00'),
+    ('SHARE', '2023-10-04 12:00:00');
+
+INSERT INTO CoreData.Shares (UserID, OriginalPostID, InteractableItemID, ShareCaption, CreatedAt)
+VALUES
+    (1, 1, 41, 'Chia sẻ bài viết tuyệt vời này!', '2023-10-01 12:00:00'),
+    (2, 2, 42, 'Mọi người không nên bỏ lỡ video này', '2023-10-01 14:05:00'),
+    (3, 3, 43, 'Bài viết rất hữu ích cho những ai đam mê công nghệ', '2023-10-01 15:30:00'),
+    (4, 4, 44, 'Chia sẻ những khoảnh khắc tuyệt vời của tôi', '2023-10-01 16:00:00'),
+    (5, 5, 45, 'Đừng quên tham gia sự kiện sắp tới nhé!', '2023-10-02 09:10:00'),
+    (6, 6, 46, 'Chuyến du lịch này thật đáng nhớ!', '2023-10-02 11:20:00'),
+    (7, 7, 47, 'Nhớ theo dõi để xem thêm các video mới', '2023-10-02 12:30:00'),
+    (8, 8, 48, 'Bài viết này nói về những điều quan trọng', '2023-10-02 13:40:00'),
+    (9, 9, 49, 'Rất vui vì sự kiện đã thành công ngoài mong đợi', '2023-10-02 14:50:00'),
+    (10, 10, 50, 'Bài viết này chia sẻ những kiến thức rất hữu ích', '2023-10-02 15:05:00'),
+    (11, 11, 51, 'Chuyến đi này khiến tôi cảm thấy thư giãn hơn bao giờ hết', '2023-10-03 08:00:00'),
+    (12, 12, 52, 'Đây là video tôi rất thích, mong mọi người xem thử', '2023-10-03 10:20:00'),
+    (13, 13, 53, 'Những sản phẩm mới ra mắt thật sự ấn tượng', '2023-10-03 11:30:00'),
+    (14, 14, 54, 'Thật tuyệt vời khi có thể cùng bạn bè chia sẻ bài viết này', '2023-10-03 12:45:00'),
+    (15, 15, 55, 'Chuyến du lịch này thật sự rất đáng giá', '2023-10-03 13:50:00'),
+    (16, 16, 56, 'Video này quá hay, tôi đã học được nhiều điều mới', '2023-10-03 14:15:00'),
+    (17, 17, 57, 'Nếu bạn chưa xem bài viết này thì thật tiếc đấy!', '2023-10-03 14:40:00'),
+    (18, 18, 58, 'Bài viết này rất nhiều thông tin hay ho về du lịch', '2023-10-04 09:00:00'),
+    (19, 19, 59, 'Mình thấy bài viết này rất ý nghĩa, chia sẻ cho mọi người!', '2023-10-04 10:30:00'),
+    (20, 20, 60, 'Hãy tham gia cuộc thi này để có cơ hội nhận giải thưởng lớn!', '2023-10-04 12:00:00');
+
+
+
+INSERT INTO CoreData.FeedItems (UserID, ItemID, ActivityType, ActorUserID, CreatedAt)
+VALUES
+    -- Hoạt động "CREATED" (Tạo bài viết mới)
+    (1, 1, 'CREATED', 1, '2023-10-01 08:30:00'),
+    (2, 2, 'CREATED', 2, '2023-10-01 09:00:00'),
+    (3, 3, 'CREATED', 3, '2023-10-01 10:00:00'),
+    (4, 4, 'CREATED', 4, '2023-10-01 11:15:00'),
+    (5, 5, 'CREATED', 5, '2023-10-02 09:30:00'),
+    (6, 6, 'CREATED', 6, '2023-10-02 10:45:00'),
+    (7, 7, 'CREATED', 7, '2023-10-02 12:00:00'),
+    (8, 8, 'CREATED', 8, '2023-10-02 13:30:00'),
+    (9, 9, 'CREATED', 9, '2023-10-02 15:00:00'),
+    (10, 10, 'CREATED', 10, '2023-10-02 16:30:00'),
+
+    -- Hoạt động "SHARED" (Chia sẻ bài viết)
+    (1, 1, 'SHARED', 1, '2023-10-01 12:00:00'),
+    (2, 2, 'SHARED', 2, '2023-10-01 14:05:00'),
+    (3, 3, 'SHARED', 3, '2023-10-01 15:30:00'),
+    (4, 4, 'SHARED', 4, '2023-10-01 16:00:00'),
+    (5, 5, 'SHARED', 5, '2023-10-02 09:10:00'),
+    (6, 6, 'SHARED', 6, '2023-10-02 11:20:00'),
+    (7, 7, 'SHARED', 7, '2023-10-02 12:30:00'),
+    (8, 8, 'SHARED', 8, '2023-10-02 13:40:00'),
+    (9, 9, 'SHARED', 9, '2023-10-02 14:50:00'),
+    (10, 10, 'SHARED', 10, '2023-10-02 15:05:00');
+
+-- Dữ liệu cho bảng Comments
+-- Dữ liệu cho bảng InteractableItems
+INSERT INTO CoreData.InteractableItems (ItemType, CreatedAt)
+VALUES
+    ('COMMENT', '2023-10-01 10:00:00'),
+    ('COMMENT', '2023-10-01 10:30:00'),
+    ('COMMENT', '2023-10-01 11:00:00'),
+    ('COMMENT', '2023-10-01 12:00:00'),
+    ('COMMENT', '2023-10-01 13:00:00'),
+    ('COMMENT', '2023-10-01 14:00:00'),
+    ('COMMENT', '2023-10-01 14:30:00'),
+    ('COMMENT', '2023-10-01 15:00:00'),
+    ('COMMENT', '2023-10-01 16:00:00'),
+    ('COMMENT', '2023-10-01 17:00:00'),
+    ('COMMENT', '2023-10-01 18:00:00'),
+    ('COMMENT', '2023-10-01 18:30:00'),
+    ('COMMENT', '2023-10-01 19:00:00'),
+    ('COMMENT', '2023-10-02 08:00:00'),
+    ('COMMENT', '2023-10-02 09:00:00'),
+    ('COMMENT', '2023-10-02 10:00:00'),
+    ('COMMENT', '2023-10-02 11:00:00'),
+    ('COMMENT', '2023-10-02 12:00:00'),
+    ('COMMENT', '2023-10-02 13:00:00'),
+    ('COMMENT', '2023-10-02 14:00:00');
+
+INSERT INTO CoreData.Comments (UserID, TargetInteractableItemID, OwnInteractableItemID, ParentCommentID, Content, CreatedAt, IsDeleted)
+VALUES
+    (1, 10, 61, NULL, 'Bài viết này thật tuyệt vời!', '2023-10-01 10:00:00', 0),
+    (2, 15, 62, NULL, 'Tôi đồng ý với bạn, rất hay!', '2023-10-01 10:30:00', 0),
+    (3, 20, 63, NULL, 'Cảm ơn bạn đã chia sẻ!', '2023-10-01 11:00:00', 0),
+    (4, 25, 64, NULL, 'Chủ đề này rất thú vị!', '2023-10-01 12:00:00', 0),
+    (5, 30, 65, NULL, 'Mình sẽ thử làm theo hướng dẫn của bạn.', '2023-10-01 13:00:00', 0),
+    (6, 35, 66, NULL, 'Bài viết này rất bổ ích, cảm ơn bạn!', '2023-10-01 14:00:00', 0),
+    (7, 40, 67, NULL, 'Thông tin rất chi tiết, cảm ơn vì đã chia sẻ!', '2023-10-01 14:30:00', 0),
+    (8, 45, 68, NULL, 'Mình thấy bài viết này có thể cải thiện thêm về...', '2023-10-01 15:00:00', 0),
+    (9, 50, 69, NULL, 'Đồng tình với bạn, rất bổ ích!', '2023-10-01 16:00:00', 0),
+    (10, 55, 70, NULL, 'Mình sẽ làm thử, cảm ơn bạn!', '2023-10-01 17:00:00', 0),
+    (1, 60, 71, 1, 'Cảm ơn bạn đã đóng góp ý kiến!', '2023-10-01 18:00:00', 0),
+    (2, 5, 72, 2, 'Mình rất thích phần chia sẻ của bạn!', '2023-10-01 18:30:00', 0),
+    (3, 12, 73, 3, 'Cảm ơn bạn đã tán thành với mình!', '2023-10-01 19:00:00', 0),
+    (4, 18, 74, 4, 'Mình thấy bài viết này có thể thêm phần giải thích nữa.', '2023-10-02 08:00:00', 0),
+    (5, 23, 75, 5, 'Bài viết hay quá, cảm ơn bạn đã chia sẻ!', '2023-10-02 09:00:00', 0),
+    (6, 28, 76, 6, 'Mình thấy bài viết này rất hữu ích!', '2023-10-02 10:00:00', 0),
+    (7, 32, 77, 7, 'Cảm ơn vì đã chia sẻ bài viết này, rất tuyệt!', '2023-10-02 11:00:00', 0),
+    (8, 38, 78, 8, 'Bài viết này rất hay nhưng có thể bổ sung thêm ví dụ.', '2023-10-02 12:00:00', 0),
+    (9, 42, 79, 9, 'Đây là bài viết tuyệt vời, tôi hoàn toàn đồng ý!', '2023-10-02 13:00:00', 0),
+    (10, 47, 80, 10, 'Cảm ơn bạn đã cung cấp thông tin chi tiết!', '2023-10-02 14:00:00', 0);
+
+
+INSERT INTO CoreData.Reactions (UserID, InteractableItemID, ReactionType, ReactedAt)
+VALUES
+    (1, 1, 'LIKE', '2023-10-01 10:00:00'),
+    (2, 2, 'LOVE', '2023-10-01 10:30:00'),
+    (3, 3, 'HAHA', '2023-10-01 11:00:00'),
+    (4, 4, 'WOW', '2023-10-01 12:00:00'),
+    (5, 5, 'SAD', '2023-10-01 13:00:00'),
+    (6, 6, 'ANGRY', '2023-10-01 14:00:00'),
+    (7, 7, 'LIKE', '2023-10-01 14:30:00'),
+    (8, 8, 'LOVE', '2023-10-01 15:00:00'),
+    (9, 9, 'HAHA', '2023-10-01 16:00:00'),
+    (10, 10, 'WOW', '2023-10-01 17:00:00'),
+    (1, 11, 'SAD', '2023-10-01 18:00:00'),
+    (2, 12, 'ANGRY', '2023-10-01 19:00:00'),
+    (3, 13, 'LIKE', '2023-10-02 08:00:00'),
+    (4, 14, 'LOVE', '2023-10-02 09:00:00'),
+    (5, 15, 'HAHA', '2023-10-02 10:00:00'),
+    (6, 16, 'WOW', '2023-10-02 11:00:00'),
+    (7, 17, 'SAD', '2023-10-02 12:00:00'),
+    (8, 18, 'ANGRY', '2023-10-02 13:00:00'),
+    (9, 19, 'LIKE', '2023-10-02 14:00:00'),
+    (10, 20, 'LOVE', '2023-10-02 15:00:00');
+
 INSERT INTO CoreData.PostTags (PostID, TaggedUserID, TaggedAt)
 VALUES
-    (1, 2, GETDATE()),
-    (1, 3, GETDATE()),
-    (2, 4, GETDATE()),
-    (3, 5, GETDATE()),
-    (4, 6, GETDATE()),
-    (5, 7, GETDATE()),
-    (6, 8, GETDATE()),
-    (7, 9, GETDATE()),
-    (8, 10, GETDATE()),
-    (9, 11, GETDATE()),
-    (10, 12, GETDATE()),
-    (11, 13, GETDATE()),
-    (12, 14, GETDATE()),
-    (13, 15, GETDATE()),
-    (14, 16, GETDATE()),
-    (15, 17, GETDATE()),
-    (16, 18, GETDATE()),
-    (17, 19, GETDATE()),
-    (18, 20, GETDATE()),
-    (19, 1, GETDATE()),
-    (20, 2, GETDATE());
+    (1, 2, '2023-10-01 09:00:00'),
+    (1, 3, '2023-10-01 09:15:00'),
+    (2, 4, '2023-10-01 10:00:00'),
+    (3, 5, '2023-10-01 10:30:00'),
+    (3, 6, '2023-10-01 11:00:00'),
+    (4, 7, '2023-10-01 11:30:00'),
+    (5, 8, '2023-10-01 12:00:00'),
+    (6, 9, '2023-10-01 12:30:00'),
+    (7, 10, '2023-10-01 13:00:00'),
+    (8, 11, '2023-10-01 13:30:00'),
+    (9, 12, '2023-10-01 14:00:00'),
+    (10, 13, '2023-10-01 14:30:00'),
+    (11, 14, '2023-10-02 08:00:00'),
+    (12, 15, '2023-10-02 08:30:00'),
+    (13, 16, '2023-10-02 09:00:00'),
+    (14, 17, '2023-10-02 09:30:00'),
+    (15, 18, '2023-10-02 10:00:00'),
+    (16, 19, '2023-10-02 10:30:00'),
+    (17, 20, '2023-10-02 11:00:00'),
+    (18, 2, '2023-10-02 11:30:00');
+
+INSERT INTO CoreData.Hashtags (TagName)
+VALUES
+    ('#love'),
+    ('#fun'),
+    ('#vacation'),
+    ('#workout'),
+    ('#foodie'),
+    ('#tech'),
+    ('#fitness'),
+    ('#travel'),
+    ('#friends'),
+    ('#family'),
+    ('#motivation'),
+    ('#music'),
+    ('#art'),
+    ('#fashion'),
+    ('#adventure'),
+    ('#sports'),
+    ('#health'),
+    ('#nature'),
+    ('#photography'),
+    ('#goodvibes');
+
+INSERT INTO CoreData.PostHashtags (PostID, HashtagID)
+VALUES
+    (1, 1),  -- PostID 1, Hashtag #love
+    (1, 2),  -- PostID 1, Hashtag #fun
+    (2, 3),  -- PostID 2, Hashtag #vacation
+    (3, 4),  -- PostID 3, Hashtag #workout
+    (4, 5),  -- PostID 4, Hashtag #foodie
+    (5, 6),  -- PostID 5, Hashtag #tech
+    (6, 7),  -- PostID 6, Hashtag #fitness
+    (7, 8),  -- PostID 7, Hashtag #travel
+    (8, 9),  -- PostID 8, Hashtag #friends
+    (9, 10), -- PostID 9, Hashtag #family
+    (10, 11),-- PostID 10, Hashtag #motivation
+    (11, 12),-- PostID 11, Hashtag #music
+    (12, 13),-- PostID 12, Hashtag #art
+    (13, 14),-- PostID 13, Hashtag #fashion
+    (14, 15),-- PostID 14, Hashtag #adventure
+    (15, 16),-- PostID 15, Hashtag #sports
+    (16, 17),-- PostID 16, Hashtag #health
+    (17, 18),-- PostID 17, Hashtag #nature
+    (18, 19),-- PostID 18, Hashtag #photography
+    (19, 20);-- PostID 19, Hashtag #goodvibes
+
 INSERT INTO CoreData.Follows (FollowerID, FollowingID, FollowedAt)
 VALUES
-    (1, 2, GETDATE()),
-    (1, 3, GETDATE()),
-    (2, 4, GETDATE()),
-    (3, 5, GETDATE()),
-    (4, 6, GETDATE()),
-    (5, 7, GETDATE()),
-    (6, 8, GETDATE()),
-    (7, 9, GETDATE()),
-    (8, 10, GETDATE()),
-    (9, 11, GETDATE()),
-    (10, 12, GETDATE()),
-    (11, 13, GETDATE()),
-    (12, 14, GETDATE()),
-    (13, 15, GETDATE()),
-    (14, 16, GETDATE()),
-    (15, 17, GETDATE()),
-    (16, 18, GETDATE()),
-    (17, 19, GETDATE()),
-    (18, 20, GETDATE()),
-    (19, 1, GETDATE()),
-    (20, 2, GETDATE());
+    (1, 2, '2025-10-01 10:30:00'),
+    (1, 3, '2025-10-02 09:15:00'),
+    (2, 1, '2025-09-30 11:00:00'),
+    (3, 4, '2025-10-03 13:30:00'),
+    (4, 5, '2025-10-04 14:10:00'),
+    (5, 6, '2025-10-05 15:00:00'),
+    (6, 7, '2025-10-06 16:20:00'),
+    (7, 8, '2025-10-07 17:25:00'),
+    (8, 9, '2025-10-08 18:35:00'),
+    (9, 10, '2025-10-09 19:45:00'),
+    (10, 11, '2025-10-10 20:10:00'),
+    (11, 12, '2025-10-11 21:15:00'),
+    (12, 13, '2025-10-12 22:00:00'),
+    (13, 14, '2025-10-13 23:20:00'),
+    (14, 15, '2025-10-14 08:00:00'),
+    (15, 16, '2025-10-15 09:45:00'),
+    (16, 17, '2025-10-16 10:15:00'),
+    (17, 18, '2025-10-17 11:30:00'),
+    (18, 19, '2025-10-18 12:00:00'),
+    (19, 20, '2025-10-19 14:10:00');
+
 INSERT INTO CoreData.Blocks (BlockerID, BlockedUserID, BlockedAt)
 VALUES
-    (1, 2, GETDATE()),
-    (2, 3, GETDATE()),
-    (3, 4, GETDATE()),
-    (4, 5, GETDATE()),
-    (5, 6, GETDATE()),
-    (6, 7, GETDATE()),
-    (7, 8, GETDATE()),
-    (8, 9, GETDATE()),
-    (9, 10, GETDATE()),
-    (10, 11, GETDATE()),
-    (11, 12, GETDATE()),
-    (12, 13, GETDATE()),
-    (13, 14, GETDATE()),
-    (14, 15, GETDATE()),
-    (15, 16, GETDATE()),
-    (16, 17, GETDATE()),
-    (17, 18, GETDATE()),
-    (18, 19, GETDATE()),
-    (19, 20, GETDATE()),
-    (20, 1, GETDATE());
+    (1, 3, '2025-10-01 10:30:00'),
+    (2, 4, '2025-10-02 09:15:00'),
+    (3, 5, '2025-10-03 11:00:00'),
+    (4, 6, '2025-10-04 12:30:00'),
+    (5, 7, '2025-10-05 13:40:00'),
+    (6, 8, '2025-10-06 14:50:00'),
+    (7, 9, '2025-10-07 15:25:00'),
+    (8, 10, '2025-10-08 16:00:00'),
+    (9, 11, '2025-10-09 17:30:00'),
+    (10, 12, '2025-10-10 18:10:00'),
+    (11, 13, '2025-10-11 19:00:00'),
+    (12, 14, '2025-10-12 20:20:00'),
+    (13, 15, '2025-10-13 21:00:00'),
+    (14, 16, '2025-10-14 22:15:00'),
+    (15, 17, '2025-10-15 08:45:00'),
+    (16, 18, '2025-10-16 09:10:00'),
+    (17, 19, '2025-10-17 10:30:00'),
+    (18, 20, '2025-10-18 11:40:00'),
+    (19, 2, '2025-10-19 12:00:00'),
+    (20, 1, '2025-10-20 14:00:00');
+
 INSERT INTO CoreData.Reports (ReporterID, ReportedPostID, ReportedCommentID, ReportedUserID, Reason, ReportStatus, ReportedAt)
 VALUES
-    (1, 2, NULL, NULL, N'Bài viết vi phạm chính sách', 'PENDING', GETDATE()),
-    (2, 3, NULL, NULL, N'Bài viết có nội dung khiêu dâm', 'PENDING', GETDATE()),
-    (3, 4, NULL, NULL, N'Lý do không rõ', 'PENDING', GETDATE()),
-    (4, NULL, 5, NULL, N'Bình luận chứa ngôn từ thô tục', 'PENDING', GETDATE()),
-    (5, 6, NULL, NULL, N'Spam, quảng cáo', 'PENDING', GETDATE()),
-    (6, 7, NULL, NULL, N'Bài viết sai sự thật', 'PENDING', GETDATE()),
-    (7, NULL, 8, NULL, N'Bình luận xúc phạm cá nhân', 'PENDING', GETDATE()),
-    (8, 9, NULL, NULL, N'Bài viết mang tính chính trị', 'PENDING', GETDATE()),
-    (9, NULL, 10, NULL, N'Bình luận gây hấn', 'PENDING', GETDATE()),
-    (10, 11, NULL, NULL, N'Lý do không rõ', 'PENDING', GETDATE()),
-    (11, 12, NULL, NULL, N'Bài viết gây hiểu lầm', 'PENDING', GETDATE()),
-    (12, 13, NULL, NULL, N'Bài viết kích động bạo lực', 'PENDING', GETDATE()),
-    (13, NULL, 14, NULL, N'Bình luận vi phạm quy định cộng đồng', 'PENDING', GETDATE()),
-    (14, 15, NULL, NULL, N'Bài viết có hình ảnh không phù hợp', 'PENDING', GETDATE()),
-    (15, 16, NULL, NULL, N'Bài viết mang nội dung xuyên tạc', 'PENDING', GETDATE()),
-    (16, NULL, 17, NULL, N'Bình luận vi phạm quyền riêng tư', 'PENDING', GETDATE()),
-    (17, 18, NULL, NULL, N'Bài viết xúc phạm tổ chức', 'PENDING', GETDATE()),
-    (18, NULL, 19, NULL, N'Bình luận mang tính phân biệt chủng tộc', 'PENDING', GETDATE()),
-    (19, 20, NULL, NULL, N'Bài viết có thông tin sai lệch', 'PENDING', GETDATE()),
-    (20, 1, NULL, NULL, N'Bài viết khích lệ hành vi phạm pháp', 'PENDING', GETDATE());
+    (1, 1, NULL, NULL, 'Spam content', 'PENDING', '2025-10-01 10:30:00'),
+    (2, 2, NULL, NULL, 'Offensive language', 'REVIEWED', '2025-10-02 12:00:00'),
+    (3, NULL, 3, NULL, 'Harassment', 'RESOLVED', '2025-10-03 13:15:00'),
+    (4, 4, NULL, NULL, 'Misinformation', 'PENDING', '2025-10-04 14:45:00'),
+    (5, 5, NULL, NULL, 'Hate speech', 'REJECTED', '2025-10-05 15:20:00'),
+    (6, NULL, 6, NULL, 'Threatening behavior', 'REVIEWED', '2025-10-06 16:30:00'),
+    (7, 7, NULL, NULL, 'Inappropriate content', 'PENDING', '2025-10-07 17:45:00'),
+    (8, NULL, 8, NULL, 'Harassment', 'PENDING', '2025-10-08 18:50:00'),
+    (9, 9, NULL, NULL, 'Violence', 'REVIEWED', '2025-10-09 19:10:00'),
+    (10, NULL, 10, NULL, 'Fake news', 'RESOLVED', '2025-10-10 20:00:00'),
+    (11, 11, NULL, NULL, 'Bullying', 'PENDING', '2025-10-11 21:30:00'),
+    (12, 12, NULL, NULL, 'Discriminatory', 'PENDING', '2025-10-12 22:00:00'),
+    (13, NULL, 13, NULL, 'Inappropriate comment', 'REJECTED', '2025-10-13 23:40:00'),
+    (14, 14, NULL, NULL, 'Explicit content', 'REVIEWED', '2025-10-14 08:20:00'),
+    (15, NULL, 15, NULL, 'Defamation', 'PENDING', '2025-10-15 09:00:00'),
+    (16, 16, NULL, NULL, 'Unsolicited advertisement', 'PENDING', '2025-10-16 10:15:00'),
+    (17, 17, NULL, NULL, 'Sexual content', 'REVIEWED', '2025-10-17 11:30:00'),
+    (18, NULL, 18, NULL, 'Threats of violence', 'REJECTED', '2025-10-18 12:45:00'),
+    (19, 19, NULL, NULL, 'Plagiarism', 'PENDING', '2025-10-19 13:25:00'),
+    (20, NULL, 20, NULL, 'Terroristic content', 'RESOLVED', '2025-10-20 14:35:00');
+
+INSERT INTO CoreData.Notifications (RecipientUserID, ActorUserID, NotificationType, TargetItemID, IsRead, CreatedAt)
+VALUES
+    (1, 2, 'NEW_COMMENT', 1, 0, '2025-10-01 10:30:00'),
+    (2, 3, 'NEW_REACTION', 2, 1, '2025-10-02 11:00:00'),
+    (3, 4, 'NEW_FOLLOWER', NULL, 0, '2025-10-03 12:30:00'),
+    (4, 5, 'POST_TAG', 3, 0, '2025-10-04 13:45:00'),
+    (5, 6, 'COMMENT_MENTION', 4, 1, '2025-10-05 14:20:00'),
+    (6, 7, 'NEW_COMMENT', 5, 0, '2025-10-06 15:30:00'),
+    (7, 8, 'NEW_REACTION', 6, 1, '2025-10-07 16:40:00'),
+    (8, 9, 'NEW_FOLLOWER', NULL, 0, '2025-10-08 17:50:00'),
+    (9, 10, 'POST_TAG', 7, 1, '2025-10-09 19:00:00'),
+    (10, 11, 'COMMENT_MENTION', 8, 0, '2025-10-10 20:00:00'),
+    (11, 12, 'NEW_COMMENT', 9, 1, '2025-10-11 21:15:00'),
+    (12, 13, 'NEW_REACTION', 10, 0, '2025-10-12 22:30:00'),
+    (13, 14, 'NEW_FOLLOWER', NULL, 1, '2025-10-13 23:45:00'),
+    (14, 15, 'POST_TAG', 11, 0, '2025-10-14 08:25:00'),
+    (15, 16, 'COMMENT_MENTION', 12, 1, '2025-10-15 09:10:00'),
+    (16, 17, 'NEW_COMMENT', 13, 0, '2025-10-16 10:20:00'),
+    (17, 18, 'NEW_REACTION', 14, 1, '2025-10-17 11:30:00'),
+    (18, 19, 'NEW_FOLLOWER', NULL, 0, '2025-10-18 12:00:00'),
+    (19, 20, 'POST_TAG', 15, 1, '2025-10-19 13:30:00'),
+    (20, 1, 'COMMENT_MENTION', 16, 0, '2025-10-20 14:15:00');
+
+
+
+
+

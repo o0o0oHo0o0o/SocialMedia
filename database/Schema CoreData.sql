@@ -1,6 +1,7 @@
 ﻿-- *******************************************************************
 -- SOCIAL MEDIA DATABASE
 -- *******************************************************************
+USE master
 ALTER DATABASE SocialMedia SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
 GO
 DROP DATABASE IF EXISTS SocialMedia;
@@ -191,26 +192,19 @@ GO
 CREATE TABLE CoreData.FeedItems (
     FeedItemID BIGINT PRIMARY KEY IDENTITY(1,1),
     UserID INT NOT NULL,
-    PostID INT NOT NULL,
+    ItemID INT NOT NULL,
     ActivityType NVARCHAR(20) NOT NULL 
         CHECK (ActivityType IN ('CREATED', 'SHARED')),
     ActorUserID INT NOT NULL,
-    ShareID BIGINT NULL,
     CreatedAt DATETIME DEFAULT GETDATE(),
     
     FOREIGN KEY (UserID) REFERENCES CoreData.Users(UserID),
-    FOREIGN KEY (PostID) REFERENCES CoreData.Posts(PostID),
     FOREIGN KEY (ActorUserID) REFERENCES CoreData.Users(UserID),
-    FOREIGN KEY (ShareID) REFERENCES CoreData.Shares(ShareID)
 );
 GO
 
 CREATE INDEX IX_FeedItems_UserID_CreatedAt 
 ON CoreData.FeedItems(UserID, CreatedAt DESC);
-GO
-
-CREATE INDEX IX_FeedItems_PostID 
-ON CoreData.FeedItems(PostID);
 GO
 
 -- *******************************************************************
