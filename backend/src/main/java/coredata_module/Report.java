@@ -1,10 +1,15 @@
 package coredata_module;
 
 import jakarta.persistence.*;
-import java.util.Date;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "Reports")
+@Setter
+@Getter
 public class Report {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -15,23 +20,23 @@ public class Report {
     private User reportUser;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ReportedPostID", nullable = true)
+    @JoinColumn(name = "ReportedPostID")
     private Post post;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ReportedCommentID", nullable = true)
+    @JoinColumn(name = "ReportedCommentID")
     private Comment comment;
 
     @ManyToOne
-    @JoinColumn(name = "ReportedUserID", nullable = true)
+    @JoinColumn(name = "ReportedUserID")
     private User reportedUser;
 
     @Column(name = "Reason", nullable = false)
     private String reason;
 
-    @Column(name = "ReportStatus", nullable = true)
+    @Column(name = "ReportStatus")
     private String reportStatus;
 
     @Column(name = "ReportedAt", nullable = false)
-    private Date reportedDate;
+    private LocalDateTime reportedLocalDateTime;
 }

@@ -1,9 +1,15 @@
 package coredata_module;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.util.List;
 
 @Entity
 @Table(name = "PostMedia")
+@Setter
+@Getter
 public class PostMedia {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -14,6 +20,10 @@ public class PostMedia {
     @JoinColumn(name = "PostID")
     private Post post;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "InteractableItemID")
+    private InteractableItems interactableItem;
+
     @Column(name = "MediaURL", unique = true, nullable = false)
     private String mediaURL;
 
@@ -23,43 +33,8 @@ public class PostMedia {
     @Column(name = "SortOrder", unique = true, nullable = false)
     private int sortOrder;
 
-    public int getPostMediaId() {
-        return postMediaId;
-    }
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "InteractableItemID",referencedColumnName = "InteractableItemID")
+    private List<Reaction> reactions;
 
-    public void setPostMediaId(int postMediaId) {
-        this.postMediaId = postMediaId;
-    }
-
-    public Post getPost() {
-        return post;
-    }
-
-    public void setPost(Post post) {
-        this.post = post;
-    }
-
-    public String getMediaURL() {
-        return mediaURL;
-    }
-
-    public void setMediaURL(String mediaURL) {
-        this.mediaURL = mediaURL;
-    }
-
-    public String getMediaType() {
-        return mediaType;
-    }
-
-    public void setMediaType(String mediaType) {
-        this.mediaType = mediaType;
-    }
-
-    public int getSortOrder() {
-        return sortOrder;
-    }
-
-    public void setSortOrder(int sortOrder) {
-        this.sortOrder = sortOrder;
-    }
 }

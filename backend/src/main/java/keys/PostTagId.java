@@ -1,4 +1,4 @@
-package Keys;
+package keys;
 
 import jakarta.persistence.Embeddable;
 
@@ -6,21 +6,21 @@ import java.io.Serializable;
 import java.util.Objects;
 
 @Embeddable
-public class ShareId implements Serializable {
-    private int  postId;
-    private int userId;
+public class PostTagId implements Serializable {
+    private int postId;
+    private int taggedUserId;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        ShareId shareId = (ShareId) o;
-        if (postId != shareId.postId) return false;
-        return userId == shareId.userId;
+        PostTagId postTagId = (PostTagId) o;
+        if (postId != postTagId.postId) return false;
+        return taggedUserId == postTagId.taggedUserId;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(postId, userId);
+        return Objects.hash(postId, taggedUserId);
     }
 }

@@ -1,12 +1,16 @@
 package coredata_module;
 
-import Keys.FollowId;
+import keys.FollowId;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "Follows", schema = "CoreData")
+@Setter
+@Getter
 public class Follow {
     @EmbeddedId
     private FollowId followId;
@@ -22,5 +26,6 @@ public class Follow {
     private User userFollowing;
 
     @Column(name = "FollowedAt",  nullable = false)
-    private Date followedDate;
+    private LocalDateTime followedLocalDateTime;
+
 }

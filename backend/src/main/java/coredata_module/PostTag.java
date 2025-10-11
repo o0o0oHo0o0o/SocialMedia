@@ -1,12 +1,16 @@
 package coredata_module;
 
-import Keys.PostTagId;
+import keys.PostTagId;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "PostTags")
+@Setter
+@Getter
 public class PostTag {
     @EmbeddedId
     private PostTagId postTagId;
@@ -22,6 +26,5 @@ public class PostTag {
     private User taggedUser;
 
     @Column(name = "TaggedAt", nullable = false)
-    private Date taggedDate;
-
+    private LocalDateTime taggedLocalDateTime;
 }

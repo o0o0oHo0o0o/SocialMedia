@@ -1,11 +1,15 @@
 package coredata_module;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "Shares")
+@Setter
+@Getter
 public class Share {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -13,14 +17,20 @@ public class Share {
     private int shareId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "PostID", nullable = false)
+    @JoinColumn(name = "OriginalPostID", nullable = false)
     private Post post;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "UserID", nullable = false)
     private User user;
 
-    @Column(name = "SharedAt", nullable = false)
-    private Date sharedDate;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "InteractableItemID")
+    private InteractableItems interactableItem;
 
+    @Column(name = "ShareCaption")
+    private String shareCaption;
+
+    @Column(name = "CreatedAt", nullable = false)
+    private LocalDateTime sharedLocalDateTime;
 }
