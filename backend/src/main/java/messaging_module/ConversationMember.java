@@ -1,26 +1,39 @@
 package messaging_module;
 
+import keys.ConversationMembersID;
 import coredata_module.User;
 import jakarta.persistence.*;
-
-import java.util.Date;
+import java.time.LocalDateTime;
+import lombok.Setter;
+import lombok.Getter;
 
 @Entity
 @Table(name = "ConversationMembers")
+@Getter
+@Setter
 public class ConversationMember {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ConversationMemberID", nullable = false)
-    private int  conversationId;
+    @EmbeddedId
+    private ConversationMembersID conversationMembersID;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ConversationID", nullable = false)
+    @MapsId("conversationID")
+    @JoinColumn(name = "conversationID", nullable = false)
     private Conversation conversation;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "UserID", nullable = false)
+    @MapsId("userID")
+    @JoinColumn(name = "userID", nullable = false)
     private User user;
 
+    @Column(name = "Nickname")
+    private String nickname;
+
+    @Column(name = "LastReadMessageID")
+    private String lastReadMessageID;
+
+    @Column(name = "MutedUntil")
+    private LocalDateTime  mutedUntil;
+
     @Column(name = "JoinedAt", nullable = false)
-    private Date joinedDate;
+    private LocalDateTime joinedLocalDateTime;
 }

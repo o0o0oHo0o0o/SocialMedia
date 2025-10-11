@@ -1,12 +1,14 @@
 package coredata_module;
 
-import Keys.BlockId;
+import keys.BlockId;
 import jakarta.persistence.*;
-
-import java.util.Date;
-
+import lombok.Getter;
+import lombok.Setter;
+import java.time.LocalDateTime;
 @Entity
 @Table(name = "Blocks")
+@Setter
+@Getter
 public class Block {
     @EmbeddedId
     private BlockId blockId;
@@ -22,5 +24,5 @@ public class Block {
     private User blockedUser;
 
     @Column(name = "BlockedAt", nullable = false)
-    private Date blockedDate;
+    private LocalDateTime blockedLocalDateTime;
 }

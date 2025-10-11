@@ -1,12 +1,20 @@
 package messaging_module;
 
+import coredata_module.InteractableItems;
+import coredata_module.Reaction;
 import coredata_module.User;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "Messages")
+@Getter
+@Setter
 public class Message {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,9 +29,29 @@ public class Message {
     @JoinColumn(name = "SenderID", nullable = false)
     private User sender;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "InteractableItemID")
+    private InteractableItems interactableItem;
+
+    @Column(name = "ReplyToMessageID")
+    private int replyToMessageID;
+
     @Column(name = "Content", nullable = false)
     private String content;
 
+    @Column(name = "MessageType")
+    private String messageType;
+
     @Column(name = "SentAt", nullable = false)
-    private Date sentDate;
+    private LocalDateTime sentLocalDateTime;
+
+    @Column(name = "isDeleted")
+    private boolean isDeleted;
+
+    @OneToMany(mappedBy = "message", fetch = FetchType.LAZY)
+    private Set<MessageMedia> messageMedia;
+
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "InteractableItemID", referencedColumnName = "InteractableItemID")
+    private List<Reaction> reactions;
 }

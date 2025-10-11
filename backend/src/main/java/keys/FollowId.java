@@ -1,4 +1,4 @@
-package Keys;
+package keys;
 
 import jakarta.persistence.Embeddable;
 
