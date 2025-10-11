@@ -46,8 +46,6 @@ BEGIN
 
     -- Delete InteractableItems when a Comment is deleted (both OwnInteractableItemID and TargetInteractableItemID are involved)
     DELETE FROM CoreData.InteractableItems WHERE InteractableItemID IN (SELECT OwnInteractableItemID FROM deleted)
-    -- Delete any comments replying to this comment
-    DELETE FROM CoreData.Comments WHERE ParentCommentID IN (SELECT CommentID FROM deleted);
 END;
 GO
 ---SHARE
