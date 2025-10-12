@@ -1,6 +1,7 @@
 ﻿-- *******************************************************************
 -- SOCIAL MEDIA DATABASE
 -- *******************************************************************
+USE master
 ALTER DATABASE SocialMedia SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
 GO
 DROP DATABASE IF EXISTS SocialMedia;
@@ -67,7 +68,7 @@ GO
 CREATE TABLE CoreData.InteractableItems (
     InteractableItemID BIGINT PRIMARY KEY IDENTITY(1,1),
     ItemType NVARCHAR(20) NOT NULL 
-        CHECK (ItemType IN ('POST', 'MEDIA', 'COMMENT', 'SHARE', 'MESSAGE')),
+        CHECK (ItemType IN ('POST', 'MEDIA', 'COMMENT', 'SHARE', 'MESSAGE', 'STORY')),
     CreatedAt DATETIME DEFAULT GETDATE()
 );
 GO
