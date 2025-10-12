@@ -1,4 +1,4 @@
-package messaging_module;
+package model.messaging_model;
 
 import jakarta.persistence.*;
 import lombok.Getter;

@@ -1,6 +1,6 @@
 package repository;
 
-import coredata_module.User;
+import model.coredata_model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

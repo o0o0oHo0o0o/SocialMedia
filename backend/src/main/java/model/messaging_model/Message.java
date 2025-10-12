@@ -1,8 +1,8 @@
-package messaging_module;
+package model.messaging_model;
 
-import coredata_module.InteractableItems;
-import coredata_module.Reaction;
-import coredata_module.User;
+import model.coredata_model.InteractableItems;
+import model.coredata_model.Reaction;
+import model.coredata_model.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

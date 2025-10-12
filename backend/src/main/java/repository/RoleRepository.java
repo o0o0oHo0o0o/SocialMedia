@@ -1,6 +1,6 @@
 package repository;
 
-import coredata_module.Role;
+import model.coredata_model.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
