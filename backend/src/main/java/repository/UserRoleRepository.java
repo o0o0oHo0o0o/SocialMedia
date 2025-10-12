@@ -1,9 +1,9 @@
 package repository;
 
 import keys.UserRoleId;
-import coredata_module.Role;
-import coredata_module.User;
-import coredata_module.UserRole;
+import model.coredata_model.Role;
+import model.coredata_model.User;
+import model.coredata_model.UserRole;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

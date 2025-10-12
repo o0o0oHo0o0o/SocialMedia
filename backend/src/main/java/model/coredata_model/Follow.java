@@ -1,4 +1,4 @@
-package coredata_module;
+package model.coredata_model;
 
 import keys.FollowId;
 import jakarta.persistence.*;

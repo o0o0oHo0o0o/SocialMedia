@@ -1,7 +1,7 @@
-package messaging_module;
+package model.messaging_model;
 
 import keys.PinnedMessagesID;
-import coredata_module.User;
+import model.coredata_model.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

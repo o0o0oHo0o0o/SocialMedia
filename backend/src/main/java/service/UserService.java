@@ -1,9 +1,9 @@
 package service;
 
-import coredata_module.Post;
-import coredata_module.Reaction;
-import coredata_module.Role;
-import coredata_module.User;
+import model.coredata_model.Post;
+import model.coredata_model.Reaction;
+import model.coredata_model.Role;
+import model.coredata_model.User;
 import org.springframework.stereotype.Service;
 import repository.RoleRepository;
 import repository.UserRepository;

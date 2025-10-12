@@ -1,4 +1,4 @@
-package coredata_module;
+package model.coredata_model;
 
 import keys.BlockId;
 import jakarta.persistence.*;

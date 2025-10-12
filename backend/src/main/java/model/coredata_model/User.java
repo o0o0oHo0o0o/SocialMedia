@@ -1,9 +1,9 @@
-package coredata_module;
+package model.coredata_model;
 
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import messaging_module.ConversationMember;
+import model.messaging_model.ConversationMember;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
