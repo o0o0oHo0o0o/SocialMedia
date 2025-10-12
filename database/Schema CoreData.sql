@@ -167,9 +167,9 @@ CREATE TABLE CoreData.Shares (
     ShareCaption NVARCHAR(500),
     CreatedAt DATETIME DEFAULT GETDATE(),
     
-    FOREIGN KEY (UserID) REFERENCES CoreData.Users(UserID),
-    FOREIGN KEY (OriginalPostID) REFERENCES CoreData.Posts(PostID),
-    FOREIGN KEY (InteractableItemID) REFERENCES CoreData.InteractableItems(InteractableItemID),
+    FOREIGN KEY (UserID) REFERENCES CoreData.Users(UserID) ON DELETE CASCADE,
+    FOREIGN KEY (OriginalPostID) REFERENCES CoreData.Posts(PostID) ON DELETE CASCADE,
+    FOREIGN KEY (InteractableItemID) REFERENCES CoreData.InteractableItems(InteractableItemID) ON DELETE CASCADE,
     
     UNIQUE (UserID, OriginalPostID)
 );
@@ -194,25 +194,19 @@ GO
 CREATE TABLE CoreData.FeedItems (
     FeedItemID BIGINT PRIMARY KEY IDENTITY(1,1),
     UserID INT NOT NULL,
-    PostID INT NOT NULL,
+    ItemID INT NOT NULL,
     ActivityType NVARCHAR(20) NOT NULL 
         CHECK (ActivityType IN ('CREATED', 'SHARED')),
     ActorUserID INT NOT NULL,
-    ItemID BIGINT NULL,
     CreatedAt DATETIME DEFAULT GETDATE(),
     
     FOREIGN KEY (UserID) REFERENCES CoreData.Users(UserID) ON DELETE CASCADE,
-    FOREIGN KEY (PostID) REFERENCES CoreData.Posts(PostID),
-    FOREIGN KEY (ActorUserID) REFERENCES CoreData.Users(UserID)
+    FOREIGN KEY (ActorUserID) REFERENCES CoreData.Users(UserID) ON DELETE CASCADE,
 );
 GO
 
 CREATE INDEX IX_FeedItems_UserID_CreatedAt 
 ON CoreData.FeedItems(UserID, CreatedAt DESC);
-GO
-
-CREATE INDEX IX_FeedItems_PostID 
-ON CoreData.FeedItems(PostID);
 GO
 
 -- *******************************************************************
@@ -231,11 +225,11 @@ CREATE TABLE CoreData.Comments (
     DeletedAt DATETIME2 NULL,
     FOREIGN KEY (UserID) REFERENCES CoreData.Users(UserID) ON DELETE CASCADE,
     FOREIGN KEY (TargetInteractableItemID) 
-        REFERENCES CoreData.InteractableItems(InteractableItemID),
+        REFERENCES CoreData.InteractableItems(InteractableItemID) ON DELETE CASCADE,
     FOREIGN KEY (OwnInteractableItemID) 
-        REFERENCES CoreData.InteractableItems(InteractableItemID) ON DELETE NO ACTION,
+        REFERENCES CoreData.InteractableItems(InteractableItemID) ON DELETE CASCADE,
     FOREIGN KEY (ParentCommentID) 
-        REFERENCES CoreData.Comments(CommentID)
+        REFERENCES CoreData.Comments(CommentID) ON DELETE CASCADE
 );
 GO
 
@@ -271,7 +265,7 @@ CREATE TABLE CoreData.Reactions (
         CHECK (ReactionType IN ('LIKE', 'LOVE', 'HAHA', 'WOW', 'SAD', 'ANGRY')),
     ReactedAt DATETIME DEFAULT GETDATE(),
     
-    FOREIGN KEY (UserID) REFERENCES CoreData.Users(UserID),
+    FOREIGN KEY (UserID) REFERENCES CoreData.Users(UserID) ON DELETE CASCADE,
     FOREIGN KEY (InteractableItemID) 
         REFERENCES CoreData.InteractableItems(InteractableItemID) ON DELETE CASCADE,
     
@@ -298,7 +292,7 @@ CREATE TABLE CoreData.PostTags (
     
     PRIMARY KEY (PostID, TaggedUserID),
     FOREIGN KEY (PostID) REFERENCES CoreData.Posts(PostID) ON DELETE CASCADE,
-    FOREIGN KEY (TaggedUserID) REFERENCES CoreData.Users(UserID)
+    FOREIGN KEY (TaggedUserID) REFERENCES CoreData.Users(UserID) ON DELETE CASCADE
 );
 GO
 
@@ -339,7 +333,7 @@ CREATE TABLE CoreData.Follows (
     
     PRIMARY KEY (FollowerID, FollowingID),
     FOREIGN KEY (FollowerID) REFERENCES CoreData.Users(UserID) ON DELETE CASCADE,
-    FOREIGN KEY (FollowingID) REFERENCES CoreData.Users(UserID),
+    FOREIGN KEY (FollowingID) REFERENCES CoreData.Users(UserID) ON DELETE CASCADE,
   
     CHECK (FollowerID <> FollowingID)
 );
@@ -357,7 +351,7 @@ CREATE TABLE CoreData.Blocks (
     
     PRIMARY KEY (BlockerID, BlockedUserID),
     FOREIGN KEY (BlockerID) REFERENCES CoreData.Users(UserID) ON DELETE CASCADE,
-    FOREIGN KEY (BlockedUserID) REFERENCES CoreData.Users(UserID),
+    FOREIGN KEY (BlockedUserID) REFERENCES CoreData.Users(UserID) ON DELETE CASCADE,
     
     CHECK (BlockerID <> BlockedUserID)
 );

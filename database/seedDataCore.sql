@@ -59,7 +59,6 @@ VALUES
     (1, 19, '2022-01-18 15:40:00'),  -- Admin cho Tuấn Anh X
     (2, 20, '2022-03-12 10:50:00');  -- User cho Minh Cường
 
-
 -- Dữ liệu mẫu cho bảng Posts với trạng thái đa dạng và UpdatedAt
 INSERT INTO CoreData.InteractableItems (ItemType, CreatedAt)
 VALUES
