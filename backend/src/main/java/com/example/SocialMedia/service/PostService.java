@@ -6,5 +6,5 @@ import org.springframework.stereotype.Service;
 
 @Service
 public interface PostService {
-    Post getPostById(long id);
+    Post getPostById(int id);
 }

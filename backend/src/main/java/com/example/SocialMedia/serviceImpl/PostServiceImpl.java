@@ -15,7 +15,7 @@ public class PostServiceImpl implements PostService {
     private PostRepository postRepository;
 
     @Override
-    public Post getPostById(long id) {
+    public Post getPostById(int id) {
         return postRepository.findByPostId(id)
                 .orElseThrow(() -> new RuntimeException("Post not found"));
     }

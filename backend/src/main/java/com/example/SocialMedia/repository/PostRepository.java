@@ -10,7 +10,7 @@ import java.util.Optional;
 @Repository
 public interface PostRepository extends JpaRepository<Post, Integer> {
     // Find a post by its ID
-    Optional<Post> findByPostId(long postId);
+    Optional<Post> findByPostId(int postId);
 
     // Find all posts by a specific user
     List<Post> findByUserUserName(String userName);
