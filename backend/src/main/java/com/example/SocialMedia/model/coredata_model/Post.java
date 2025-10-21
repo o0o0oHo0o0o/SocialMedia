@@ -50,9 +50,6 @@ public class Post {
     @Column(name = "DeletedAt")
     private LocalDateTime deletedLocalDateTime;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    private InteractableItems interactableItems;
-
     @OneToMany(mappedBy = "post", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<PostMedia> postMedias;
 

@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import java.time.LocalDateTime;
 @Entity
-@Table(name = "Blocks")
+@Table(name = "Blocks", schema = "CoreData")
 @Setter
 @Getter
 public class Block {
