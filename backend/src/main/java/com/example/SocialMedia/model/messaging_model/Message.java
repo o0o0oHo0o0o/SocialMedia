@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Set;
 
 @Entity
-@Table(name = "Messages")
+@Table(name = "Messages", schema = "Messaging")
 @Getter
 @Setter
 public class Message {

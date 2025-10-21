@@ -36,6 +36,7 @@ public class SecurityConfig {
     private final CorsProperties corsProperties;
     public static String[] PUBLIC_ENDPOINTS = {
             "/auth/**",
+            "/oauth2/**",
             "/api/public/**",
             "/health",
             "/actuator/health",
@@ -43,7 +44,8 @@ public class SecurityConfig {
             "/swagger-ui/**",
             "/v3/api-docs/**",
             "/swagger-resources/**",
-            "/webjars/**"
+            "/webjars/**",
+            "/api/post/**"
     };
     public static String[] ADMIN_ENDPOINTS = {
             "/api/admin/**"
