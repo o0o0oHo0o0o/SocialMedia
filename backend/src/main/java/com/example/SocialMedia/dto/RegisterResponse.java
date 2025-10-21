@@ -1,14 +1,14 @@
 package com.example.SocialMedia.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
-@Getter
-@Setter
+@Data
+@NoArgsConstructor
 @AllArgsConstructor
 public class RegisterResponse {
     private int id;
     private String username;
     private String message;
+    private String token;
+    private String refreshToken;
 }

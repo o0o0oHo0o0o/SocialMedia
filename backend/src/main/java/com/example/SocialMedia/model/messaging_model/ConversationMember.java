@@ -8,7 +8,7 @@ import lombok.Setter;
 import lombok.Getter;
 
 @Entity
-@Table(name = "ConversationMembers")
+@Table(name = "ConversationMembers", schema = "Messaging")
 @Getter
 @Setter
 public class ConversationMember {
@@ -29,7 +29,7 @@ public class ConversationMember {
     private String nickname;
 
     @Column(name = "LastReadMessageID")
-    private String lastReadMessageID;
+    private long lastReadMessageID;
 
     @Column(name = "MutedUntil")
     private LocalDateTime  mutedUntil;

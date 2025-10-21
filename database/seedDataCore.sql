@@ -126,28 +126,51 @@ VALUES
     (20, 20, 'Cảm nhận về bộ phim yêu thích gần đây.', 'Phim', 'Đà Nẵng', 0, '2022-09-30 14:50:00', '2022-10-01 15:30:00', 1, '2022-10-02 08:30:00');
 
 -- Dữ liệu mẫu cho bảng Stories
-INSERT INTO CoreData.Stories (UserID, MediaURL, MediaType, CreatedAt)
+INSERT INTO CoreData.InteractableItems (ItemType, CreatedAt)
 VALUES
-    (1, 'https://example.com/images/story1.jpg', 'IMAGE', '2022-01-01 10:00:00'),
-    (2, 'https://example.com/videos/story2.mp4', 'VIDEO', '2022-02-10 14:30:00'),
-    (3, 'https://example.com/images/story3.jpg', 'IMAGE', '2022-03-20 08:15:00'),
-    (4, 'https://example.com/videos/story4.mp4', 'VIDEO', '2022-04-25 18:45:00'),
-    (5, 'https://example.com/images/story5.jpg', 'IMAGE', '2022-05-05 11:00:00'),
-    (6, 'https://example.com/videos/story6.mp4', 'VIDEO', '2022-06-15 16:25:00'),
-    (7, 'https://example.com/images/story7.jpg', 'IMAGE', '2022-07-20 07:50:00'),
-    (8, 'https://example.com/videos/story8.mp4', 'VIDEO', '2022-08-10 12:40:00'),
-    (9, 'https://example.com/images/story9.jpg', 'IMAGE', '2022-09-05 09:30:00'),
-    (10, 'https://example.com/videos/story10.mp4', 'VIDEO', '2022-10-12 17:15:00'),
-    (11, 'https://example.com/images/story11.jpg', 'IMAGE', '2022-11-01 13:00:00'),
-    (12, 'https://example.com/videos/story12.mp4', 'VIDEO', '2022-12-25 15:00:00'),
-    (13, 'https://example.com/images/story13.jpg', 'IMAGE', '2023-01-05 10:05:00'),
-    (14, 'https://example.com/videos/story14.mp4', 'VIDEO', '2023-02-10 14:10:00'),
-    (15, 'https://example.com/images/story15.jpg', 'IMAGE', '2023-03-03 19:20:00'),
-    (16, 'https://example.com/videos/story16.mp4', 'VIDEO', '2023-04-18 11:45:00'),
-    (17, 'https://example.com/images/story17.jpg', 'IMAGE', '2023-05-12 08:30:00'),
-    (18, 'https://example.com/videos/story18.mp4', 'VIDEO', '2023-06-25 13:00:00'),
-    (19, 'https://example.com/images/story19.jpg', 'IMAGE', '2023-07-30 10:10:00'),
-    (20, 'https://example.com/videos/story20.mp4', 'VIDEO', '2023-08-10 15:55:00');
+    ('STORY', '2022-01-01 10:00:00'),
+    ('STORY', '2022-02-10 14:30:00'),
+    ('STORY', '2022-03-20 08:15:00'),
+    ('STORY', '2022-04-25 18:45:00'),
+    ('STORY', '2022-05-05 11:00:00'),
+    ('STORY', '2022-06-15 16:25:00'),
+    ('STORY', '2022-07-20 07:50:00'),
+    ('STORY', '2022-08-10 12:40:00'),
+    ('STORY', '2022-09-05 09:30:00'),
+    ('STORY', '2022-10-12 17:15:00'),
+    ('STORY', '2022-11-01 13:00:00'),
+    ('STORY', '2022-12-25 15:00:00'),
+    ('STORY', '2023-01-05 10:05:00'),
+    ('STORY', '2023-02-10 14:10:00'),
+    ('STORY', '2023-03-03 19:20:00'),
+    ('STORY', '2023-04-18 11:45:00'),
+    ('STORY', '2023-05-12 08:30:00'),
+    ('STORY', '2023-06-25 13:00:00'),
+    ('STORY', '2023-07-30 10:10:00'),
+    ('STORY', '2023-08-10 15:55:00');
+INSERT INTO CoreData.Stories (UserID, InteractableItemID, MediaURL, MediaType, CreatedAt)
+VALUES
+    (1, 21, 'https://example.com/images/story1.jpg', 'IMAGE', '2022-01-01 10:00:00'),
+    (2, 22, 'https://example.com/videos/story2.mp4', 'VIDEO', '2022-02-10 14:30:00'),
+    (3, 23, 'https://example.com/images/story3.jpg', 'IMAGE', '2022-03-20 08:15:00'),
+    (4, 24, 'https://example.com/videos/story4.mp4', 'VIDEO', '2022-04-25 18:45:00'),
+    (5, 25, 'https://example.com/images/story5.jpg', 'IMAGE', '2022-05-05 11:00:00'),
+    (6, 26, 'https://example.com/videos/story6.mp4', 'VIDEO', '2022-06-15 16:25:00'),
+    (7, 27, 'https://example.com/images/story7.jpg', 'IMAGE', '2022-07-20 07:50:00'),
+    (8, 28, 'https://example.com/videos/story8.mp4', 'VIDEO', '2022-08-10 12:40:00'),
+    (9, 29, 'https://example.com/images/story9.jpg', 'IMAGE', '2022-09-05 09:30:00'),
+    (10, 30, 'https://example.com/videos/story10.mp4', 'VIDEO', '2022-10-12 17:15:00'),
+    (11, 31, 'https://example.com/images/story11.jpg', 'IMAGE', '2022-11-01 13:00:00'),
+    (12, 32, 'https://example.com/videos/story12.mp4', 'VIDEO', '2022-12-25 15:00:00'),
+    (13, 33, 'https://example.com/images/story13.jpg', 'IMAGE', '2023-01-05 10:05:00'),
+    (14, 34, 'https://example.com/videos/story14.mp4', 'VIDEO', '2023-02-10 14:10:00'),
+    (15, 35, 'https://example.com/images/story15.jpg', 'IMAGE', '2023-03-03 19:20:00'),
+    (16, 36, 'https://example.com/videos/story16.mp4', 'VIDEO', '2023-04-18 11:45:00'),
+    (17, 37, 'https://example.com/images/story17.jpg', 'IMAGE', '2023-05-12 08:30:00'),
+    (18, 38, 'https://example.com/videos/story18.mp4', 'VIDEO', '2023-06-25 13:00:00'),
+    (19, 39, 'https://example.com/images/story19.jpg', 'IMAGE', '2023-07-30 10:10:00'),
+    (20, 40, 'https://example.com/videos/story20.mp4', 'VIDEO', '2023-08-10 15:55:00');
+
 -- Dữ liệu cho bảng PostMedia với InteractableItemID bắt đầu từ 21
 INSERT INTO CoreData.InteractableItems (ItemType, CreatedAt)
 VALUES
@@ -198,26 +221,27 @@ VALUES
     ('MEDIA', '2022-01-10 10:05:00');
 INSERT INTO CoreData.PostMedia (PostID, InteractableItemID, MediaURL, MediaType, Caption, SortOrder)
 VALUES
-    (1, 21, 'https://example.com/media1.jpg', 'IMAGE', 'Ảnh đẹp từ chuyến đi biển', 0),
-    (1, 22, 'https://example.com/media2.jpg', 'IMAGE', 'Chuyến đi tuyệt vời', 1),
-    (2, 23, 'https://example.com/video1.mp4', 'VIDEO', 'Video giới thiệu sản phẩm mới', 0),
-    (2, 24, 'https://example.com/media3.jpg', 'IMAGE', 'Đừng bỏ lỡ sự kiện này!', 0),
-    (3, 25, 'https://example.com/media4.jpg', 'IMAGE', 'Cảnh hoàng hôn tuyệt vời', 0),
-    (3, 26, 'https://example.com/video2.mp4', 'VIDEO', 'Video vui nhộn từ buổi tiệc', 1),
-    (4, 27, 'https://example.com/media5.jpg', 'IMAGE', 'Cảm giác tuyệt vời khi leo núi', 0),
-    (4, 28, 'https://example.com/video3.mp4', 'VIDEO', 'Sự kiện thể thao cuối tuần', 0),
-    (5, 29, 'https://example.com/media6.jpg', 'IMAGE', 'Sản phẩm mới ra mắt', 0),
-    (6, 30, 'https://example.com/media7.jpg', 'IMAGE', 'Khám phá vẻ đẹp của thiên nhiên', 0),
-    (6, 31, 'https://example.com/video4.mp4', 'VIDEO', 'Buổi hòa nhạc mùa hè', 0),
-    (7, 32, 'https://example.com/media8.jpg', 'IMAGE', 'Bữa tiệc sinh nhật vui nhộn', 0),
-    (7, 33, 'https://example.com/video5.mp4', 'VIDEO', 'Phỏng vấn đặc biệt với diễn viên nổi tiếng', 1),
-    (8, 34, 'https://example.com/media9.jpg', 'IMAGE', 'Kỳ nghỉ hè tại Đà Lạt', 0),
-    (8, 35, 'https://example.com/video6.mp4', 'VIDEO', 'Chuyến du lịch sang trọng tại Phú Quốc', 0),
-    (9, 36, 'https://example.com/media10.jpg', 'IMAGE', 'Ảnh chụp từ sự kiện âm nhạc lớn', 0),
-    (9, 37, 'https://example.com/video7.mp4', 'VIDEO', 'Trải nghiệm thử xe mới', 1),
-    (10, 38, 'https://example.com/media11.jpg', 'IMAGE', 'Phong cảnh tuyệt đẹp ở Đà Nẵng', 0),
-    (10, 39, 'https://example.com/video8.mp4', 'VIDEO', 'Hướng dẫn sử dụng phần mềm mới', 0),
-    (11, 40, 'https://example.com/media12.jpg', 'IMAGE', 'Thưởng thức cà phê sáng tại Hà Nội', 0);
+    (1, 41, 'https://example.com/media1.jpg', 'IMAGE', 'Ảnh đẹp từ chuyến đi biển', 0),
+    (1, 42, 'https://example.com/media2.jpg', 'IMAGE', 'Chuyến đi tuyệt vời', 1),
+    (2, 43, 'https://example.com/video1.mp4', 'VIDEO', 'Video giới thiệu sản phẩm mới', 0),
+    (2, 44, 'https://example.com/media3.jpg', 'IMAGE', 'Đừng bỏ lỡ sự kiện này!', 0),
+    (3, 45, 'https://example.com/media4.jpg', 'IMAGE', 'Cảnh hoàng hôn tuyệt vời', 0),
+    (3, 46, 'https://example.com/video2.mp4', 'VIDEO', 'Video vui nhộn từ buổi tiệc', 1),
+    (4, 47, 'https://example.com/media5.jpg', 'IMAGE', 'Cảm giác tuyệt vời khi leo núi', 0),
+    (4, 48, 'https://example.com/video3.mp4', 'VIDEO', 'Sự kiện thể thao cuối tuần', 0),
+    (5, 49, 'https://example.com/media6.jpg', 'IMAGE', 'Sản phẩm mới ra mắt', 0),
+    (6, 50, 'https://example.com/media7.jpg', 'IMAGE', 'Khám phá vẻ đẹp của thiên nhiên', 0),
+    (6, 51, 'https://example.com/video4.mp4', 'VIDEO', 'Buổi hòa nhạc mùa hè', 0),
+    (7, 52, 'https://example.com/media8.jpg', 'IMAGE', 'Bữa tiệc sinh nhật vui nhộn', 0),
+    (7, 53, 'https://example.com/video5.mp4', 'VIDEO', 'Phỏng vấn đặc biệt với diễn viên nổi tiếng', 1),
+    (8, 54, 'https://example.com/media9.jpg', 'IMAGE', 'Kỳ nghỉ hè tại Đà Lạt', 0),
+    (8, 55, 'https://example.com/video6.mp4', 'VIDEO', 'Chuyến du lịch sang trọng tại Phú Quốc', 0),
+    (9, 56, 'https://example.com/media10.jpg', 'IMAGE', 'Ảnh chụp từ sự kiện âm nhạc lớn', 0),
+    (9, 57, 'https://example.com/video7.mp4', 'VIDEO', 'Trải nghiệm thử xe mới', 1),
+    (10, 58, 'https://example.com/media11.jpg', 'IMAGE', 'Phong cảnh tuyệt đẹp ở Đà Nẵng', 0),
+    (10, 59, 'https://example.com/video8.mp4', 'VIDEO', 'Hướng dẫn sử dụng phần mềm mới', 0),
+    (11, 60, 'https://example.com/media12.jpg', 'IMAGE', 'Thưởng thức cà phê sáng tại Hà Nội', 0);
+
 
 
 -- Dữ liệu cho bảng Shares với InteractableItemID bắt đầu từ 41
@@ -246,26 +270,26 @@ VALUES
 
 INSERT INTO CoreData.Shares (UserID, OriginalPostID, InteractableItemID, ShareCaption, CreatedAt)
 VALUES
-    (1, 1, 41, 'Chia sẻ bài viết tuyệt vời này!', '2023-10-01 12:00:00'),
-    (2, 2, 42, 'Mọi người không nên bỏ lỡ video này', '2023-10-01 14:05:00'),
-    (3, 3, 43, 'Bài viết rất hữu ích cho những ai đam mê công nghệ', '2023-10-01 15:30:00'),
-    (4, 4, 44, 'Chia sẻ những khoảnh khắc tuyệt vời của tôi', '2023-10-01 16:00:00'),
-    (5, 5, 45, 'Đừng quên tham gia sự kiện sắp tới nhé!', '2023-10-02 09:10:00'),
-    (6, 6, 46, 'Chuyến du lịch này thật đáng nhớ!', '2023-10-02 11:20:00'),
-    (7, 7, 47, 'Nhớ theo dõi để xem thêm các video mới', '2023-10-02 12:30:00'),
-    (8, 8, 48, 'Bài viết này nói về những điều quan trọng', '2023-10-02 13:40:00'),
-    (9, 9, 49, 'Rất vui vì sự kiện đã thành công ngoài mong đợi', '2023-10-02 14:50:00'),
-    (10, 10, 50, 'Bài viết này chia sẻ những kiến thức rất hữu ích', '2023-10-02 15:05:00'),
-    (11, 11, 51, 'Chuyến đi này khiến tôi cảm thấy thư giãn hơn bao giờ hết', '2023-10-03 08:00:00'),
-    (12, 12, 52, 'Đây là video tôi rất thích, mong mọi người xem thử', '2023-10-03 10:20:00'),
-    (13, 13, 53, 'Những sản phẩm mới ra mắt thật sự ấn tượng', '2023-10-03 11:30:00'),
-    (14, 14, 54, 'Thật tuyệt vời khi có thể cùng bạn bè chia sẻ bài viết này', '2023-10-03 12:45:00'),
-    (15, 15, 55, 'Chuyến du lịch này thật sự rất đáng giá', '2023-10-03 13:50:00'),
-    (16, 16, 56, 'Video này quá hay, tôi đã học được nhiều điều mới', '2023-10-03 14:15:00'),
-    (17, 17, 57, 'Nếu bạn chưa xem bài viết này thì thật tiếc đấy!', '2023-10-03 14:40:00'),
-    (18, 18, 58, 'Bài viết này rất nhiều thông tin hay ho về du lịch', '2023-10-04 09:00:00'),
-    (19, 19, 59, 'Mình thấy bài viết này rất ý nghĩa, chia sẻ cho mọi người!', '2023-10-04 10:30:00'),
-    (20, 20, 60, 'Hãy tham gia cuộc thi này để có cơ hội nhận giải thưởng lớn!', '2023-10-04 12:00:00');
+    (1, 1, 61, 'Chia sẻ bài viết tuyệt vời này!', '2023-10-01 12:00:00'),
+    (2, 2, 62, 'Mọi người không nên bỏ lỡ video này', '2023-10-01 14:05:00'),
+    (3, 3, 63, 'Bài viết rất hữu ích cho những ai đam mê công nghệ', '2023-10-01 15:30:00'),
+    (4, 4, 64, 'Chia sẻ những khoảnh khắc tuyệt vời của tôi', '2023-10-01 16:00:00'),
+    (5, 5, 65, 'Đừng quên tham gia sự kiện sắp tới nhé!', '2023-10-02 09:10:00'),
+    (6, 6, 66, 'Chuyến du lịch này thật đáng nhớ!', '2023-10-02 11:20:00'),
+    (7, 7, 67, 'Nhớ theo dõi để xem thêm các video mới', '2023-10-02 12:30:00'),
+    (8, 8, 68, 'Bài viết này nói về những điều quan trọng', '2023-10-02 13:40:00'),
+    (9, 9, 69, 'Rất vui vì sự kiện đã thành công ngoài mong đợi', '2023-10-02 14:50:00'),
+    (10, 10, 70, 'Bài viết này chia sẻ những kiến thức rất hữu ích', '2023-10-02 15:05:00'),
+    (11, 11, 71, 'Chuyến đi này khiến tôi cảm thấy thư giãn hơn bao giờ hết', '2023-10-03 08:00:00'),
+    (12, 12, 72, 'Đây là video tôi rất thích, mong mọi người xem thử', '2023-10-03 10:20:00'),
+    (13, 13, 73, 'Những sản phẩm mới ra mắt thật sự ấn tượng', '2023-10-03 11:30:00'),
+    (14, 14, 74, 'Thật tuyệt vời khi có thể cùng bạn bè chia sẻ bài viết này', '2023-10-03 12:45:00'),
+    (15, 15, 75, 'Chuyến du lịch này thật sự rất đáng giá', '2023-10-03 13:50:00'),
+    (16, 16, 76, 'Video này quá hay, tôi đã học được nhiều điều mới', '2023-10-03 14:15:00'),
+    (17, 17, 77, 'Nếu bạn chưa xem bài viết này thì thật tiếc đấy!', '2023-10-03 14:40:00'),
+    (18, 18, 78, 'Bài viết này rất nhiều thông tin hay ho về du lịch', '2023-10-04 09:00:00'),
+    (19, 19, 79, 'Mình thấy bài viết này rất ý nghĩa, chia sẻ cho mọi người!', '2023-10-04 10:30:00'),
+    (20, 20, 80, 'Hãy tham gia cuộc thi này để có cơ hội nhận giải thưởng lớn!', '2023-10-04 12:00:00');
 
 
 
@@ -322,26 +346,26 @@ VALUES
 
 INSERT INTO CoreData.Comments (UserID, TargetInteractableItemID, OwnInteractableItemID, ParentCommentID, Content, CreatedAt, IsDeleted)
 VALUES
-    (1, 10, 61, NULL, 'Bài viết này thật tuyệt vời!', '2023-10-01 10:00:00', 0),
-    (2, 15, 62, NULL, 'Tôi đồng ý với bạn, rất hay!', '2023-10-01 10:30:00', 0),
-    (3, 20, 63, NULL, 'Cảm ơn bạn đã chia sẻ!', '2023-10-01 11:00:00', 0),
-    (4, 25, 64, NULL, 'Chủ đề này rất thú vị!', '2023-10-01 12:00:00', 0),
-    (5, 30, 65, NULL, 'Mình sẽ thử làm theo hướng dẫn của bạn.', '2023-10-01 13:00:00', 0),
-    (6, 35, 66, NULL, 'Bài viết này rất bổ ích, cảm ơn bạn!', '2023-10-01 14:00:00', 0),
-    (7, 40, 67, NULL, 'Thông tin rất chi tiết, cảm ơn vì đã chia sẻ!', '2023-10-01 14:30:00', 0),
-    (8, 45, 68, NULL, 'Mình thấy bài viết này có thể cải thiện thêm về...', '2023-10-01 15:00:00', 0),
-    (9, 50, 69, NULL, 'Đồng tình với bạn, rất bổ ích!', '2023-10-01 16:00:00', 0),
-    (10, 55, 70, NULL, 'Mình sẽ làm thử, cảm ơn bạn!', '2023-10-01 17:00:00', 0),
-    (1, 60, 71, 1, 'Cảm ơn bạn đã đóng góp ý kiến!', '2023-10-01 18:00:00', 0),
-    (2, 5, 72, 2, 'Mình rất thích phần chia sẻ của bạn!', '2023-10-01 18:30:00', 0),
-    (3, 12, 73, 3, 'Cảm ơn bạn đã tán thành với mình!', '2023-10-01 19:00:00', 0),
-    (4, 18, 74, 4, 'Mình thấy bài viết này có thể thêm phần giải thích nữa.', '2023-10-02 08:00:00', 0),
-    (5, 23, 75, 5, 'Bài viết hay quá, cảm ơn bạn đã chia sẻ!', '2023-10-02 09:00:00', 0),
-    (6, 28, 76, 6, 'Mình thấy bài viết này rất hữu ích!', '2023-10-02 10:00:00', 0),
-    (7, 32, 77, 7, 'Cảm ơn vì đã chia sẻ bài viết này, rất tuyệt!', '2023-10-02 11:00:00', 0),
-    (8, 38, 78, 8, 'Bài viết này rất hay nhưng có thể bổ sung thêm ví dụ.', '2023-10-02 12:00:00', 0),
-    (9, 42, 79, 9, 'Đây là bài viết tuyệt vời, tôi hoàn toàn đồng ý!', '2023-10-02 13:00:00', 0),
-    (10, 47, 80, 10, 'Cảm ơn bạn đã cung cấp thông tin chi tiết!', '2023-10-02 14:00:00', 0);
+    (1, 10, 81, NULL, 'Bài viết này thật tuyệt vời!', '2023-10-01 10:00:00', 0),
+    (2, 15, 82, NULL, 'Tôi đồng ý với bạn, rất hay!', '2023-10-01 10:30:00', 0),
+    (3, 20, 83, NULL, 'Cảm ơn bạn đã chia sẻ!', '2023-10-01 11:00:00', 0),
+    (4, 25, 84, NULL, 'Chủ đề này rất thú vị!', '2023-10-01 12:00:00', 0),
+    (5, 30, 85, NULL, 'Mình sẽ thử làm theo hướng dẫn của bạn.', '2023-10-01 13:00:00', 0),
+    (6, 35, 86, NULL, 'Bài viết này rất bổ ích, cảm ơn bạn!', '2023-10-01 14:00:00', 0),
+    (7, 40, 87, NULL, 'Thông tin rất chi tiết, cảm ơn vì đã chia sẻ!', '2023-10-01 14:30:00', 0),
+    (8, 45, 88, NULL, 'Mình thấy bài viết này có thể cải thiện thêm về...', '2023-10-01 15:00:00', 0),
+    (9, 50, 89, NULL, 'Đồng tình với bạn, rất bổ ích!', '2023-10-01 16:00:00', 0),
+    (10, 55, 90, NULL, 'Mình sẽ làm thử, cảm ơn bạn!', '2023-10-01 17:00:00', 0),
+    (1, 60, 91, 1, 'Cảm ơn bạn đã đóng góp ý kiến!', '2023-10-01 18:00:00', 0),
+    (2, 5, 92, 2, 'Mình rất thích phần chia sẻ của bạn!', '2023-10-01 18:30:00', 0),
+    (3, 12, 93, 3, 'Cảm ơn bạn đã tán thành với mình!', '2023-10-01 19:00:00', 0),
+    (4, 18, 94, 4, 'Mình thấy bài viết này có thể thêm phần giải thích nữa.', '2023-10-02 08:00:00', 0),
+    (5, 23, 95, 5, 'Bài viết hay quá, cảm ơn bạn đã chia sẻ!', '2023-10-02 09:00:00', 0),
+    (6, 28, 96, 6, 'Mình thấy bài viết này rất hữu ích!', '2023-10-02 10:00:00', 0),
+    (7, 32, 97, 7, 'Cảm ơn vì đã chia sẻ bài viết này, rất tuyệt!', '2023-10-02 11:00:00', 0),
+    (8, 38, 98, 8, 'Bài viết này rất hay nhưng có thể bổ sung thêm ví dụ.', '2023-10-02 12:00:00', 0),
+    (9, 42, 99, 9, 'Đây là bài viết tuyệt vời, tôi hoàn toàn đồng ý!', '2023-10-02 13:00:00', 0),
+    (10, 47, 100, 10, 'Cảm ơn bạn đã cung cấp thông tin chi tiết!', '2023-10-02 14:00:00', 0);
 
 
 INSERT INTO CoreData.Reactions (UserID, InteractableItemID, ReactionType, ReactedAt)

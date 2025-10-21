@@ -1,4 +1,4 @@
-package com.example.SocialMedia.service.serviceImpl;
+package com.example.SocialMedia.serviceImpl;
 
 import com.example.SocialMedia.model.coredata_model.Post;
 import com.example.SocialMedia.repository.PostRepository;
@@ -18,5 +18,4 @@ public class PostServiceImpl implements PostService {
     public Post getPostById(long id) {
         return postRepository.findByPostId(id)
                 .orElseThrow(() -> new RuntimeException("Post not found"));
-    }
 }

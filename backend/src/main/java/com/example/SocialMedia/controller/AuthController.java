@@ -27,7 +27,7 @@ public class AuthController {
 
         User savedUser = authService.register(user);
 
-        RegisterResponse registerRespone = new RegisterResponse(savedUser.getId(), savedUser.getUsername(), "User registered successfully!");
-        return new ResponseEntity<>(registerRespone, HttpStatus.CREATED);
+        RegisterResponse registerResponse = new RegisterResponse(savedUser.getId(), savedUser.getUsername(), "User registered successfully!", "", "");
+        return new ResponseEntity<>(registerResponse, HttpStatus.CREATED);
     }
 }
