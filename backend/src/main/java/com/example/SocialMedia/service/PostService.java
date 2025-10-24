@@ -1,5 +1,6 @@
 package com.example.SocialMedia.service;
 
+import com.example.SocialMedia.dto.PostRequest;
 import com.example.SocialMedia.model.coredata_model.Post;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -7,4 +8,5 @@ import org.springframework.stereotype.Service;
 @Service
 public interface PostService {
     Post getPostById(long id);
+    Post createPost(PostRequest postRequest);
 }
