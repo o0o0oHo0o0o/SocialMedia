@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 
 @Service
 public interface PostService {
-    Post getPostById(long id);
+    Post getPostById(Integer id);
     Post createPost(PostRequest postRequest);
+    List<Post> getPostByUserId(Integer id);
+    Post updatePost(PostRequest postRequest);
 }

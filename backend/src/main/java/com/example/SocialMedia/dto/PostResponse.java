@@ -13,5 +13,6 @@ public class PostResponse {
     private String postTopic;
     private String location;
     private String username; // from User
+    private LocalDateTime updatedAt;
     private LocalDateTime createdAt;
 }
