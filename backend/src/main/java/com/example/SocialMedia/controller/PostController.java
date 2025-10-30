@@ -1,10 +1,8 @@
 package com.example.SocialMedia.controller;
 
-import com.example.SocialMedia.model.coredata_model.Post;
 import com.example.SocialMedia.dto.PostRequest;
 import com.example.SocialMedia.dto.PostResponse;
 import com.example.SocialMedia.service.PostService;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,46 +26,35 @@ public class PostController {
     //Get a post by ID
     @GetMapping("/{id}")
     public PostResponse getPostById(@PathVariable int id) {
-        // Fetch post from the service layer
-        Post post = postService.getPostById(id);
-
-        // Convert Post entity to PostResponse DTO
-        PostResponse response = new PostResponse();
-        response.setId(post.getPostId());
-        response.setContent(post.getContent());
-        response.setPostTopic(post.getPostTopic());
-        response.setLocation(post.getLocation());
-        response.setUsername(post.getUser().getUsername());  // Assuming 'User' has 'username'
-        response.setCreatedAt(post.getCreatedLocalDateTime());
-        response.setUpdatedAt(post.getUpdatedLocalDateTime());
-        return response;
+        return postService.getPostById(id);
     }
     // New POST method to create a post
     @PostMapping
     public PostResponse createPost(@RequestBody PostRequest postRequest) {
         // Create the post using the service
         postRequest.setCreatedAt(LocalDateTime.now());
-        Post createdPost = postService.createPost(postRequest);
-
-        // Return a successful response with the PostResponse DTO
-        return getPostById(createdPost.getPostId());
+        return postService.createPost(postRequest);
     }
     // Get posts from a user
     @GetMapping("/user/{id}")
     public List<PostResponse> getPostByUserId(@PathVariable int id) {
-        List<PostResponse> postResponses = new ArrayList<>();
-        List<Post> posts = postService.getPostByUserId(id);
-        for (Post post : posts) {
-            postResponses.add(getPostById(post.getPostId()));
-        }
-        return postResponses;
+        return postService.getPostByUserId(id);
     }
     // Update a post
     @PostMapping("/{id}")
     public PostResponse updatePost(@PathVariable Integer id, @RequestBody PostRequest postRequest) {
         postRequest.setPostId(id);
         postRequest.setUpdatedAt(LocalDateTime.now());
-        Post updatedPost = postService.updatePost(postRequest);
-        return getPostById(updatedPost.getPostId());
+        return postService.updatePost(postRequest);
+    }
+    // Delete a post
+    @DeleteMapping("/{id}")
+    public String deletePost(@PathVariable int id) {
+        try {
+            postService.deletePost(id);
+            return "Post deleted successfully";
+        } catch (Exception e) {
+            return "Post not found";
+        }
     }
 }
