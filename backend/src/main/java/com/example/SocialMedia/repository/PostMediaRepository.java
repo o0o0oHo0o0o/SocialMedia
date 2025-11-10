@@ -9,5 +9,6 @@ import java.util.List;
 
 @Repository
 public interface PostMediaRepository extends JpaRepository<PostMedia, Integer> {
+    PostMedia findPostMediaByPostMediaId(Integer postMediaId);
     List<PostMedia> findByPost(Post post);
 }

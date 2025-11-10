@@ -1,39 +1,76 @@
 package com.example.SocialMedia;
 
-import com.example.SocialMedia.model.coredata_model.Post;
-import com.example.SocialMedia.repository.PostRepository;
-import com.example.SocialMedia.service.serviceImpl.PostServiceImpl;
+
+import com.example.SocialMedia.controller.PostController;
+import com.example.SocialMedia.exception.FileTooLargeException;
+import com.example.SocialMedia.exception.TooManyFileException;
+import com.example.SocialMedia.service.PostService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.junit.jupiter.api.extension.ExtendWith;        // For @ExtendWith annotation (JUnit 5 extension)
-import org.mockito.InjectMocks;                         // For @InjectMocks annotation
-import org.mockito.Mock;                                // For @Mock annotation
-import org.mockito.junit.jupiter.MockitoExtension;
-import java.util.Optional;
+import org.springframework.web.multipart.MultipartFile;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith(MockitoExtension.class)
-class PostServiceImplTest {
+class PostControllerTest {
 
-    @Mock
-    private PostRepository postRepository;
+    private static final int MAX_FILE = 10; // maximum number of files allowed
+    private static final long MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB in bytes
 
-    @InjectMocks
-    private PostServiceImpl postService;
+    private PostController postController;
+
+    @BeforeEach
+    void setUp() {
+        // Mock the PostService (no need to use it for testing checkUploadedFile method)
+        PostService postService = mock(PostService.class);
+        postController = new PostController(postService); // Instantiate PostController
+    }
 
     @Test
-    void testGetPostById() {
-        Post post = new Post();
-        post.setPostId(1);
-        post.setContent("Example content");
+    void testCheckUploadedFile_withTooManyFiles() {
+        // Simulate the scenario where the number of files exceeds the allowed MAX_FILE limit
+        MultipartFile[] files = new MultipartFile[MAX_FILE + 1]; // More than MAX_FILE
+        for (int i = 0; i < files.length; i++) {
+            files[i] = mock(MultipartFile.class); // Mock each file
+        }
 
-        when(postRepository.findByPostId(1)).thenReturn(Optional.of(post));
+        // Assert that TooManyFileException is thrown
+        TooManyFileException exception = assertThrows(TooManyFileException.class, () -> {
+            postController.checkUploadedFile(files); // Call the method directly
+        });
 
-        Post result = postService.getPostById(1);
+        assertEquals("File exceeds maximum number of 10", exception.getMessage());
+    }
 
-        assertEquals("Example content", result.getContent());
+    @Test
+    void testCheckUploadedFile_withFileExceedsMaxSize() {
+        // Simulate a file whose size exceeds the MAX_FILE_SIZE
+        MultipartFile file = mock(MultipartFile.class);
+        when(file.getSize()).thenReturn(MAX_FILE_SIZE + 1); // Simulate a file size greater than MAX_FILE_SIZE
+
+        MultipartFile[] files = {file}; // One file larger than the max size
+
+        // Assert that FileTooLargeException is thrown
+        FileTooLargeException exception = assertThrows(FileTooLargeException.class, () -> {
+            postController.checkUploadedFile(files); // Call the method directly
+        });
+
+        assertEquals("File exceeds maximum size limit of 10MB", exception.getMessage());
+    }
+
+    @Test
+    void testCheckUploadedFile_withValidFiles() {
+        // Simulate valid files that don't exceed the size or number limits
+        MultipartFile file1 = mock(MultipartFile.class);
+        MultipartFile file2 = mock(MultipartFile.class);
+
+        // File sizes are within the valid range (less than MAX_FILE_SIZE)
+        when(file1.getSize()).thenReturn((long) (5 * 1024 * 1024)); // 5MB
+        when(file2.getSize()).thenReturn((long) (8 * 1024 * 1024)); // 8MB
+
+        MultipartFile[] files = {file1, file2};
+
+        // No exception should be thrown
+        assertDoesNotThrow(() -> postController.checkUploadedFile(files)); // Call the method directly
     }
 }

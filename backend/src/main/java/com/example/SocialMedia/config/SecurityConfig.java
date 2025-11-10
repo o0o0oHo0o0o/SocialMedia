@@ -46,7 +46,8 @@ public class SecurityConfig {
             "/swagger-resources/**",
             "/webjars/**",
             "/api/posts/**",
-            "/error/**"
+            "/error/**",
+            "/uploads/**",
     };
     public static String[] ADMIN_ENDPOINTS = {
             "/api/admin/**"

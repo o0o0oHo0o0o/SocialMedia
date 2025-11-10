@@ -2,6 +2,7 @@ package com.example.SocialMedia.dto;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 
@@ -10,6 +11,8 @@ import java.time.LocalDateTime;
 public class PostRequest {
     private Integer postId;
     private String content;
+    private MultipartFile[] medias;
+    private int[] deleteMedia;
     private String postTopic;
     private String location;
     private Integer userID;

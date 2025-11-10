@@ -5,10 +5,13 @@ import com.example.SocialMedia.dto.PostRequest;
 import com.example.SocialMedia.dto.PostResponse;
 import com.example.SocialMedia.model.coredata_model.*;
 import com.example.SocialMedia.repository.*;
+import com.example.SocialMedia.service.InteractableItemService;
+import com.example.SocialMedia.service.PostMediaService;
 import com.example.SocialMedia.service.PostService;
-import com.example.SocialMedia.service.UserService;
+import io.jsonwebtoken.io.IOException;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,30 +20,56 @@ import java.util.List;
 public class PostServiceImpl implements PostService {
 
     private final PostRepository postRepository;
-    private final InteractableItemsRepository interactableItemsRepository;
     private final UserRepository userRepository;
     private final PostMediaRepository postMediaRepository;
     private final ReactionRepository reactionRepository;
     private final CommentRepository commentRepository;
     private final ShareRepository shareRepository;
-
+    private final InteractableItemService interactableItemService;
+    private final PostMediaService postMediaService;
     @Autowired
     public PostServiceImpl(PostRepository postRepository,
-                           InteractableItemsRepository interactableItemsRepository,
                            UserRepository userRepository,
                            PostMediaRepository postMediaRepository,
                            ReactionRepository reactionRepository,
                            CommentRepository commentRepository,
-                           ShareRepository shareRepository) {
+                           ShareRepository shareRepository,
+                           InteractableItemService interactableItemService,
+                           PostMediaService postMediaService) {
         this.postRepository = postRepository;
-        this.interactableItemsRepository = interactableItemsRepository;
         this.userRepository = userRepository;
         this.postMediaRepository = postMediaRepository;
         this.reactionRepository = reactionRepository;
         this.commentRepository = commentRepository;
         this.shareRepository = shareRepository;
+        this.interactableItemService = interactableItemService;
+        this.postMediaService = postMediaService;
     }
 
+    private void createMultiMedia(MultipartFile[] medias, Post post) throws IOException {
+        if (!(medias != null && medias.length > 0)) {
+            return;
+        }
+        for (MultipartFile media : medias){
+            try {
+                postMediaService.createPostMedia(media, post);
+            } catch (java.io.IOException e) {
+                // Handle the exception: log, rethrow, or return an error message
+                System.err.println("Error while creating post media: " + e.getMessage());
+                // Optionally, throw a runtime exception if you want to fail the operation
+                throw new RuntimeException("Error while handling media file upload", e);
+            }
+        }
+    }
+    private void deleteMultiMedia(int[] ids) throws IOException {
+        if (!(ids != null && ids.length > 0)) {
+            return;
+        }
+        for (int mediaId : ids){
+            PostMedia media = postMediaRepository.findPostMediaByPostMediaId(mediaId);
+            postMediaService.deletePostMedia(media);
+        }
+    }
     @Override
     public PostResponse getPostById(Integer id) {
         Post post = postRepository.findByPostId(id)
@@ -72,16 +101,13 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public PostResponse createPost(PostRequest postRequest) {
+    public PostResponse createPost(PostRequest postRequest){
         // Find user by username (if username exists)
         User user = userRepository.findById(postRequest.getUserID())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // Find interactable item (assuming you have logic to fetch it)
-        InteractableItems item = new InteractableItems();
-        item.setItemType("POST");
-        item.setCreatedAt(postRequest.getCreatedAt());
-        interactableItemsRepository.save(item);
+        // Create Interactable Item
+        InteractableItems item = interactableItemService.createInteractableItems("POST", postRequest.getCreatedAt());
 
         // Create new Post entity
         Post post = new Post();
@@ -94,6 +120,10 @@ public class PostServiceImpl implements PostService {
 
         // Save the post using the repository
         post =  postRepository.save(post);
+
+        //Save post media
+        createMultiMedia(postRequest.getMedias(), post);
+
         return getPostById(post.getPostId());
     }
 
@@ -131,12 +161,10 @@ public class PostServiceImpl implements PostService {
 
         // Save the post using the repository
         postRepository.save(post);
-        return getPostById(post.getPostId());
-    }
 
-    @Override
-    public List<PostMedia> findMediaByPost(Post post){
-        return postMediaRepository.findByPost(post);
+        createMultiMedia(postRequest.getMedias(), post);
+        deleteMultiMedia(postRequest.getDeleteMedia());
+        return getPostById(post.getPostId());
     }
 
     @Override
@@ -146,6 +174,11 @@ public class PostServiceImpl implements PostService {
                 .orElseThrow(() -> new RuntimeException("Post not found with id: " + postId));
         post.setDeleted(true);
         // Delete the post
+        List<PostMedia> medias = postMediaRepository.findByPost(post);
+        // Delete post media
+        for (PostMedia media : medias) {
+            postMediaService.deletePostMedia(media);
+        }
         postRepository.save(post);
     }
 }

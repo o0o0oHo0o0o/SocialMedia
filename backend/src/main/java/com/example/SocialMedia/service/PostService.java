@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 @Service
 public interface PostService {
     PostResponse getPostById(Integer id);
-    List<PostMedia> findMediaByPost(Post post);
     PostResponse createPost(PostRequest postRequest);
     List<PostResponse> getPostByUserId(Integer id);
     PostResponse updatePost(PostRequest postRequest);
