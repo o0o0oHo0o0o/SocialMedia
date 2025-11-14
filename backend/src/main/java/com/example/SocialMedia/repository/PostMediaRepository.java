@@ -2,6 +2,8 @@ package com.example.SocialMedia.repository;
 
 import com.example.SocialMedia.model.coredata_model.Post;
 import com.example.SocialMedia.model.coredata_model.PostMedia;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -11,4 +13,5 @@ import java.util.List;
 public interface PostMediaRepository extends JpaRepository<PostMedia, Integer> {
     PostMedia findPostMediaByPostMediaId(Integer postMediaId);
     List<PostMedia> findByPost(Post post);
+    Page<PostMedia> findByPost(Post post, Pageable pageable);
 }

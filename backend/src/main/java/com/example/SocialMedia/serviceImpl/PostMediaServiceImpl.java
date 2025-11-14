@@ -1,5 +1,7 @@
 package com.example.SocialMedia.serviceImpl;
 
+import com.example.SocialMedia.dto.PostMediaResponse;
+import com.example.SocialMedia.exception.UnsupportedFileTypeException;
 import com.example.SocialMedia.model.coredata_model.Post;
 import com.example.SocialMedia.model.coredata_model.PostMedia;
 import com.example.SocialMedia.repository.PostMediaRepository;
@@ -8,10 +10,13 @@ import com.example.SocialMedia.service.PostMediaService;
 import com.example.SocialMedia.service.StorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 @Service
 public class PostMediaServiceImpl implements PostMediaService {
@@ -39,13 +44,37 @@ public class PostMediaServiceImpl implements PostMediaService {
         return "Unknown";  // If MIME type is not recognized
     }
 
-    public String createPostMedia(MultipartFile file, Post post) throws IOException {
+    public PostMediaResponse[] findByPost(Post post, Pageable pageable){
+        return postMediaRepository.findByPost(post, pageable)
+                .getContent().stream()
+                .map(media -> new PostMediaResponse.PostMediaResponseBuilder()
+                        .id(media.getPostMediaId())
+                        .mediaType(media.getMediaType())
+                        .mediaURL(media.getMediaURL())
+                        .sortOrder(media.getSortOrder())
+                        .build())
+                .toArray(PostMediaResponse[]::new);
+    }
+
+    public void deleteByPost(Post post) {
+        List<PostMedia> postMedia = postMediaRepository.findByPost(post);
+        postMedia.forEach(media -> deletePostMedia(media.getPostMediaId()));
+    }
+
+    public void createPostMedia(MultipartFile file, Post post){
+        String fileName = file.getOriginalFilename();
+
         String type = classify(file);
         if (type.equals("Unknown")) {
-            return "Your file type is: " + file.getContentType() + " and it's fucking sucks";
+            throw new UnsupportedFileTypeException("Your file" + fileName + "type is: " + file.getContentType() + " and it's fucking sucks");
         }
 
-        String urlPath = storageService.uploadImage(file);
+        String urlPath;
+        try {
+            urlPath = storageService.uploadImage(file);
+        } catch (IOException e){
+            throw new DataIntegrityViolationException("Could not upload image:" + e.getMessage());
+        }
 
         PostMedia postMedia = new PostMedia();
         postMedia.setPost(post);
@@ -54,23 +83,19 @@ public class PostMediaServiceImpl implements PostMediaService {
         postMedia.setInteractableItem(interactableItemService.createInteractableItems("MEDIA", post.getCreatedLocalDateTime()));
 
         postMediaRepository.save(postMedia);
-        return "Successfully uploaded post media";
     }
 
-    public String deletePostMedia(PostMedia postMedia) {
+    public void deletePostMedia(int id) {
+        PostMedia postMedia = postMediaRepository.findPostMediaByPostMediaId(id);
         String path = postMedia.getMediaURL();
         String result = path.replace("uploads/", "");
         try {
-            if (storageService.deleteImage(result).equals("deleted")){
-                postMedia.setMediaURL("");
-                postMediaRepository.save(postMedia);
-            }
-            return "Successfully deleted post media";
-        } catch (java.io.IOException e) {
-            // Handle the exception: log, rethrow, or return an error message
-            System.err.println("Error while deleting post media: " + e.getMessage());
+            storageService.deleteImage(result);
+            postMedia.setMediaURL("");
+            postMediaRepository.save(postMedia);
+        } catch (IOException e) {
             // Optionally, throw a runtime exception if you want to fail the operation
-            throw new RuntimeException("Error while handling media file delete", e);
+            throw new DataIntegrityViolationException("Error while deleting post media: " + e.getMessage());
         }
     }
 }

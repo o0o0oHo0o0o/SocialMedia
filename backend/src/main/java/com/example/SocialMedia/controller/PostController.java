@@ -2,9 +2,11 @@ package com.example.SocialMedia.controller;
 
 import com.example.SocialMedia.dto.PostRequest;
 import com.example.SocialMedia.dto.PostResponse;
+import com.example.SocialMedia.model.coredata_model.Post;
 import com.example.SocialMedia.service.PostService;
 import com.example.SocialMedia.exception.FileTooLargeException;
 import com.example.SocialMedia.exception.TooManyFileException;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -53,8 +55,8 @@ public class PostController {
     }
     // Get posts from a user
     @GetMapping("/user/{id}")
-    public List<PostResponse> getPostByUserId(@PathVariable int id) {
-        return postService.getPostByUserId(id);
+    public List<PostResponse> getPostByUserId(@PathVariable int id, Pageable pageable) {
+        return postService.getPostByUserId(id, pageable);
     }
 
     // Update a post
@@ -76,12 +78,7 @@ public class PostController {
     }
     // Delete a post
     @DeleteMapping("/{id}")
-    public String deletePost(@PathVariable int id) {
-        try {
-            postService.deletePost(id);
-            return "Post deleted successfully";
-        } catch (Exception e) {
-            return "Post not found";
-        }
+    public PostResponse deletePost(@PathVariable int id) {
+        return postService.deletePost(id);
     }
 }

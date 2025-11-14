@@ -1,27 +1,32 @@
 package com.example.SocialMedia.serviceImpl;
 
-import com.example.SocialMedia.dto.PostMediaResponse;
 import com.example.SocialMedia.dto.PostRequest;
 import com.example.SocialMedia.dto.PostResponse;
+import com.example.SocialMedia.exception.PostNotFoundException;
+import com.example.SocialMedia.exception.UserNotFoundException;
 import com.example.SocialMedia.model.coredata_model.*;
 import com.example.SocialMedia.repository.*;
 import com.example.SocialMedia.service.InteractableItemService;
 import com.example.SocialMedia.service.PostMediaService;
 import com.example.SocialMedia.service.PostService;
 import io.jsonwebtoken.io.IOException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class PostServiceImpl implements PostService {
 
+    int MAX_LOAD_MEDIA = 4;
+    Pageable MEDIA_PAGEABLE = PageRequest.of(0, MAX_LOAD_MEDIA);
     private final PostRepository postRepository;
     private final UserRepository userRepository;
-    private final PostMediaRepository postMediaRepository;
     private final ReactionRepository reactionRepository;
     private final CommentRepository commentRepository;
     private final ShareRepository shareRepository;
@@ -30,7 +35,6 @@ public class PostServiceImpl implements PostService {
     @Autowired
     public PostServiceImpl(PostRepository postRepository,
                            UserRepository userRepository,
-                           PostMediaRepository postMediaRepository,
                            ReactionRepository reactionRepository,
                            CommentRepository commentRepository,
                            ShareRepository shareRepository,
@@ -38,7 +42,6 @@ public class PostServiceImpl implements PostService {
                            PostMediaService postMediaService) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
-        this.postMediaRepository = postMediaRepository;
         this.reactionRepository = reactionRepository;
         this.commentRepository = commentRepository;
         this.shareRepository = shareRepository;
@@ -46,65 +49,43 @@ public class PostServiceImpl implements PostService {
         this.postMediaService = postMediaService;
     }
 
-    private void createMultiMedia(MultipartFile[] medias, Post post) throws IOException {
-        if (!(medias != null && medias.length > 0)) {
-            return;
-        }
-        for (MultipartFile media : medias){
-            try {
+    private void createMultiMedia(MultipartFile[] medias, Post post){
+        if (medias != null) {
+            for (MultipartFile media : medias) {
                 postMediaService.createPostMedia(media, post);
-            } catch (java.io.IOException e) {
-                // Handle the exception: log, rethrow, or return an error message
-                System.err.println("Error while creating post media: " + e.getMessage());
-                // Optionally, throw a runtime exception if you want to fail the operation
-                throw new RuntimeException("Error while handling media file upload", e);
             }
         }
     }
     private void deleteMultiMedia(int[] ids) throws IOException {
-        if (!(ids != null && ids.length > 0)) {
-            return;
-        }
-        for (int mediaId : ids){
-            PostMedia media = postMediaRepository.findPostMediaByPostMediaId(mediaId);
-            postMediaService.deletePostMedia(media);
-        }
+        if (ids != null) for (int mediaId : ids) postMediaService.deletePostMedia(mediaId);
+    }
+    private PostResponse convertToPostResponse(Post post){
+        return new PostResponse.PostResponseBuilder()
+                .id(post.getPostId())
+                .content(post.getContent())
+                .postTopic(post.getPostTopic())
+                .location(post.getLocation())
+                .username(post.getUser().getUsername())
+                .createdAt(post.getCreatedLocalDateTime())
+                .updatedAt(post.getUpdatedLocalDateTime())
+                .commentCount(commentRepository.countCommentByPost(post))
+                .reactionCount(reactionRepository.countReactionByInteractableItems(post.getInteractableItem()))
+                .shareCount(shareRepository.countShareByPost(post))
+                .medias(postMediaService.findByPost(post, MEDIA_PAGEABLE))
+                .build();
     }
     @Override
     public PostResponse getPostById(Integer id) {
         Post post = postRepository.findByPostId(id)
-                .orElseThrow(() -> new RuntimeException("Post not found"));
-        PostResponse response = new PostResponse();
-        response.setId(post.getPostId());
-        response.setContent(post.getContent());
-        response.setPostTopic(post.getPostTopic());
-        response.setLocation(post.getLocation());
-        response.setUsername(post.getUser().getUsername());  // Assuming 'User' has 'username'
-        response.setCreatedAt(post.getCreatedLocalDateTime());
-        response.setUpdatedAt(post.getUpdatedLocalDateTime());
-
-        List<PostMedia> medias = postMediaRepository.findByPost(post);
-        List<PostMediaResponse> mediasResponse = new ArrayList<>();
-        for (PostMedia media : medias) {
-            PostMediaResponse mediaResponse = new PostMediaResponse();
-            mediaResponse.setId(media.getPostMediaId());
-            mediaResponse.setMediaURL(media.getMediaURL());
-            mediaResponse.setMediaType(media.getMediaType());
-            mediaResponse.setSortOrder(media.getSortOrder());
-            mediasResponse.add(mediaResponse);
-        }
-        response.setMedias(mediasResponse);
-        response.setCommentCount(commentRepository.countCommentByPost(post));
-        response.setShareCount(shareRepository.countShareByPost(post));
-        response.setReactionCount(reactionRepository.countReactionByInteractableItems(post.getInteractableItem()));
-        return response;
+                .orElseThrow(()-> new PostNotFoundException("Post not found"));
+        return convertToPostResponse(post);
     }
 
     @Override
     public PostResponse createPost(PostRequest postRequest){
         // Find user by username (if username exists)
         User user = userRepository.findById(postRequest.getUserID())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + postRequest.getUserID()));
 
         // Create Interactable Item
         InteractableItems item = interactableItemService.createInteractableItems("POST", postRequest.getCreatedAt());
@@ -124,19 +105,29 @@ public class PostServiceImpl implements PostService {
         //Save post media
         createMultiMedia(postRequest.getMedias(), post);
 
-        return getPostById(post.getPostId());
+        return convertToPostResponse(post);
     }
 
     @Override
-    public List<PostResponse> getPostByUserId(Integer id) {
+    public List<PostResponse> getPostByUserId(Integer id, Pageable pageable) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-        List<PostResponse> postResponses = new ArrayList<>();
-        List<Post> posts = postRepository.findByUser(user);
-        for (Post post : posts) {
-            postResponses.add(getPostById(post.getPostId()));
-        }
-        return postResponses;
+                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
+        Page<Post> posts = postRepository.findByUser(user, pageable);
+        return posts.getContent().stream()
+                .map(post -> new PostResponse.PostResponseBuilder()
+                        .id(post.getPostId())
+                        .content(post.getContent())
+                        .postTopic(post.getPostTopic())
+                        .location(post.getLocation())
+                        .username(post.getUser().getUsername())  // Assuming User has getUsername()
+                        .reactionCount(reactionRepository.countReactionByInteractableItems(post.getInteractableItem()))
+                        .commentCount(commentRepository.countCommentByPost(post))
+                        .shareCount(shareRepository.countShareByPost(post))
+                        .updatedAt(post.getUpdatedLocalDateTime())
+                        .createdAt(post.getCreatedLocalDateTime())
+                        .medias(postMediaService.findByPost(post, MEDIA_PAGEABLE))
+                        .build())
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -160,25 +151,21 @@ public class PostServiceImpl implements PostService {
         post.setUpdatedLocalDateTime(postRequest.getUpdatedAt());  // Set the creation time
 
         // Save the post using the repository
-        postRepository.save(post);
+        post = postRepository.save(post);
 
         createMultiMedia(postRequest.getMedias(), post);
         deleteMultiMedia(postRequest.getDeleteMedia());
-        return getPostById(post.getPostId());
+        return convertToPostResponse(post);
     }
 
     @Override
-    public void deletePost(int postId) {
+    public PostResponse deletePost(int postId) {
         // Check if the post exists
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new RuntimeException("Post not found with id: " + postId));
+                .orElseThrow(() -> new PostNotFoundException("Post not found with id: " + postId));
         post.setDeleted(true);
         // Delete the post
-        List<PostMedia> medias = postMediaRepository.findByPost(post);
-        // Delete post media
-        for (PostMedia media : medias) {
-            postMediaService.deletePostMedia(media);
-        }
-        postRepository.save(post);
+        postMediaService.deleteByPost(post);
+        return convertToPostResponse(postRepository.save(post));
     }
 }

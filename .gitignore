@@ -1,5 +1,5 @@
 HELP.md
-target/
+backend/target/
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
@@ -32,5 +32,6 @@ build/
 ### VS Code ###
 .vscode/
 
-../.idea/
-/src/main/resources/application.yaml
+/.idea/
+/backend/src/main/resources/application.yaml
+/backend/src/main/resources/static/uploads/
