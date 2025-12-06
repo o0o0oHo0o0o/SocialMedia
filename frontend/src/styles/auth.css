@@ -1,0 +1,348 @@
+/* AUTH PAGE */
+.auth-page {
+  /* Ưu tiên web: dùng 100vh tiêu chuẩn */
+  min-height: 100vh;
+  width: 100vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  position: relative;
+  box-sizing: border-box;
+}
+
+.theme-toggle {
+  position: fixed;
+  top: 2rem;
+  right: 2rem;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  z-index: 100;
+}
+
+.theme-toggle:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.1) rotate(15deg);
+}
+
+.auth-card {
+  width: 90%;
+  max-width: 540px;
+  margin: 0 auto;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(20px);
+  border-radius: 24px;
+  padding: 3rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+  transition: all 0.3s ease;
+  animation: slideUp 0.6s ease;
+}
+
+/* Split layout cho desktop */
+.auth-card.split {
+  max-width: 1000px;
+  padding: 2rem 2.5rem;
+}
+
+.app.light .auth-card {
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.auth-card.flipping {
+  animation: none;
+}
+
+.auth-card.show-otp {
+  animation: scaleIn 0.4s ease;
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.auth-footer {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.85rem;
+  z-index: 10;
+}
+
+.app.light .auth-footer {
+  color: rgba(0, 0, 0, 0.5);
+}
+
+.form-header {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.form-header h2 {
+  font-size: 2.25rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 0.5rem;
+}
+
+.app.dark .form-header h2 {
+  background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.form-header p {
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 1rem;
+}
+
+.app.light .form-header p {
+  color: rgba(0, 0, 0, 0.7);
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.9rem;
+  margin: 0.5rem 0;
+}
+
+.app.light .divider {
+  color: rgba(0, 0, 0, 0.55);
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.app.light .divider::before,
+.app.light .divider::after {
+  border-color: rgba(0, 0, 0, 0.12);
+}
+
+.divider span {
+  padding: 0 1rem;
+}
+
+.error-message,
+.success-message {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.875rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.error-message {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.success-message {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.form-footer {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.95rem;
+}
+
+.app.light .form-footer {
+  color: rgba(0, 0, 0, 0.6);
+}
+
+/* Tabs chuyển đổi Sign In / Sign Up */
+.auth-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 0.4rem;
+  border-radius: 14px;
+}
+
+.app.light .auth-tabs {
+  background: rgba(255, 255, 255, 0.8);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+.app.light .auth-tab.active {
+  /* Dùng một dải màu tối hơn, đậm hơn */
+  background: linear-gradient(135deg, #4c51bf 0%, #5a3a7b 100%);
+  color: #fff;
+  /* Chữ trắng giờ đã nổi bật */
+  box-shadow: 0 6px 18px rgba(76, 81, 191, 0.3);
+}
+
+.auth-tab {
+  border: none;
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  font-size: 1.02rem;
+  font-weight: 700;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.app.light .auth-tab {
+  color: #1f2937;
+}
+
+.auth-tab:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.app.light .auth-tab:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.auth-tab.active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  box-shadow: 0 6px 18px rgba(118, 75, 162, 0.35);
+}
+
+/* Two-column layout */
+.auth-columns {
+  display: grid;
+  grid-template-columns: 60% 40%;
+  gap: 2.25rem;
+}
+
+.auth-left {
+  display: flex;
+  flex-direction: column;
+}
+
+.auth-right {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border-left: 1px solid rgba(255, 255, 255, 0.12);
+  padding-left: 2.5rem;
+  padding-right: 2.5rem;
+}
+
+.app.light .auth-right {
+  border-left-color: rgba(0, 0, 0, 0.1);
+}
+
+.welcome-block h3 {
+  font-size: 1.9rem;
+  font-weight: 800;
+  line-height: 1.2;
+  margin: 0 0 0.5rem 0;
+  background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.welcome-block p {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.app.light .welcome-block p {
+  color: rgba(0, 0, 0, 0.7);
+}
+
+.social-section {
+  margin-top: 1.5rem;
+}
+
+/* Responsive: stack on tablet/mobile */
+@media (max-width: 900px) {
+  .auth-card.split {
+    max-width: 600px;
+    padding: 1.75rem;
+  }
+
+  .auth-columns {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  .auth-right {
+    border-left: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    padding-left: 0;
+    padding-top: 1.25rem;
+  }
+
+  .app.light .auth-right {
+    border-top-color: rgba(0, 0, 0, 0.1);
+  }
+}

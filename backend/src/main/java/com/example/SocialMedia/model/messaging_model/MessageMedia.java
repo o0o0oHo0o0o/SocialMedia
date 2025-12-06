@@ -16,10 +16,10 @@ public class MessageMedia {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "MessageID")
-    private Message message;
+    private Messages message;
 
-    @Column(name = "MediaURL")
-    private String MediaURL;
+    @Column(name = "MediaName")
+    private String MediaName;
 
     @Column(name = "MediaType")
     private String MediaType;
@@ -30,6 +30,6 @@ public class MessageMedia {
     @Column(name = "FileSize")
     private int FileSize;
 
-    @Column(name = "ThumbnailURL")
-    private String ThumbnailURL;
+    @Column(name = "ThumbnailName")
+    private String ThumbnailName;
 }

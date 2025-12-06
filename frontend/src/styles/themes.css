@@ -1,0 +1,13 @@
+/* Theme classes for dark and light mode */
+.app.dark {
+  background: radial-gradient(ellipse at top left, #18192b 0%, #23234a 100%);
+  color: var(--color-text-light);
+}
+.app.light {
+  /* softer gradient with subtle cool center to give stars contrast */
+  background: radial-gradient(circle at 30% 20%, #f6f9ff 0%, #eef4ff 30%, rgba(238, 242, 255, 0.9) 60%, #f3f6ff 100%);
+  color: var(--color-text-dark);
+}
+body {
+  font-family: var(--font-main);
+}

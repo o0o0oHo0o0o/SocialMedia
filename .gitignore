@@ -1,0 +1,6 @@
+# Ẩn file môi trường chứa password
+.env
+
+# Ẩn TOÀN BỘ dữ liệu của MinIO
+minio-data/
+redis-data/

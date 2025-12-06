@@ -1,14 +1,20 @@
 package com.example.SocialMedia.keys;
 
 import jakarta.persistence.Embeddable;
+import lombok.AllArgsConstructor;
 
 import java.io.Serializable;
 import java.util.Objects;
 
 @Embeddable
+@AllArgsConstructor
 public class ConversationMembersID implements Serializable {
     private int conversationID;
     private int userID;
+
+    public ConversationMembersID() {
+
+    }
 
     @Override
     public boolean equals(Object o){

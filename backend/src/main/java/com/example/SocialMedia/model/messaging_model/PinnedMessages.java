@@ -19,7 +19,7 @@ public class PinnedMessages {
     @OneToOne(fetch = FetchType.LAZY)
     @MapsId("messageID")
     @JoinColumn(name = "MessageID")
-    private Message message;
+    private Messages message;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("conversationID")
