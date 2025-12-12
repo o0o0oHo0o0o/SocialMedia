@@ -18,12 +18,12 @@ public class LocalStorageServiceImpl implements StorageService {
         String fileName = UUID.randomUUID() + "-" + file.getOriginalFilename();
         Path filePath = uploadDirectory.resolve(fileName);
         Files.copy(file.getInputStream(), filePath);
-        return "uploads/" + fileName;// Save the relative path to the database
+        return "http://localhost:8080/uploads/" + fileName;// Save the relative path to the database
     }
     @Override
     public void deleteImage(String fileName) throws IOException {
         System.out.println("Delete directory is: " + uploadDirectory.toAbsolutePath());
-        Path filePath = uploadDirectory.resolve(fileName);
+        Path filePath = uploadDirectory.resolve(fileName.substring(fileName.lastIndexOf('/') + 1));
         Files.delete(filePath);
     }
 }

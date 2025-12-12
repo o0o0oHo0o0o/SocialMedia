@@ -1,6 +1,7 @@
 ﻿-- *******************************************************************
 -- SOCIAL MEDIA DATABASE
 -- *******************************************************************
+use master
 ALTER DATABASE SocialMedia SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
 GO
 DROP DATABASE IF EXISTS SocialMedia;
@@ -208,10 +209,6 @@ CREATE INDEX IX_FeedItems_UserID_CreatedAt
 ON CoreData.FeedItems(UserID, CreatedAt DESC);
 GO
 
-CREATE INDEX IX_FeedItems_PostID 
-ON CoreData.FeedItems(PostID);
-GO
-
 -- *******************************************************************
 -- 7. COMMENTS
 -- *******************************************************************
@@ -272,7 +269,7 @@ CREATE TABLE CoreData.Reactions (
     FOREIGN KEY (InteractableItemID) 
         REFERENCES CoreData.InteractableItems(InteractableItemID) ON DELETE CASCADE,
     
-    UNIQUE (UserID, InteractableItemID)
+     (UserID, InteractableItemID)
 );
 GO
 

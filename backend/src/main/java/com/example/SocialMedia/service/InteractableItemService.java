@@ -7,5 +7,5 @@ import java.time.LocalDateTime;
 
 @Service
 public interface InteractableItemService {
-    InteractableItems createInteractableItems(String type, LocalDateTime createdAt);
+    InteractableItems createInteractableItems(String type, LocalDateTime createdAt); //'POST', 'MEDIA', 'COMMENT', 'SHARE', 'MESSAGE', 'STORY'
 }

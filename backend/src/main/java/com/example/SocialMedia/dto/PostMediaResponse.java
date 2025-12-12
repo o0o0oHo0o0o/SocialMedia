@@ -12,7 +12,7 @@ public class PostMediaResponse {
     private int sortOrder;
 
     // Private constructor, to be used by the builder
-    public PostMediaResponse(PostMediaResponseBuilder builder) {
+    private PostMediaResponse(PostMediaResponseBuilder builder) {
         this.id = builder.id;
         this.mediaURL = builder.mediaURL != null ? builder.mediaURL : "";  // Default empty string if null
         this.mediaType = builder.mediaType != null ? builder.mediaType : "";  // Default empty string if null

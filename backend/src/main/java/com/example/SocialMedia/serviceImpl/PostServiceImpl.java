@@ -2,13 +2,14 @@ package com.example.SocialMedia.serviceImpl;
 
 import com.example.SocialMedia.dto.PostRequest;
 import com.example.SocialMedia.dto.PostResponse;
-import com.example.SocialMedia.exception.PostNotFoundException;
-import com.example.SocialMedia.exception.UserNotFoundException;
+import com.example.SocialMedia.exception.ResourceNotFound.PostNotFoundException;
+import com.example.SocialMedia.exception.ResourceNotFound.UserNotFoundException;
 import com.example.SocialMedia.model.coredata_model.*;
 import com.example.SocialMedia.repository.*;
 import com.example.SocialMedia.service.InteractableItemService;
 import com.example.SocialMedia.service.PostMediaService;
 import com.example.SocialMedia.service.PostService;
+import com.example.SocialMedia.service.ReactionService;
 import io.jsonwebtoken.io.IOException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
 @Service
 public class PostServiceImpl implements PostService {
 
+    private final ReactionService reactionService;
     int MAX_LOAD_MEDIA = 4;
     Pageable MEDIA_PAGEABLE = PageRequest.of(0, MAX_LOAD_MEDIA);
     private final PostRepository postRepository;
@@ -39,7 +41,7 @@ public class PostServiceImpl implements PostService {
                            CommentRepository commentRepository,
                            ShareRepository shareRepository,
                            InteractableItemService interactableItemService,
-                           PostMediaService postMediaService) {
+                           PostMediaService postMediaService, ReactionService reactionService) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
         this.reactionRepository = reactionRepository;
@@ -47,6 +49,7 @@ public class PostServiceImpl implements PostService {
         this.shareRepository = shareRepository;
         this.interactableItemService = interactableItemService;
         this.postMediaService = postMediaService;
+        this.reactionService = reactionService;
     }
 
     private void createMultiMedia(MultipartFile[] medias, Post post){
@@ -59,17 +62,18 @@ public class PostServiceImpl implements PostService {
     private void deleteMultiMedia(int[] ids) throws IOException {
         if (ids != null) for (int mediaId : ids) postMediaService.deletePostMedia(mediaId);
     }
-    private PostResponse convertToPostResponse(Post post){
+    PostResponse convertToPostResponse(Post post){
         return new PostResponse.PostResponseBuilder()
                 .id(post.getPostId())
                 .content(post.getContent())
                 .postTopic(post.getPostTopic())
                 .location(post.getLocation())
                 .username(post.getUser().getUsername())
+                .interactableItemId(post.getInteractableItem().getInteractableItemId())
                 .createdAt(post.getCreatedLocalDateTime())
                 .updatedAt(post.getUpdatedLocalDateTime())
                 .commentCount(commentRepository.countCommentByPost(post))
-                .reactionCount(reactionRepository.countReactionByInteractableItems(post.getInteractableItem()))
+                .reactionCount(reactionRepository.countReactionsByInteractableItemId(post.getInteractableItem().getInteractableItemId()))
                 .shareCount(shareRepository.countShareByPost(post))
                 .medias(postMediaService.findByPost(post, MEDIA_PAGEABLE))
                 .build();
@@ -112,7 +116,7 @@ public class PostServiceImpl implements PostService {
     public List<PostResponse> getPostByUserId(Integer id, Pageable pageable) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
-        Page<Post> posts = postRepository.findByUser(user, pageable);
+        Page<Post> posts = postRepository.findByUserAndIsDeletedIsFalse(user, pageable);
         return posts.getContent().stream()
                 .map(post -> new PostResponse.PostResponseBuilder()
                         .id(post.getPostId())
@@ -120,7 +124,7 @@ public class PostServiceImpl implements PostService {
                         .postTopic(post.getPostTopic())
                         .location(post.getLocation())
                         .username(post.getUser().getUsername())  // Assuming User has getUsername()
-                        .reactionCount(reactionRepository.countReactionByInteractableItems(post.getInteractableItem()))
+                        .reactionCount(reactionRepository.countReactionsByInteractableItemId(post.getInteractableItem().getInteractableItemId()))
                         .commentCount(commentRepository.countCommentByPost(post))
                         .shareCount(shareRepository.countShareByPost(post))
                         .updatedAt(post.getUpdatedLocalDateTime())

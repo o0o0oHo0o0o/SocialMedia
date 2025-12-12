@@ -4,6 +4,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 
 @Getter
 @Setter
@@ -14,7 +16,8 @@ public class PostResponse {
     private String postTopic;
     private String location;
     private String username; // from User
-    private int reactionCount;
+    private Integer interactableItemId;
+    private List<Object[]> reactionCount;
     private int commentCount;
     private int shareCount;
     private PostMediaResponse[] medias;
@@ -28,7 +31,8 @@ public class PostResponse {
         this.postTopic = builder.postTopic != null ? builder.postTopic : "";  // Default empty string if null
         this.location = builder.location != null ? builder.location : "";  // Default empty string if null
         this.username = builder.username != null ? builder.username : "";  // Default empty string if null
-        this.reactionCount = builder.reactionCount != null ? builder.reactionCount : 0;  // Default to 0
+        this.interactableItemId = builder.interactableItemId;
+        this.reactionCount = builder.reactionCount;  // Default to 0
         this.commentCount = builder.commentCount != null ? builder.commentCount : 0;  // Default to 0
         this.shareCount = builder.shareCount != null ? builder.shareCount : 0;  // Default to 0
         this.medias = builder.medias != null ? builder.medias : new PostMediaResponse[0];  // Default to empty array
@@ -44,7 +48,8 @@ public class PostResponse {
         private String postTopic;
         private String location;
         private String username;
-        private Integer reactionCount;
+        private Integer interactableItemId;
+        private List<Object[]> reactionCount;
         private Integer commentCount;
         private Integer shareCount;
         private PostMediaResponse[] medias;
@@ -77,7 +82,12 @@ public class PostResponse {
             return this;
         }
 
-        public PostResponseBuilder reactionCount(int reactionCount) {
+        public PostResponseBuilder interactableItemId(Integer interactableItemId) {
+            this.interactableItemId = interactableItemId;
+            return this;
+        }
+
+        public PostResponseBuilder reactionCount(List<Object[]> reactionCount) {
             this.reactionCount = reactionCount;
             return this;
         }
@@ -106,6 +116,7 @@ public class PostResponse {
             this.createdAt = createdAt;
             return this;
         }
+
 
         // Build method to return the final PostResponse object
         public PostResponse build() {

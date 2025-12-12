@@ -7,6 +7,7 @@ import com.example.SocialMedia.service.PostService;
 import com.example.SocialMedia.exception.FileTooLargeException;
 import com.example.SocialMedia.exception.TooManyFileException;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,6 +31,9 @@ public class PostController {
     }
 
     void checkUploadedFile(MultipartFile[] files){
+        if (files == null){
+            return;
+        }
         if (files.length > MAX_FILE) {
             throw new TooManyFileException("File exceeds maximum number of 10");
         }
@@ -44,8 +48,9 @@ public class PostController {
     public PostResponse getPostById(@PathVariable int id) {
         return postService.getPostById(id);
     }
+
     // New POST method to create a post
-    @PostMapping
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public PostResponse createPost(@RequestParam(value = "mediaFile", required = false) MultipartFile[] file, @RequestPart("postRequest") PostRequest postRequest) {
         checkUploadedFile(file);
         postRequest.setMedias(file);
