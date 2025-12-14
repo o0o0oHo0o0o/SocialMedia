@@ -1,8 +1,9 @@
 package com.example.SocialMedia.model.coredata_model;
 
+import com.example.SocialMedia.constant.AuthProvider;
+import com.example.SocialMedia.dto.UserProfileDto;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import com.example.SocialMedia.model.messaging_model.ConversationMember;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -18,32 +19,52 @@ import java.util.stream.Collectors;
 @Table(name = "Users")
 @Setter
 @Getter
+@Data
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "UserID")
     private int id;
 
-    @Column(name = "Username",  unique = true,  nullable = false)
+    @Column(name = "Username",  unique = true)
     private String userName;
 
     @Column(name = "Email",   unique = true,  nullable = false)
     private String email;
 
-    @Column(name = "PasswordHash",   unique = true,  nullable = false)
+    @Column(name = "PasswordHash",   unique = true)
     private String password;
 
     @Column(name = "FullName", nullable = false)
     private String fullName;
 
-    @Column(name = "Bio", nullable = false)
+    @Column(name = "Bio")
     private String bio;
 
     @Column(name = "ProfilePictureURL")
     private String profilePictureURL;
 
+    @Column(name = "PhoneNumber")
+    private String phoneNumber;
+
     @Column(name = "CreatedAt",  nullable = false)
     private LocalDateTime createdLocalDateTime;
+
+    @Column(name = "isDeleted", nullable = false)
+    private boolean isDeleted;
+
+    @Column(name = "lastLogin")
+    private LocalDateTime lastLogin;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "AuthProvider", nullable = false)
+    private AuthProvider authProvider;
+
+    @Column(name = "IsVerified", nullable = false)
+    private boolean isVerified;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RefreshToken> refreshTokens;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Post> posts;
@@ -81,6 +102,12 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "reportUser", fetch = FetchType.LAZY)
     private List<Report> reports;
 
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private List<UserTokenDevice> userTokenDevices;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private List<UserSession> webSocketSessions;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return userRoles.stream().map(userRole -> new SimpleGrantedAuthority(userRole.getRole().getRoleName())).collect(Collectors.toList());
@@ -98,21 +125,31 @@ public class User implements UserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-        return UserDetails.super.isAccountNonExpired();
+        return true;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return UserDetails.super.isAccountNonLocked();
+        return this.isVerified;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return UserDetails.super.isCredentialsNonExpired();
+        return true;
     }
 
     @Override
     public boolean isEnabled() {
-        return UserDetails.super.isEnabled();
+        return !this.isDeleted;
     }
+
+    public UserProfileDto toUserProfileDto() {
+        return new UserProfileDto(
+                this.id,
+                this.email,
+                this.phoneNumber,
+                this.fullName,
+                this.profilePictureURL,
+                this.authProvider
+        );
 }

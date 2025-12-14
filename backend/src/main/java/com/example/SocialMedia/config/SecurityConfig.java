@@ -1,20 +1,18 @@
 package com.example.SocialMedia.config;
 
+import com.example.SocialMedia.config.auth.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import com.example.SocialMedia.service.CustomUserDetailsService;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -25,19 +23,25 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @EnableWebSecurity
 @EnableMethodSecurity
 @RequiredArgsConstructor
+@EnableConfigurationProperties(CorsProperties.class)
 public class SecurityConfig {
-    private final CustomUserDetailsService customUserDetailsService;
     private final JwtAuthFilter jwtAuthFilter;
-    private final PasswordEncoder passwordEncoder;
-
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
+    private final AuthenticationProvider authenticationProvider;
 
+    private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
+    @Value("${spring.application.frontend}")
+    private String frontendUrl;
     private final CorsProperties corsProperties;
     public static String[] PUBLIC_ENDPOINTS = {
-            "/auth/**",
+            "/auth/register",
+            "/auth/login",
+            "/verification/**",
             "/oauth2/**",
             "/api/public/**",
+            "/auth/logout",
+            "/auth/refresh",
             "/health",
             "/actuator/health",
             // Swagger UI endpoints
@@ -62,12 +66,18 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfiguration()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
+                        .requestMatchers("/ws/**", "/ws-sockjs/**").permitAll()
                         .requestMatchers(ADMIN_ENDPOINTS).hasRole("ADMIN")
+                        .anyRequest().authenticated()
                 )
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-                .authenticationProvider(authenticationProvider(customUserDetailsService, passwordEncoder))
+                .oauth2Login(oauth2 -> oauth2
+                        .successHandler(oAuth2LoginSuccessHandler)
+                        .failureUrl(frontendUrl + "/login?error=oauth2_failed")
+                )
+                .authenticationProvider(authenticationProvider)
                 .exceptionHandling(exceptionHandler -> exceptionHandler
                         .authenticationEntryPoint(jwtAuthenticationEntryPoint)
                         .accessDeniedHandler(jwtAccessDeniedHandler)
@@ -78,34 +88,23 @@ public class SecurityConfig {
                         )
                         .frameOptions(HeadersConfigurer.FrameOptionsConfig::deny)
                 )
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(new CorsCredentialsFilter(), UsernamePasswordAuthenticationFilter.class);  // THÊM DÒNG NÀY
                 return http.build();
-    }
-    @Bean
-    public AuthenticationProvider authenticationProvider(CustomUserDetailsService customUserDetailsService,
-                                                         PasswordEncoder passwordEncoder) {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(customUserDetailsService);
-        authProvider.setPasswordEncoder(passwordEncoder);
-        authProvider.setHideUserNotFoundExceptions(false);
-        return authProvider;
-    }
-
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-        return config.getAuthenticationManager();
     }
     @Bean
     public CorsConfigurationSource corsConfiguration() {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
         corsConfiguration.setAllowedMethods(corsProperties.getAllowedMethods());
+        corsConfiguration.setAllowedOriginPatterns(corsProperties.getAllowedOrigins());
         corsConfiguration.setAllowedOrigins(corsProperties.getAllowedOrigins());
         corsConfiguration.setAllowedHeaders(corsProperties.getAllowedHeaders());
         corsConfiguration.setExposedHeaders(corsProperties.getExposedHeaders());
         corsConfiguration.setAllowCredentials(true);
         corsConfiguration.setMaxAge(3600L);
+        corsConfiguration.addExposedHeader("Set-Cookie");
         UrlBasedCorsConfigurationSource urlBasedCorsConfigurationSource = new UrlBasedCorsConfigurationSource();
         urlBasedCorsConfigurationSource.registerCorsConfiguration("/**", corsConfiguration);
         return urlBasedCorsConfigurationSource;
     }
-
 }

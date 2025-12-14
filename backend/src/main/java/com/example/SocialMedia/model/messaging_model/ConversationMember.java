@@ -28,8 +28,12 @@ public class ConversationMember {
     @Column(name = "Nickname")
     private String nickname;
 
-    @Column(name = "LastReadMessageID")
-    private long lastReadMessageID;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "LastReadMessageID")
+    private Messages lastReadMessage;
+
+    @Column(name = "Role")  // Thêm dòng này
+    private String role;
 
     @Column(name = "MutedUntil")
     private LocalDateTime  mutedUntil;

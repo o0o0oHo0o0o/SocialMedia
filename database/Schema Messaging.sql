@@ -23,6 +23,9 @@ CREATE TABLE Messaging.Conversations (
 );
 GO
 
+CREATE NONCLUSTERED INDEX IX_Conversations_LastMessageID
+ON Messaging.Conversations(LastMessageID);
+
 -- *******************************************************************
 -- 2. CONVERSATION MEMBERS
 -- *******************************************************************
@@ -52,7 +55,6 @@ CREATE TABLE Messaging.Messages (
     SenderID INT NOT NULL,
     InteractableItemID BIGINT NULL UNIQUE,     
     ReplyToMessageID BIGINT NULL,              
-    Content NVARCHAR(MAX) NULL,
     MessageType NVARCHAR(20) NOT NULL DEFAULT 'TEXT' 
         CONSTRAINT CK_Messages_MessageType CHECK (MessageType IN ('TEXT', 'NOTIFICATION')),
     SentAt DATETIME NOT NULL DEFAULT GETDATE(),
@@ -64,21 +66,20 @@ CREATE TABLE Messaging.Messages (
     FOREIGN KEY (ReplyToMessageID) REFERENCES Messaging.Messages(MessageID) 
 );
 GO
+ALTER TABLE Messaging.Messages
+ADD SequenceNumber BIGINT NOT NULL DEFAULT 0;
 
-CREATE NONCLUSTERED INDEX IX_Messages_ConversationID_SentAt ON Messaging.Messages(ConversationID, SentAt DESC);
+CREATE TABLE Messaging.MessageBodies (
+    MessageID BIGINT PRIMARY KEY,
+    Content NVARCHAR(MAX) NULL,
+
+    FOREIGN KEY (MessageID) REFERENCES Messaging.Messages(MessageID) ON DELETE CASCADE
+);
 GO
 
-CREATE TRIGGER Messaging.TRG_UpdateLastMessageID
-ON Messaging.Messages
-AFTER INSERT
-AS
-BEGIN
-    SET NOCOUNT ON;
-    UPDATE C
-    SET C.LastMessageID = I.MessageID
-    FROM Messaging.Conversations C
-    INNER JOIN inserted I ON C.ConversationID = I.ConversationID;
-END;
+CREATE NONCLUSTERED INDEX IX_Messages_ConversationID_SentAt
+ON Messaging.Messages(ConversationID, SentAt DESC)
+INCLUDE (SenderID, MessageType, IsDeleted);
 GO
 
 -- *******************************************************************
@@ -96,6 +97,11 @@ CREATE TABLE Messaging.MessageMedia (
     FOREIGN KEY (MessageID) REFERENCES Messaging.Messages(MessageID) ON DELETE CASCADE
 );
 GO
+-- Đổi MediaURL -> MediaName
+EXEC sp_rename 'Messaging.MessageMedia.MediaURL', 'MediaName', 'COLUMN';
+
+-- Đổi ThumbnailURL -> ThumbnailName
+EXEC sp_rename 'Messaging.MessageMedia.ThumbnailURL', 'ThumbnailName', 'COLUMN';
 
 CREATE NONCLUSTERED INDEX IX_MessageMedia_MessageID ON Messaging.MessageMedia(MessageID);
 GO
@@ -114,3 +120,18 @@ CREATE TABLE Messaging.PinnedMessages (
     FOREIGN KEY (MessageID) REFERENCES Messaging.Messages(MessageID),
     FOREIGN KEY (PinnedByUserID) REFERENCES CoreData.Users(UserID)
 );
+GO
+
+CREATE TABLE Messaging.MessageStatus (
+    MessageID BIGINT NOT NULL,
+    UserID INT NOT NULL,
+    Status NVARCHAR(20) NOT NULL DEFAULT 'SENT', -- Enum lưu dạng chuỗi
+    DeliveredAt DATETIME2 NULL,
+    ReadAt DATETIME2 NULL,
+    CONSTRAINT PK_MessageStatus PRIMARY KEY (MessageID, UserID), -- @EmbeddedId tương ứng
+    CONSTRAINT FK_MessageStatus_Message FOREIGN KEY (MessageID)
+        REFERENCES Messaging.Messages(MessageID) ON DELETE CASCADE,
+    CONSTRAINT FK_MessageStatus_User FOREIGN KEY (UserID)
+        REFERENCES CoreData.Users(UserID) ON DELETE CASCADE
+);
+GO
