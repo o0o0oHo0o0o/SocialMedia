@@ -1,0 +1,55 @@
+.post-menu {
+  position: relative;
+  display: inline-block;
+}
+
+.post-menu-btn {
+  background: none;
+  border: none;
+  font-size: 1.25rem;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 50%;
+  line-height: 1;
+  width: 2rem;
+  height: 2rem;
+}
+
+.post-menu-btn:hover {
+  background-color: var(--overlay-color);
+}
+
+.post-menu-btn:focus {
+  outline: none;
+}
+
+.post-menu-dropdown {
+  position: absolute;
+  right: 0;
+  top: 40px;
+  background: var(--background-color);
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  min-width: 160px;
+  overflow: hidden;
+}
+
+.post-menu-item {
+  width: 100%;
+  padding: 12px 16px;
+  text-align: left;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: background-color 0.15s;
+}
+
+.post-menu-item:hover {
+  background-color: var(--overlay-color);
+}
