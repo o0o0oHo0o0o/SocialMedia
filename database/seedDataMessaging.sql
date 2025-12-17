@@ -80,27 +80,26 @@ VALUES
 -- Dữ liệu mẫu cho bảng Messages (Cập nhật InteractableItemID bắt đầu từ 81)
 INSERT INTO Messaging.Messages (ConversationID, SenderID, InteractableItemID, ReplyToMessageID, Content, MessageType, SentAt, IsDeleted)
 VALUES
-    (1, 1, 101, NULL, 'Chào mọi người, đây là bức ảnh tuyệt vời từ chuyến đi!', 'TEXT', '2023-10-01 08:05:00', 0),
-    (1, 2, 102, NULL, 'Mình cũng thích bức ảnh này, rất đẹp!', 'TEXT', '2023-10-01 08:15:00', 0),
-    (1, 3, 103, NULL, 'Video này rất hay, cảm ơn bạn đã chia sẻ!', 'TEXT', '2023-10-01 08:30:00', 0),
-    (2, 4, 104, NULL, 'Chào mọi người, đây là một video rất thú vị!', 'TEXT', '2023-10-02 10:05:00', 0),
-    (2, 5, 105, NULL, 'Cảm ơn bạn đã chia sẻ, mình rất thích!', 'TEXT', '2023-10-02 10:15:00', 0),
-    (3, 6, 106, NULL, 'Bức ảnh này khiến tôi nhớ về một chuyến đi tuyệt vời!', 'TEXT', '2023-10-02 11:10:00', 0),
-    (3, 7, 107, NULL, 'Cảm ơn vì video này, mình sẽ thử ngay!', 'TEXT', '2023-10-02 11:20:00', 0),
-    (4, 8, 108, NULL, 'Thật tuyệt vời khi có thể xem những bức ảnh đẹp như thế này!', 'TEXT', '2023-10-03 14:10:00', 0),
-    (4, 9, 109, NULL, 'Video này cực kỳ hấp dẫn, tôi sẽ chia sẻ cho bạn bè!', 'TEXT', '2023-10-03 14:30:00', 0),
-    (5, 10, 110, NULL, 'Bức ảnh này mang lại cảm giác thư giãn, cảm ơn bạn!', 'TEXT', '2023-10-04 09:05:00', 0),
-    (6, 1, 111, NULL, 'Mình rất thích bức ảnh này, cảm ơn bạn đã chia sẻ!', 'TEXT', '2023-10-04 09:20:00', 0),
-    (6, 2, 112, NULL, 'Video này thật sự rất hữu ích, cảm ơn vì đã chia sẻ!', 'TEXT', '2023-10-04 09:40:00', 0),
-    (7, 3, 113, NULL, 'Chuyến đi này thật tuyệt, mình rất muốn xem thêm những bức ảnh khác!', 'TEXT', '2023-10-05 11:00:00', 0),
-    (7, 4, 114, NULL, 'Video này quá hay, mình sẽ làm theo ngay!', 'TEXT', '2023-10-05 11:30:00', 0),
-    (8, 5, 115, NULL, 'Bức ảnh này quá đẹp, tôi phải chia sẻ ngay!', 'TEXT', '2023-10-06 12:00:00', 0),
-    (8, 6, 116, NULL, 'Video này quá tuyệt, tôi đã học được rất nhiều!', 'TEXT', '2023-10-06 12:30:00', 0),
-    (9, 7, 117, NULL, 'Cảm ơn vì đã chia sẻ video này, rất hay!', 'TEXT', '2023-10-07 13:00:00', 0),
-    (9, 8, 118, NULL, 'Bức ảnh này rất đẹp, tôi đã thử làm theo!', 'TEXT', '2023-10-07 13:15:00', 0),
-    (10, 9, 119, NULL, 'Video này rất bổ ích, cảm ơn bạn đã chia sẻ!', 'TEXT', '2023-10-08 14:00:00', 0),
-    (10, 10, 120, NULL, 'Chuyến đi này khiến tôi cảm thấy thật thư giãn!', 'TEXT', '2023-10-08 14:30:00', 0);
-
+    (1, 1, 81, NULL, 'Chào mọi người, đây là bức ảnh tuyệt vời từ chuyến đi!', 'TEXT', '2023-10-01 08:05:00', 0),
+    (1, 2, 82, NULL, 'Mình cũng thích bức ảnh này, rất đẹp!', 'TEXT', '2023-10-01 08:15:00', 0),
+    (1, 3, 83, NULL, 'Video này rất hay, cảm ơn bạn đã chia sẻ!', 'TEXT', '2023-10-01 08:30:00', 0),
+    (2, 4, 84, NULL, 'Chào mọi người, đây là một video rất thú vị!', 'TEXT', '2023-10-02 10:05:00', 0),
+    (2, 5, 85, NULL, 'Cảm ơn bạn đã chia sẻ, mình rất thích!', 'TEXT', '2023-10-02 10:15:00', 0),
+    (3, 6, 86, NULL, 'Bức ảnh này khiến tôi nhớ về một chuyến đi tuyệt vời!', 'TEXT', '2023-10-02 11:10:00', 0),
+    (3, 7, 87, NULL, 'Cảm ơn vì video này, mình sẽ thử ngay!', 'TEXT', '2023-10-02 11:20:00', 0),
+    (4, 8, 88, NULL, 'Thật tuyệt vời khi có thể xem những bức ảnh đẹp như thế này!', 'TEXT', '2023-10-03 14:10:00', 0),
+    (4, 9, 89, NULL, 'Video này cực kỳ hấp dẫn, tôi sẽ chia sẻ cho bạn bè!', 'TEXT', '2023-10-03 14:30:00', 0),
+    (5, 10, 90, NULL, 'Bức ảnh này mang lại cảm giác thư giãn, cảm ơn bạn!', 'TEXT', '2023-10-04 09:05:00', 0),
+    (6, 1, 91, NULL, 'Mình rất thích bức ảnh này, cảm ơn bạn đã chia sẻ!', 'TEXT', '2023-10-04 09:20:00', 0),
+    (6, 2, 92, NULL, 'Video này thật sự rất hữu ích, cảm ơn vì đã chia sẻ!', 'TEXT', '2023-10-04 09:40:00', 0),
+    (7, 3, 93, NULL, 'Chuyến đi này thật tuyệt, mình rất muốn xem thêm những bức ảnh khác!', 'TEXT', '2023-10-05 11:00:00', 0),
+    (7, 4, 94, NULL, 'Video này quá hay, mình sẽ làm theo ngay!', 'TEXT', '2023-10-05 11:30:00', 0),
+    (8, 5, 95, NULL, 'Bức ảnh này quá đẹp, tôi phải chia sẻ ngay!', 'TEXT', '2023-10-06 12:00:00', 0),
+    (8, 6, 96, NULL, 'Video này quá tuyệt, tôi đã học được rất nhiều!', 'TEXT', '2023-10-06 12:30:00', 0),
+    (9, 7, 97, NULL, 'Cảm ơn vì đã chia sẻ video này, rất hay!', 'TEXT', '2023-10-07 13:00:00', 0),
+    (9, 8, 98, NULL, 'Bức ảnh này rất đẹp, tôi đã thử làm theo!', 'TEXT', '2023-10-07 13:15:00', 0),
+    (10, 9, 99, NULL, 'Video này rất bổ ích, cảm ơn bạn đã chia sẻ!', 'TEXT', '2023-10-08 14:00:00', 0),
+    (10, 10, 100, NULL, 'Chuyến đi này khiến tôi cảm thấy thật thư giãn!', 'TEXT', '2023-10-08 14:30:00', 0);
 
 -- Dữ liệu mẫu cho bảng MessageMedia
 INSERT INTO Messaging.MessageMedia (MessageID, MediaURL, MediaType, FileName, FileSize, ThumbnailURL)

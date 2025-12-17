@@ -8,7 +8,7 @@ import java.util.Objects;
 @Embeddable
 public class PinnedMessagesID implements Serializable {
     private int conversationID;
-    private int messageID;
+    private long messageID;
 
     @Override
     public boolean equals(Object obj) {

@@ -1,9 +1,6 @@
 ﻿-- *******************************************************************
 -- SOCIAL MEDIA DATABASE
 -- *******************************************************************
-use master
-ALTER DATABASE SocialMedia SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
-GO
 DROP DATABASE IF EXISTS SocialMedia;
 GO
 
@@ -29,14 +26,38 @@ CREATE TABLE CoreData.Users (
     UserID INT PRIMARY KEY IDENTITY(1,1),
     Username NVARCHAR(50) UNIQUE NOT NULL,
     Email NVARCHAR(100) UNIQUE NOT NULL,
-    PasswordHash NVARCHAR(256) NOT NULL, 
-    FullName NVARCHAR(100),
-    Bio NVARCHAR(500), 
-    ProfilePictureURL NVARCHAR(255), 
+	PhoneNumber NVARCHAR(15),
+    PasswordHash NVARCHAR(256), 
+    FullName NVARCHAR(100) COLLATE Vietnamese_CI_AS,
+    Bio NVARCHAR(500) COLLATE Vietnamese_CI_AS, 
+	ProfilePictureURL NVARCHAR(2048),
     CreatedAt DATETIME DEFAULT GETDATE(),
+	LastLogin DateTime,
+	AuthProvider NVARCHAR,
+	IsVerified BIT NOT NULL DEFAULT 0,
 	IsDeleted BIT NOT NULL DEFAULT 0,
     DeletedAt DATETIME2 NULL
 );
+GO
+USE SocialMedia;
+DECLARE @maxTokenId INT = (SELECT ISNULL(MAX(TokenID), 0) FROM CoreData.RefreshTokens);
+DBCC CHECKIDENT ('CoreData.RefreshTokens', RESEED, @maxTokenId);
+
+-- *******************************************************************
+-- 0. REFRESH TOKENS
+-- *******************************************************************
+CREATE TABLE CoreData.RefreshTokens (
+
+    TokenID INT IDENTITY(1,1) PRIMARY KEY,
+    UserID INT,
+    Token NVARCHAR(36) NOT NULL UNIQUE,
+    ExpiryDate DATETIME2,
+    CreatedAt DATETIME2,
+    FOREIGN KEY (UserID) REFERENCES CoreData.Users(UserID)
+);
+
+ALTER TABLE CoreData.Users
+ALTER COLUMN AuthProvider NVARCHAR(20);
 GO
 CREATE NONCLUSTERED INDEX IX_Users_ActiveUsers
 ON CoreData.Users(UserID) WHERE DeletedAt IS NULL;
@@ -68,7 +89,7 @@ GO
 CREATE TABLE CoreData.InteractableItems (
     InteractableItemID BIGINT PRIMARY KEY IDENTITY(1,1),
     ItemType NVARCHAR(20) NOT NULL 
-        CHECK (ItemType IN ('POST', 'MEDIA', 'COMMENT', 'SHARE', 'MESSAGE', 'STORY')),
+        CHECK (ItemType IN ('POST', 'MEDIA', 'COMMENT', 'SHARE', 'MESSAGE')),
     CreatedAt DATETIME DEFAULT GETDATE()
 );
 GO
@@ -166,10 +187,10 @@ CREATE TABLE CoreData.Shares (
     InteractableItemID BIGINT UNIQUE NOT NULL,
     ShareCaption NVARCHAR(500),
     CreatedAt DATETIME DEFAULT GETDATE(),
-
-    FOREIGN KEY (UserID) REFERENCES CoreData.Users(UserID) ON DELETE CASCADE,
-    FOREIGN KEY (OriginalPostID) REFERENCES CoreData.Posts(PostID) ON DELETE NO ACTION,
-    FOREIGN KEY (InteractableItemID) REFERENCES CoreData.InteractableItems(InteractableItemID) ON DELETE CASCADE,
+    
+    FOREIGN KEY (UserID) REFERENCES CoreData.Users(UserID),
+    FOREIGN KEY (OriginalPostID) REFERENCES CoreData.Posts(PostID),
+    FOREIGN KEY (InteractableItemID) REFERENCES CoreData.InteractableItems(InteractableItemID),
     
     UNIQUE (UserID, OriginalPostID)
 );
@@ -194,6 +215,7 @@ GO
 CREATE TABLE CoreData.FeedItems (
     FeedItemID BIGINT PRIMARY KEY IDENTITY(1,1),
     UserID INT NOT NULL,
+    PostID INT NOT NULL,
     ActivityType NVARCHAR(20) NOT NULL 
         CHECK (ActivityType IN ('CREATED', 'SHARED')),
     ActorUserID INT NOT NULL,
@@ -201,12 +223,17 @@ CREATE TABLE CoreData.FeedItems (
     CreatedAt DATETIME DEFAULT GETDATE(),
     
     FOREIGN KEY (UserID) REFERENCES CoreData.Users(UserID) ON DELETE CASCADE,
-    FOREIGN KEY (ActorUserID) REFERENCES CoreData.Users(UserID) ON DELETE NO ACTION,
+    FOREIGN KEY (PostID) REFERENCES CoreData.Posts(PostID),
+    FOREIGN KEY (ActorUserID) REFERENCES CoreData.Users(UserID)
 );
 GO
 
 CREATE INDEX IX_FeedItems_UserID_CreatedAt 
 ON CoreData.FeedItems(UserID, CreatedAt DESC);
+GO
+
+CREATE INDEX IX_FeedItems_PostID 
+ON CoreData.FeedItems(PostID);
 GO
 
 -- *******************************************************************
@@ -269,7 +296,7 @@ CREATE TABLE CoreData.Reactions (
     FOREIGN KEY (InteractableItemID) 
         REFERENCES CoreData.InteractableItems(InteractableItemID) ON DELETE CASCADE,
     
-     (UserID, InteractableItemID)
+    UNIQUE (UserID, InteractableItemID)
 );
 GO
 
@@ -291,8 +318,8 @@ CREATE TABLE CoreData.PostTags (
     TaggedAt DATETIME DEFAULT GETDATE(),
     
     PRIMARY KEY (PostID, TaggedUserID),
-    FOREIGN KEY (PostID) REFERENCES CoreData.Posts(PostID) ON DELETE NO ACTION,
-    FOREIGN KEY (TaggedUserID) REFERENCES CoreData.Users(UserID) ON DELETE CASCADE
+    FOREIGN KEY (PostID) REFERENCES CoreData.Posts(PostID) ON DELETE CASCADE,
+    FOREIGN KEY (TaggedUserID) REFERENCES CoreData.Users(UserID)
 );
 GO
 
@@ -333,7 +360,7 @@ CREATE TABLE CoreData.Follows (
     
     PRIMARY KEY (FollowerID, FollowingID),
     FOREIGN KEY (FollowerID) REFERENCES CoreData.Users(UserID) ON DELETE CASCADE,
-    FOREIGN KEY (FollowingID) REFERENCES CoreData.Users(UserID) ON DELETE NO ACTION,
+    FOREIGN KEY (FollowingID) REFERENCES CoreData.Users(UserID),
   
     CHECK (FollowerID <> FollowingID)
 );
@@ -351,7 +378,7 @@ CREATE TABLE CoreData.Blocks (
     
     PRIMARY KEY (BlockerID, BlockedUserID),
     FOREIGN KEY (BlockerID) REFERENCES CoreData.Users(UserID) ON DELETE CASCADE,
-    FOREIGN KEY (BlockedUserID) REFERENCES CoreData.Users(UserID) ON DELETE NO ACTION,
+    FOREIGN KEY (BlockedUserID) REFERENCES CoreData.Users(UserID),
     
     CHECK (BlockerID <> BlockedUserID)
 );
@@ -415,3 +442,68 @@ GO
 CREATE INDEX IX_Notifications_RecipientUserID_IsRead_CreatedAt
 ON CoreData.Notifications(RecipientUserID, IsRead, CreatedAt DESC);
 GO
+
+
+-- *******************************************************************
+-- 13. UserDeviceToken
+-- *******************************************************************
+
+CREATE TABLE CoreData.UserDeviceToken (
+
+    TokenID BIGINT IDENTITY(1,1) NOT NULL,
+    UserID INT NOT NULL,
+    
+    -- Chuỗi device token (từ FCM/APNs). 
+    -- Phải là UNIQUE để tránh lưu trùng lặp.
+    DeviceToken NVARCHAR(255) NOT NULL,
+    
+    -- Trạng thái: 1 = đang hoạt động (dùng để gửi), 0 = đã vô hiệu (ví dụ: logout)
+    IsActive BIT NOT NULL DEFAULT 1,
+    
+    -- Lưu loại thiết bị: 'ANDROID', 'IOS', 'WEB'
+    DeviceType NVARCHAR(20) NULL,
+    
+    LastUsedAt DATETIME2 NULL,
+    CreatedAt DATETIME2 NOT NULL DEFAULT GETDATE(),
+    CONSTRAINT PK_UserDeviceToken PRIMARY KEY (TokenID),
+    
+    CONSTRAINT FK_UserDeviceToken_Users FOREIGN KEY (UserID)
+        REFERENCES CoreData.Users (UserID)
+        ON DELETE CASCADE, 
+
+    CONSTRAINT UQ_UserDeviceToken_DeviceToken UNIQUE (DeviceToken)
+);
+GO
+-- Tạo index cho hàm "findByUser_UserIdAndIsActive"
+-- Đây là index quan trọng nhất để tăng tốc độ lấy token khi gửi thông báo
+CREATE INDEX IX_UserDeviceToken_UserID_IsActive
+ON CoreData.UserDeviceToken (UserID, IsActive)
+WHERE IsActive = 1; 
+GO
+
+-- *******************************************************************
+-- 14. WebSocketSessions
+-- *******************************************************************
+CREATE TABLE CoreData.WebSocketSessions (
+    ID BIGINT PRIMARY KEY IDENTITY(1,1),
+    SessionToken NVARCHAR(255) NOT NULL,
+    UserID INT NOT NULL,
+    IsActive BIT NOT NULL DEFAULT 1,
+    CreatedAt DATETIME NOT NULL DEFAULT GETDATE(),
+    ExpiresAt DATETIME NOT NULL,
+    FOREIGN KEY (UserID) REFERENCES CoreData.Users(UserID) ON DELETE CASCADE,
+	CONSTRAINT CK_WebSocketSessions_ExpiresAfterCreated
+CHECK (ExpiresAt > CreatedAt),
+);
+CREATE UNIQUE INDEX UQ_WebSocketSessions_SessionToken
+ON CoreData.WebSocketSessions(SessionToken);
+
+CREATE INDEX IX_WebSocketSessions_User_Active
+ON CoreData.WebSocketSessions(UserID, IsActive)
+WHERE (IsActive = 1);
+
+CREATE INDEX IX_WebSocketSessions_Expires_Active
+ON CoreData.WebSocketSessions(ExpiresAt, IsActive)
+WHERE (IsActive = 1);
+
+
