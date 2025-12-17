@@ -4,3 +4,5 @@
 # Ẩn TOÀN BỘ dữ liệu của MinIO
 minio-data/
 redis-data/
+frontend/node_modules
+.idea

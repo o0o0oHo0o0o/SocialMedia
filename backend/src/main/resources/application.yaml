@@ -96,21 +96,6 @@ minio:
   bucket-name: social-media-images
 
 # --- JWT ---
-jwt:
-  secret: ${JWT_SECRET}
-  access:
-    token:
-      ttl: ${JWT_ACCESS_EXPIRATION}
-      cookie:
-        name: ${ACCESS_TOKEN_COOKIE_NAME}
-  refresh:
-    token:
-      ttl: ${JWT_REFRESH_EXPIRATION}
-      cookie:
-        name: ${REFRESH_TOKEN_COOKIE_NAME}
-
-# --- TWILIO ---
-            required: true
   web:
     resources:
       static-locations: classpath:/META-INF/resources/, classpath:/resources/, classpath:/static/, classpath:/public/, file:/src/main/resources/static/uploads
