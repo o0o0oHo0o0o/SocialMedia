@@ -8,7 +8,7 @@ import java.util.Date;
 import java.util.List;
 
 @Entity
-@Table(name = "Stories")
+@Table(name = "Stories", schema = "CoreData")
 @Setter
 @Getter
 public class Story {

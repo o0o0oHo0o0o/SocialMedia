@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "UserRole")
+@Table(name = "UserRole", schema = "CoreData")
 @Getter
 @Setter
 public class UserRole {

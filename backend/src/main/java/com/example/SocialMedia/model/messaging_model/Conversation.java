@@ -20,7 +20,7 @@ public class Conversation {
     @Column(name = "GroupImageURL")
     private String groupImageURL;
 
-    @Column(name = "ConversationName", nullable = false)
+    @Column(name = "ConversationName")
     private String conversationName;
 
     @Column(name = "IsGroupChat", nullable = false)
@@ -30,7 +30,7 @@ public class Conversation {
     private LocalDateTime createdLocalDateTime;
 
     @Column(name = "LastMessageID")
-    private int lastMessageID;
+    private long lastMessageID;
 
     @Column(name = "CreatedByUserID")
     private int createdByUserID;

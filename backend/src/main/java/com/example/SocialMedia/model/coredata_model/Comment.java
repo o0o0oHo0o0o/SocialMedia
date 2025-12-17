@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 
 
 @Entity
-@Table(name = "Comments")
+@Table(name = "Comments", schema = "CoreData")
 @Setter
 @Getter
 public class Comment {

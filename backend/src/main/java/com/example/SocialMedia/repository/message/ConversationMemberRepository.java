@@ -13,10 +13,14 @@ public interface ConversationMemberRepository extends JpaRepository<Conversation
             Integer conversationId,
             Integer userId
     );
+
     Boolean existsByConversation_ConversationIdAndUser_Id(int conversationId, int userId);
 
     List<ConversationMember> findByConversation_ConversationId(int conversationId);
 
+    Boolean existsByConversation_ConversationIdAndUser_UserName(int conversationId, String username);
+
+    Optional<ConversationMember> findByConversation_ConversationIdAndUser_UserName(Integer conversationId, String requesterUsername);
 }
 
 

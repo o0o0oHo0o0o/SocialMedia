@@ -1,14 +1,12 @@
 package com.example.SocialMedia.controller;
 
-import com.example.SocialMedia.dto.auth.FirebaseVerifyRequest;
 import com.example.SocialMedia.dto.auth.RegisterRequest;
 import com.example.SocialMedia.dto.auth.VerifyRequest;
 import com.example.SocialMedia.dto.auth.VerifyResponse;
 import com.example.SocialMedia.model.coredata_model.User;
 import com.example.SocialMedia.service.auth.AuthService;
 import com.example.SocialMedia.service.auth.OtpService;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseToken;
+
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -18,7 +16,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.google.firebase.auth.UserRecord;
 import java.util.Optional;
 
 
@@ -35,7 +32,7 @@ public class VerificationController {
     private final StringRedisTemplate redisTemplate;
     private final com.fasterxml.jackson.databind.ObjectMapper objectMapper;
 
-    private final com.google.firebase.FirebaseApp firebaseApp;
+//    private final com.google.firebase.FirebaseApp firebaseApp;
     @PostMapping("/otp")
     public ResponseEntity<VerifyResponse> verifyOtp(@RequestBody VerifyRequest verifyRequest,
                                                     HttpServletResponse response) {
@@ -71,35 +68,35 @@ public class VerificationController {
         redisTemplate.delete(key);
     }
 
-    @PostMapping("/firebase-otp")
-    public ResponseEntity<VerifyResponse> verifyFirebaseOtp(
-            @RequestBody FirebaseVerifyRequest firebaseRequest,
-            HttpServletResponse response) {
-
-        VerifyResponse responseEntity = new VerifyResponse();
-        try {
-            FirebaseToken decodedToken = FirebaseAuth.getInstance(firebaseApp)
-                    .verifyIdToken(firebaseRequest.getFirebaseToken());
-
-            String uid = decodedToken.getUid();
-            UserRecord userRecord = FirebaseAuth.getInstance(firebaseApp).getUser(uid);
-            String phoneNumber = userRecord.getPhoneNumber();
-            if (phoneNumber == null) {
-                throw new RuntimeException("Firebase token không hợp lệ (không có SĐT).");
-            }
-
-            String key = SIGNUP_KEY_PREFIX + phoneNumber;
-            registerCacheData(response, key);
-
-            responseEntity.setMessage("Xác thực SĐT thành công!");
-            responseEntity.setIdentifier(phoneNumber);
-            return ResponseEntity.ok(responseEntity);
-
-        } catch (Exception ex) {
-            responseEntity.setMessage(ex.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseEntity);
-        }
-    }
+//    @PostMapping("/firebase-otp")
+//    public ResponseEntity<VerifyResponse> verifyFirebaseOtp(
+//            @RequestBody FirebaseVerifyRequest firebaseRequest,
+//            HttpServletResponse response) {
+//
+//        VerifyResponse responseEntity = new VerifyResponse();
+//        try {
+//            FirebaseToken decodedToken = FirebaseAuth.getInstance(firebaseApp)
+//                    .verifyIdToken(firebaseRequest.getFirebaseToken());
+//
+//            String uid = decodedToken.getUid();
+//            UserRecord userRecord = FirebaseAuth.getInstance(firebaseApp).getUser(uid);
+//            String phoneNumber = userRecord.getPhoneNumber();
+//            if (phoneNumber == null) {
+//                throw new RuntimeException("Firebase token không hợp lệ (không có SĐT).");
+//            }
+//
+//            String key = SIGNUP_KEY_PREFIX + phoneNumber;
+//            registerCacheData(response, key);
+//
+//            responseEntity.setMessage("Xác thực SĐT thành công!");
+//            responseEntity.setIdentifier(phoneNumber);
+//            return ResponseEntity.ok(responseEntity);
+//
+//        } catch (Exception ex) {
+//            responseEntity.setMessage(ex.getMessage());
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseEntity);
+//        }
+//    }
     @PostMapping("/resend-otp")
     public ResponseEntity<VerifyResponse> resendOtp(@RequestBody VerifyRequest verifyRequest) {
         VerifyResponse responseEntity = new VerifyResponse();

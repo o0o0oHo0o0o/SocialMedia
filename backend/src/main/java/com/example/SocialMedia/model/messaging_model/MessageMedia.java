@@ -28,7 +28,7 @@ public class MessageMedia {
     private String FileName;
 
     @Column(name = "FileSize")
-    private int FileSize;
+    private Integer FileSize;
 
     @Column(name = "ThumbnailName")
     private String ThumbnailName;

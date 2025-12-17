@@ -6,6 +6,7 @@ import com.example.SocialMedia.dto.request.MarkReadRequest;
 import com.example.SocialMedia.dto.request.SendMessageRequest;
 import com.example.SocialMedia.dto.response.ConversationResponse;
 import com.example.SocialMedia.dto.response.MessageResponse;
+import com.example.SocialMedia.dto.response.ReactionResponse;
 import com.example.SocialMedia.repository.UserRepository;
 import com.example.SocialMedia.service.message.ChatService;
 import com.example.SocialMedia.service.message.ConversationService;
@@ -23,6 +24,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import com.example.SocialMedia.dto.request.ReactionRequest;
 
 import java.util.List;
 import java.util.Map;
@@ -38,11 +40,76 @@ public class ChatController {
     private final UserRepository userRepository;
     private final ConversationService conversationService;
 
+
+    // 1. Endpoint Thả Reaction (Toggle: Add/Remove/Update)
+    @PostMapping("/reactions")
+    public ResponseEntity<?> reactToMessage(
+            @RequestBody ReactionRequest request,
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        try {
+            // Validate cơ bản
+            if (request.getMessageId() == null) {
+                return ResponseEntity.badRequest().body(Map.of("message", "Message ID is required"));
+            }
+
+            // Gọi Service xử lý
+            chatService.reactToMessage(userDetails.getUsername(), request);
+
+            return ResponseEntity.ok(Map.of(
+                    "message", "Reaction updated successfully"
+            ));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(Map.of("message", "Lỗi server: " + e.getMessage()));
+        }
+    }
+
+    // 2. Endpoint Lấy danh sách chi tiết người thả tim (Lazy Loading)
+    // Dùng khi user click vào icon reaction để xem "Ai đã thả tim?"
+    @GetMapping("/messages/{messageId}/reactions")
+    public ResponseEntity<?> getMessageReactionDetails(@PathVariable Long messageId) {
+        try {
+            List<ReactionResponse> details = conversationService.getReactionDetails(messageId);
+            return ResponseEntity.ok(details);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        }
+    }
+    // 1. Cập nhật ảnh đại diện nhóm (Conversation Avatar)
+    @PutMapping(value = "/conversations/{conversationId}/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> updateConversationAvatar(
+            @PathVariable int conversationId,
+            @RequestPart("file") MultipartFile file,
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        try {
+            if (file == null || file.isEmpty()) {
+                return ResponseEntity.badRequest().body(Map.of("message", "File ảnh không được để trống"));
+            }
+
+            // Gọi Service
+            String newAvatarUrl = conversationService.updateConversationAvatar(
+                    conversationId,
+                    file,
+                    userDetails.getUsername()
+            );
+
+            return ResponseEntity.ok(Map.of(
+                    "message", "Cập nhật ảnh nhóm thành công",
+                    "data", newAvatarUrl
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Lỗi: " + e.getMessage()));
+        }
+    }
     // 2. Controller endpoint - Thêm vào ConversationController hoặc MessagingController
     @PutMapping("/{conversationId}/nickname")
     public ResponseEntity<?> updateNickname(
             @PathVariable Integer conversationId,
-            @RequestBody ConversationMemberDTO request) {
+            @RequestBody ConversationMemberDTO request,
+            @AuthenticationPrincipal UserDetails userDetails) {
         try {
             // Lấy targetUserId từ request body - người muốn đổi nickname
             Integer targetUserId = request.getUserId();
@@ -55,8 +122,9 @@ public class ChatController {
 
             conversationService.updateMemberNickname(
                     conversationId,
-                    targetUserId,  // <-- Đổi từ userId (người đăng nhập) sang targetUserId (người được đổi nickname)
-                    request.getNickname()
+                    targetUserId,
+                    request.getNickname(),
+                    userDetails.getUsername()
             );
 
             return ResponseEntity.ok(Map.of(
@@ -67,6 +135,34 @@ public class ChatController {
             return ResponseEntity.badRequest().body(Map.of(
                     "message", "Lỗi: " + e.getMessage()
             ));
+        }
+    }
+    // 3. Đổi tên nhóm (Conversation Name)
+    @PutMapping("/{conversationId}/name")
+    public ResponseEntity<?> updateConversationName(
+            @PathVariable int conversationId,
+            @RequestBody Map<String, String> payload, // Nhận JSON: {"conversationName": "Tên Nhóm Mới"}
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        try {
+            String newName = payload.get("conversationName");
+
+            // Validate cơ bản
+            if (newName == null || newName.trim().isEmpty()) {
+                return ResponseEntity.badRequest().body(Map.of("message", "Tên nhóm không được để trống"));
+            }
+
+            // Gọi Service xử lý
+            conversationService.updateConversationName(conversationId, newName, userDetails.getUsername());
+
+            return ResponseEntity.ok(Map.of(
+                    "message", "Đổi tên nhóm thành công",
+                    "data", newName
+            ));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(Map.of("message", "Lỗi server: " + e.getMessage()));
         }
     }
 

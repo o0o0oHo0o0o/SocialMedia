@@ -6,7 +6,7 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "WebSocketSessions")
+@Table(name = "WebSocketSessions", schema = "CoreData")
 @Data
 public class UserSession {
 

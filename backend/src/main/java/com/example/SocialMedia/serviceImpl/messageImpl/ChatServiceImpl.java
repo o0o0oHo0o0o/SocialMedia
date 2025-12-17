@@ -1,18 +1,26 @@
 package com.example.SocialMedia.serviceImpl.messageImpl;
 
+import com.example.SocialMedia.constant.ReactionType;
 import com.example.SocialMedia.dto.message.MessageStatusSummary;
 import com.example.SocialMedia.dto.message.UserReadStatus;
 import com.example.SocialMedia.dto.projection.ConversationProjection;
+import com.example.SocialMedia.dto.request.ReactionRequest;
 import com.example.SocialMedia.dto.request.SendMessageRequest;
 import com.example.SocialMedia.dto.response.*;
 import com.example.SocialMedia.keys.MessageStatusID;
+import com.example.SocialMedia.model.coredata_model.InteractableItems;
+import com.example.SocialMedia.model.coredata_model.Reaction;
 import com.example.SocialMedia.model.coredata_model.User;
 import com.example.SocialMedia.model.messaging_model.*;
+import com.example.SocialMedia.repository.InteractableItemRepository;
 import com.example.SocialMedia.repository.UserRepository;
 import com.example.SocialMedia.repository.message.*;
 import com.example.SocialMedia.service.IMinioService;
 import com.example.SocialMedia.service.message.ChatService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,11 +28,12 @@ import org.springframework.web.multipart.MultipartFile;
 import com.example.SocialMedia.model.messaging_model.MessageStatus;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ChatServiceImpl implements ChatService {
 
     private final MessageRepository messageRepo;
@@ -33,6 +42,8 @@ public class ChatServiceImpl implements ChatService {
     private final MessageStatusRepository messageStatusRepo;
     private final ConversationRepository conversationRepo;
     private final ConversationMemberRepository conversationMemberRepo;
+    private final InteractableItemRepository interactableItemRepo;
+    private final ReactionRepository reactionRepo;
     private final UserRepository userRepo;
     private final IMinioService minioService;
     private final SimpMessagingTemplate messagingTemplate;
@@ -40,35 +51,50 @@ public class ChatServiceImpl implements ChatService {
     @Override
     @Transactional
     public MessageResponse sendMessage(String username, SendMessageRequest request, List<MultipartFile> files) {
-        // 1. Fetch User & Conversation
-        User sender = userRepo.findByUserName(username).orElseThrow(() -> new RuntimeException("User not found"));
-        Conversation conversation = conversationRepo.findById(request.getConversationId())
-                .orElseThrow(() -> new RuntimeException("Conversation not found"));
+        log.info("Sending message for user: {}", username);
 
+        // 1. Fetch User & Conversation
+        User sender = userRepo.findByUserName(username)
+                .orElseThrow(() -> new RuntimeException("User not found: " + username));
+        Conversation conversation = conversationRepo.findById(request.getConversationId())
+                .orElseThrow(() -> new RuntimeException("Conversation not found: " + request.getConversationId()));
+
+        // ==================================================================
+        // BƯỚC MỚI: Tạo InteractableItem trước
+        // ==================================================================
+        InteractableItems interactableItem = new InteractableItems();
+        interactableItem.setItemType("MESSAGE"); // Hoặc dùng Enum nếu bạn có
+        interactableItem.setCreatedAt(LocalDateTime.now());
+        interactableItem = interactableItemRepo.save(interactableItem);
+
+        // 2. Create Base Message
         Messages message = new Messages();
         message.setConversation(conversation);
         message.setSender(sender);
         message.setSentAt(LocalDateTime.now());
         message.setMessageType("TEXT");
+
+        // Gắn InteractableItem vừa tạo vào Message
+        message.setInteractableItem(interactableItem);
+
         long nextSeq = conversation.getLastMessageID() + 1;
         message.setSequenceNumber(nextSeq);
 
-        // FIX: Set replyMessage từ fresh object từ DB
+        // Handle Reply
         if (request.getReplyToMessageId() != null) {
             messageRepo.findById(request.getReplyToMessageId()).ifPresent(message::setReplyMessage);
         }
 
-        Messages savedMessage = messageRepo.save(message); // Save để có ID
+        Messages savedMessage = messageRepo.save(message);
 
-        // ===== Tạo MessageStatus cho tất cả members =====
+        // 3. Create Message Status for other members
         List<ConversationMember> members = conversationMemberRepo
                 .findByConversation_ConversationId(conversation.getConversationId());
         int senderId = sender.getId();
+
         for (ConversationMember member : members) {
-            // Không tạo status cho chính người gửi
             if (member.getUser().getId() != senderId) {
                 MessageStatus status = new MessageStatus();
-
                 MessageStatusID statusId = new MessageStatusID();
                 statusId.setMessageID(savedMessage.getMessageId());
                 statusId.setUserID(member.getUser().getId());
@@ -77,23 +103,25 @@ public class ChatServiceImpl implements ChatService {
                 status.setMessage(savedMessage);
                 status.setUser(member.getUser());
                 status.setStatus(MessageStatus.MessageStatusEnum.SENT);
-
                 messageStatusRepo.save(status);
             }
         }
-        // ============================================================
-        // 3. Handle Message Body (Content text) - FIX: Use native SQL insert
-        if (request.getContent() != null && !request.getContent().trim().isEmpty()) {
-            try {
-                messageBodyRepo.insertBody(savedMessage.getMessageId(), request.getContent());
-            } catch (Exception e) {
-                // Sửa logging với constant message
-                org.slf4j.LoggerFactory.getLogger(this.getClass())
-                        .warn("Failed to insert message body", e);
-            }
+
+        // 4. Handle Message Body
+        String bodyContent = request.getContent();
+
+        // Nếu null hoặc rỗng thì gán chuỗi rỗng để tránh lỗi logic sau này
+        if (bodyContent == null || bodyContent.trim().isEmpty()) {
+            bodyContent = "";
         }
 
-        // 4. Handle Media (MinIO)
+        try {
+            messageBodyRepo.insertBody(savedMessage.getMessageId(), bodyContent);
+        } catch (Exception e) {
+            log.warn("Failed to insert message body for msgId: {}", savedMessage.getMessageId(), e);
+        }
+
+        // 5. Handle Media
         List<MediaDto> mediaDtos = new ArrayList<>();
         if (files != null && !files.isEmpty()) {
             for (MultipartFile file : files) {
@@ -117,20 +145,19 @@ public class ChatServiceImpl implements ChatService {
             }
         }
 
-        // 5. Update Conversation Metadata
+        // 6. Update Conversation Metadata
         conversation.setLastMessageID((int) savedMessage.getMessageId());
         conversationRepo.save(conversation);
 
-        // 6. Get Nickname
+        // 7. Get Nickname
         ConversationMember memberInfo = conversationMemberRepo
                 .findByConversation_ConversationIdAndUser_Id(conversation.getConversationId(), sender.getId())
                 .orElse(null);
         String nickname = memberInfo != null ? memberInfo.getNickname() : null;
 
-        // 7. Build Response
+        // 8. Build Response
         MessageResponse response = MessageResponse.builder()
                 .messageId(savedMessage.getMessageId())
-                .sender(SenderDto.fromUser(sender, nickname))
                 .conversationId(conversation.getConversationId())
                 .content(request.getContent())
                 .media(mediaDtos)
@@ -141,7 +168,7 @@ public class ChatServiceImpl implements ChatService {
                 .isDelivered(false)
                 .build();
 
-        // 8. REAL-TIME PUSH (Socket)
+        // 9. Push Real-time Event
         SocketResponse<MessageResponse> socketEvent = SocketResponse.<MessageResponse>builder()
                 .type("NEW_MESSAGE")
                 .payload(response)
@@ -151,89 +178,87 @@ public class ChatServiceImpl implements ChatService {
 
         return response;
     }
+
+    // ... (Giữ nguyên các hàm getUserConversations và getMessages từ code đã fix trước đó)
+    @Override
     public List<ConversationResponse> getUserConversations(String username, int page, int size) {
-        User user = userRepo.findByUserName(username).orElseThrow();
-
-        // Gọi SP (Page bắt đầu từ 1)
-        List<ConversationProjection> rawData = conversationRepo.getUserConversations(user.getId(), size, page);
-
-        // Map từ Projection sang Response DTO (để xử lý URL ảnh)
+        User user = userRepo.findByUserName(username)
+                .orElseThrow(() -> new RuntimeException("User not found: " + username));
+        int dbPage = (page > 0) ? page - 1 : 0;
+        List<ConversationProjection> rawData = conversationRepo.getUserConversations(user.getId(), dbPage, size);
         return rawData.stream().map(this::mapToResponse).toList();
     }
+
 
     @Override
     @Transactional(readOnly = true)
     public List<MessageResponse> getMessages(String username, int conversationId, int page, int size) {
-        // 0) Kiểm tra membership
         User user = userRepo.findByUserName(username).orElseThrow();
-        boolean isMember = conversationMemberRepo
-                .existsByConversation_ConversationIdAndUser_Id(conversationId, user.getId());
+        boolean isMember = conversationMemberRepo.existsByConversation_ConversationIdAndUser_Id(conversationId, user.getId());
         if (!isMember) throw new RuntimeException("Not a conversation member");
 
-        // 1) Lấy page message - DESCENDING để lấy tin mới nhất trước
         int p = Math.max(page - 1, 0);
-        org.springframework.data.domain.Pageable pageable =
-                org.springframework.data.domain.PageRequest.of(p, size);
-
-        // ✅ SỬA ĐÂY: Dùng method DESC từ repository
+        Pageable pageable = PageRequest.of(p, size);
         var pageMsgs = messageRepo.findByConversationIdOrderBySequenceNumberDesc(conversationId, pageable);
         List<Messages> messages = pageMsgs.getContent();
         if (messages.isEmpty()) return List.of();
 
-        // 2) Batch data (phần còn lại giữ nguyên)
         List<Long> ids = messages.stream().map(Messages::getMessageId).toList();
         int currentUserId = user.getId();
 
-        var bodiesByMsgId = messageBodyRepo.findByMessageIDIn(ids).stream()
-                .collect(java.util.stream.Collectors.groupingBy(MessageBodies::getMessageID));
+        // 1. Fetch dữ liệu phụ (Body, Media, Status)
+        var bodiesByMsgId = messageBodyRepo.findByMessageIDIn(ids).stream().collect(Collectors.groupingBy(MessageBodies::getMessageID));
+        var mediaByMsgId = messageMediaRepo.findByMessage_MessageIdIn(ids).stream().collect(Collectors.groupingBy(m -> m.getMessage().getMessageId()));
+        var statusesByMsgId = messageStatusRepo.findByMessage_MessageIdIn(ids).stream().collect(Collectors.groupingBy(s -> s.getMessage().getMessageId()));
 
-        var mediaByMsgId = messageMediaRepo.findByMessage_MessageIdIn(ids).stream()
-                .collect(java.util.stream.Collectors.groupingBy(m -> m.getMessage().getMessageId()));
+        // Lấy list InteractableItemID từ messages (lọc null để tránh lỗi)
+        List<Integer> interactableItemIds = messages.stream()
+                .map(m -> m.getInteractableItem() != null ? m.getInteractableItem().getInteractableItemId() : null)
+                .filter(Objects::nonNull)
+                .toList();
 
-        var statusesByMsgId = messageStatusRepo.findByMessage_MessageIdIn(ids).stream()
-                .collect(java.util.stream.Collectors.groupingBy(s -> s.getMessage().getMessageId()));
+        // Query DB lấy reactions và gom nhóm theo ItemID
+        var reactionsByItemId = reactionRepo.findByInteractableItems_InteractableItemIdIn(interactableItemIds)
+                .stream()
+                .collect(Collectors.groupingBy(r -> r.getInteractableItems().getInteractableItemId()));
+        // ------------------------------------------------
 
-        // 3) Map ra DTO
-        List<Long> undeliveredIds = new java.util.ArrayList<>();
+        List<Long> undeliveredIds = new ArrayList<>();
         List<MessageResponse> result = messages.stream().map(m -> {
-            // Content
-            String content = bodiesByMsgId.getOrDefault(m.getMessageId(), java.util.List.of())
-                    .stream().findFirst().map(MessageBodies::getContent).orElse(null);
-
-            // Media
-            List<MediaDto> mediaDtos = mediaByMsgId.getOrDefault(m.getMessageId(), java.util.List.of()).stream()
+            String content = bodiesByMsgId.getOrDefault(m.getMessageId(), List.of()).stream().findFirst().map(MessageBodies::getContent).orElse(null);
+            List<MediaDto> mediaDtos = mediaByMsgId.getOrDefault(m.getMessageId(), List.of()).stream()
                     .map(media -> MediaDto.builder()
                             .url(minioService.getFileUrl(media.getMediaName()))
                             .type(media.getMediaType())
                             .fileName(media.getFileName())
+                            .fileSize(media.getFileSize())
                             .build())
                     .toList();
-
-            // Nickname
-            String nickname = conversationMemberRepo
-                    .findByConversation_ConversationIdAndUser_Id(m.getConversation().getConversationId(), m.getSender().getId())
-                    .map(ConversationMember::getNickname)
-                    .orElse(null);
-
-            // Status calculation
+            String nickname = conversationMemberRepo.findByConversation_ConversationIdAndUser_Id(m.getConversation().getConversationId(), m.getSender().getId()).map(ConversationMember::getNickname).orElse(null);
             boolean isMySent = m.getSender().getId() == currentUserId;
-            List<MessageStatus> statuses = statusesByMsgId.getOrDefault(m.getMessageId(), java.util.List.of());
-
-            MessageStatus relevantStatus = statuses.stream()
-                    .filter(s -> isMySent == (s.getUser().getId() != currentUserId))
-                    .findFirst()
-                    .orElse(null);
-
+            List<MessageStatus> statuses = statusesByMsgId.getOrDefault(m.getMessageId(), List.of());
+            MessageStatus relevantStatus = statuses.stream().filter(s -> isMySent == (s.getUser().getId() != currentUserId)).findFirst().orElse(null);
             boolean isRead = relevantStatus != null && MessageStatus.MessageStatusEnum.READ.equals(relevantStatus.getStatus());
-            boolean isDelivered = relevantStatus != null &&
-                    (MessageStatus.MessageStatusEnum.DELIVERED.equals(relevantStatus.getStatus()) || isRead);
+            boolean isDelivered = relevantStatus != null && (MessageStatus.MessageStatusEnum.DELIVERED.equals(relevantStatus.getStatus()) || isRead);
 
-            // Collect undelivered IDs - CHỈ cho status SENT
-            if (!isMySent && relevantStatus != null &&
-                    MessageStatus.MessageStatusEnum.SENT.equals(relevantStatus.getStatus())) {
+
+            if (!isMySent && relevantStatus != null && MessageStatus.MessageStatusEnum.SENT.equals(relevantStatus.getStatus())) {
                 undeliveredIds.add(m.getMessageId());
             }
+            Integer itemId = m.getInteractableItem() != null ? m.getInteractableItem().getInteractableItemId() : null;
+            List<Reaction> itemReactions = (itemId != null) ? reactionsByItemId.getOrDefault(itemId, List.of()) : List.of();
 
+            // 3.1. Đếm số lượng (Dùng Enum làm Key)
+            Map<ReactionType, Long> reactionCounts = itemReactions.stream()
+                    .collect(Collectors.groupingBy(Reaction::getReactionType, Collectors.counting()));
+
+            // 3.2. Tìm reaction của mình
+            ReactionType myReactionType = itemReactions.stream()
+                    .filter(r -> r.getUser().getId() == currentUserId)
+                    .map(Reaction::getReactionType)
+                    .findFirst()
+                    .orElse(null);
+            // ----------------------------------------
             return MessageResponse.builder()
                     .messageId(m.getMessageId())
                     .conversationId(m.getConversation().getConversationId())
@@ -245,45 +270,104 @@ public class ChatServiceImpl implements ChatService {
                     .isRead(isRead)
                     .isDelivered(isDelivered)
                     .statusSummary(buildStatusSummary(statuses, currentUserId))
+                    .reactionCounts(reactionCounts)
+                    .myReactionType(myReactionType)
                     .build();
         }).toList();
 
-        // Auto mark as delivered - CHỈ cho status SENT
         if (!undeliveredIds.isEmpty()) {
             messageStatusRepo.markAsDelivered(currentUserId, undeliveredIds, LocalDateTime.now());
         }
-
         return result;
     }
 
+    @Override
+    @Transactional
+    public void reactToMessage(String username, ReactionRequest request) {
+        // 1. Lấy User
+        User user = userRepo.findByUserName(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // 2. Lấy Message để tìm InteractableItem
+        Messages message = messageRepo.findById(request.getMessageId())
+                .orElseThrow(() -> new RuntimeException("Message not found"));
+
+        // Lưu ý: Message của bạn liên kết với InteractableItems
+        InteractableItems item = message.getInteractableItem();
+        // (Hoặc message.getInteractableItemID() tùy vào mapping trong Entity Message của bạn)
+
+        if (item == null) {
+            throw new RuntimeException("Tin nhắn này không thể tương tác");
+        }
+
+        // 3. Xử lý Reaction (Thêm/Sửa/Xóa)
+        Optional<Reaction> existingReactionOpt = reactionRepo
+                .findByInteractableItemsAndUser_Id(item, user.getId());
+
+        String action = ""; // Để log hoặc bắn socket
+
+        if (existingReactionOpt.isPresent()) {
+            Reaction existingReaction = existingReactionOpt.get();
+
+            // SO SÁNH ENUM
+            if (existingReaction.getReactionType() == request.getReactionType()) {
+                reactionRepo.delete(existingReaction);
+                action = "REMOVED";
+            } else {
+                // Update
+                existingReaction.setReactionType(request.getReactionType());
+                existingReaction.setReactedLocalDateTime(LocalDateTime.now());
+                reactionRepo.save(existingReaction);
+                action = "UPDATED";
+            }
+        } else {
+            // Chưa có -> Tạo mới
+            if (request.getReactionType() != null) {
+                Reaction newReaction = new Reaction();
+                newReaction.setInteractableItems(item);
+                newReaction.setUser(user);
+                newReaction.setReactionType(request.getReactionType());
+                newReaction.setReactedLocalDateTime(LocalDateTime.now());
+                reactionRepo.save(newReaction);
+                action = "ADDED";
+            }
+        }
+
+        // 4. Bắn Socket Real-time (Quan trọng)
+        Map<String, Object> socketPayload = new HashMap<>(); // Dùng HashMap thay vì Map.of
+        socketPayload.put("conversationId", message.getConversation().getConversationId());
+        socketPayload.put("messageId", message.getMessageId());
+        socketPayload.put("userId", user.getId());
+        socketPayload.put("username", user.getUsername());
+        socketPayload.put("action", action);
+        socketPayload.put("reactionType", action.equals("REMOVED") ? null : request.getReactionType().name());
+
+        SocketResponse<Object> socketEvent = SocketResponse.builder()
+                .type("REACTION_UPDATE") // Frontend sẽ lắng nghe type này
+                .payload(socketPayload)
+                .build();
+
+        messagingTemplate.convertAndSend("/topic/chat." + message.getConversation().getConversationId(), socketEvent);
+    }
+
+    // (Các hàm helper mapToResponse, determineMediaType, buildStatusSummary giữ nguyên như cũ)
     private ConversationResponse mapToResponse(ConversationProjection proj) {
-        // 1. Xử lý URL ảnh
-        // SP đã trả về filename đúng (dù là avatar user hay ảnh nhóm) vào cột getGroupImageURL
         String finalAvatarUrl = null;
         if (proj.getGroupImageURL() != null) {
-            // Convert filename -> Presigned URL (link xem được)
             finalAvatarUrl = minioService.getFileUrl(proj.getGroupImageURL());
         }
 
-        // 2. Map dữ liệu vào DTO
         return ConversationResponse.builder()
                 .conversationId(proj.getConversationID())
-                // SQL đã tự chọn tên nhóm hoặc tên người chat
                 .conversationName(proj.getConversationName())
                 .avatarUrl(finalAvatarUrl)
                 .isGroup(proj.getIsGroupChat())
                 .unreadCount(proj.getUnreadCount())
-
-                // 3. Thông tin tin nhắn cuối (Last Message)
-                // SQL đã xử lý [Hình ảnh]/[Video] nếu content null
                 .lastMessageContent(proj.getLastMessageContent())
                 .lastMessageTime(proj.getLastMessageSentAt() != null ? proj.getLastMessageSentAt().toString() : null)
-
-                // Nếu bạn muốn hiển thị thêm: Ai là người nhắn cuối?
-                // (Bạn cần thêm field lastMessageSender vào DTO ConversationResponse trước)
-                // .lastMessageSender(proj.getLastMessageSender()
                 .build();
     }
+
     private String determineMediaType(String contentType) {
         if (contentType == null) return "FILE";
         if (contentType.startsWith("image")) return "IMAGE";
@@ -291,7 +375,6 @@ public class ChatServiceImpl implements ChatService {
         if (contentType.startsWith("audio")) return "AUDIO";
         return "FILE";
     }
-    // Thêm vào cuối class ChatServiceImpl
 
     private MessageStatusSummary buildStatusSummary(List<MessageStatus> statuses, int currentUserId) {
         List<UserReadStatus> readByUsers = statuses.stream()

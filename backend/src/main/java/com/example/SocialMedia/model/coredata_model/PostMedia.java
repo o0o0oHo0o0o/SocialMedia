@@ -7,7 +7,7 @@ import lombok.Setter;
 import java.util.List;
 
 @Entity
-@Table(name = "PostMedia")
+@Table(name = "PostMedia", schema = "CoreData")
 @Setter
 @Getter
 public class PostMedia {

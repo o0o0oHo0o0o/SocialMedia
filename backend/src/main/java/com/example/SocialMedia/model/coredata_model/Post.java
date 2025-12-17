@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Set;
 
 @Entity
-@Table(name = "Posts")
+@Table(name = "Posts", schema = "CoreData")
 @Setter
 @Getter
 public class Post {

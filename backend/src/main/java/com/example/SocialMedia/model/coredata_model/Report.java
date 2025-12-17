@@ -7,7 +7,7 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "Reports")
+@Table(name = "Reports", schema = "CoreData")
 @Setter
 @Getter
 public class Report {

@@ -8,7 +8,7 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "PostTags")
+@Table(name = "PostTags", schema = "CoreData")
 @Setter
 @Getter
 public class PostTag {
