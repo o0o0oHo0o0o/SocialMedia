@@ -1,6 +1,7 @@
 package com.example.SocialMedia.serviceImpl.messageImpl;
 
 import com.example.SocialMedia.constant.ReactionType;
+import com.example.SocialMedia.constant.TargetType;
 import com.example.SocialMedia.dto.message.MessageStatusSummary;
 import com.example.SocialMedia.dto.message.UserReadStatus;
 import com.example.SocialMedia.dto.projection.ConversationProjection;
@@ -13,6 +14,7 @@ import com.example.SocialMedia.model.coredata_model.Reaction;
 import com.example.SocialMedia.model.coredata_model.User;
 import com.example.SocialMedia.model.messaging_model.*;
 import com.example.SocialMedia.repository.InteractableItemRepository;
+import com.example.SocialMedia.repository.ReactionRepository;
 import com.example.SocialMedia.repository.UserRepository;
 import com.example.SocialMedia.repository.message.*;
 import com.example.SocialMedia.service.IMinioService;
@@ -63,7 +65,7 @@ public class ChatServiceImpl implements ChatService {
         // BƯỚC MỚI: Tạo InteractableItem trước
         // ==================================================================
         InteractableItems interactableItem = new InteractableItems();
-        interactableItem.setItemType("MESSAGE"); // Hoặc dùng Enum nếu bạn có
+        interactableItem.setItemType(TargetType.MESSAGE); // Hoặc dùng Enum nếu bạn có
         interactableItem.setCreatedAt(LocalDateTime.now());
         interactableItem = interactableItemRepo.save(interactableItem);
 
@@ -283,74 +285,109 @@ public class ChatServiceImpl implements ChatService {
 
     @Override
     @Transactional
-    public void reactToMessage(String username, ReactionRequest request) {
+    public String reactToMessage(String username, ReactionRequest request) {
         // 1. Lấy User
         User user = userRepo.findByUserName(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException("User not found: " + username));
 
-        // 2. Lấy Message để tìm InteractableItem
-        Messages message = messageRepo.findById(request.getMessageId())
-                .orElseThrow(() -> new RuntimeException("Message not found"));
+        InteractableItems item = null;
+        Messages message = null;
 
-        // Lưu ý: Message của bạn liên kết với InteractableItems
-        InteractableItems item = message.getInteractableItem();
-        // (Hoặc message.getInteractableItemID() tùy vào mapping trong Entity Message của bạn)
+        // 2. Xác định đối tượng (Dùng Enum TargetType)
+        switch (request.getTargetType()) {
+            case MESSAGE:
+                message = messageRepo.findById((long) request.getTargetId())
+                        .orElseThrow(() -> new RuntimeException("Message not found with id: " + request.getTargetId()));
+                item = message.getInteractableItem();
+                break;
 
-        if (item == null) {
-            throw new RuntimeException("Tin nhắn này không thể tương tác");
+            case POST:
+                // TODO: Logic cho Post
+                break;
+
+            case COMMENT:
+                // TODO: Logic cho Comment
+                break;
+
+            default:
+                throw new IllegalArgumentException("Target type không hỗ trợ: " + request.getTargetType());
         }
 
-        // 3. Xử lý Reaction (Thêm/Sửa/Xóa)
+        if (item == null) {
+            throw new RuntimeException("Lỗi dữ liệu: Đối tượng này chưa có InteractableItem");
+        }
+
+        // 3. Xử lý Reaction dùng Optional
         Optional<Reaction> existingReactionOpt = reactionRepo
                 .findByInteractableItemsAndUser_Id(item, user.getId());
 
-        String action = ""; // Để log hoặc bắn socket
+        String action = "";
 
         if (existingReactionOpt.isPresent()) {
             Reaction existingReaction = existingReactionOpt.get();
 
-            // SO SÁNH ENUM
+            // Nếu bấm trùng loại cũ -> XÓA (Toggle Off)
             if (existingReaction.getReactionType() == request.getReactionType()) {
                 reactionRepo.delete(existingReaction);
                 action = "REMOVED";
             } else {
-                // Update
+                // Nếu bấm loại khác -> CẬP NHẬT cái hiện tại
                 existingReaction.setReactionType(request.getReactionType());
                 existingReaction.setReactedLocalDateTime(LocalDateTime.now());
                 reactionRepo.save(existingReaction);
                 action = "UPDATED";
             }
         } else {
-            // Chưa có -> Tạo mới
+            // Chưa có -> TẠO MỚI (Dùng hàm helper)
             if (request.getReactionType() != null) {
-                Reaction newReaction = new Reaction();
-                newReaction.setInteractableItems(item);
-                newReaction.setUser(user);
-                newReaction.setReactionType(request.getReactionType());
-                newReaction.setReactedLocalDateTime(LocalDateTime.now());
-                reactionRepo.save(newReaction);
+                saveNewReaction(item, user, request.getReactionType());
                 action = "ADDED";
             }
         }
 
-        // 4. Bắn Socket Real-time (Quan trọng)
-        Map<String, Object> socketPayload = new HashMap<>(); // Dùng HashMap thay vì Map.of
+        // 4. Bắn Socket (Chỉ bắn nếu là Message)
+        if (request.getTargetType() == TargetType.MESSAGE) {
+            sendReactionSocket(message, user, action, request.getReactionType());
+        }
+        return action;
+    }
+
+    // --- CÁC HÀM PHỤ TRỢ (HELPER METHODS) ---
+
+    // Hàm lưu Reaction mới xuống DB
+    private void saveNewReaction(InteractableItems item, User user, ReactionType type) {
+        Reaction newReaction = new Reaction();
+        newReaction.setInteractableItems(item);
+        newReaction.setUser(user);
+        newReaction.setReactionType(type);
+        newReaction.setReactedLocalDateTime(LocalDateTime.now());
+        reactionRepo.save(newReaction);
+    }
+
+    // Hàm bắn Socket
+    private void sendReactionSocket(Messages message, User user, String action, ReactionType type) {
+        Map<String, Object> socketPayload = new HashMap<>();
         socketPayload.put("conversationId", message.getConversation().getConversationId());
         socketPayload.put("messageId", message.getMessageId());
+
+        // Thông tin người thả tim
         socketPayload.put("userId", user.getId());
         socketPayload.put("username", user.getUsername());
-        socketPayload.put("action", action);
-        socketPayload.put("reactionType", action.equals("REMOVED") ? null : request.getReactionType().name());
+        socketPayload.put("fullName", user.getFullName());
+        socketPayload.put("avatarUrl", user.getProfilePictureURL()); // Thêm avatar để UI cập nhật ngay
+
+        // Thông tin hành động
+        socketPayload.put("action", action); // ADDED, REMOVED, UPDATED
+        socketPayload.put("reactionType", "REMOVED".equals(action) ? null : type);
 
         SocketResponse<Object> socketEvent = SocketResponse.builder()
-                .type("REACTION_UPDATE") // Frontend sẽ lắng nghe type này
+                .type("REACTION_UPDATE")
                 .payload(socketPayload)
                 .build();
 
         messagingTemplate.convertAndSend("/topic/chat." + message.getConversation().getConversationId(), socketEvent);
     }
 
-    // (Các hàm helper mapToResponse, determineMediaType, buildStatusSummary giữ nguyên như cũ)
     private ConversationResponse mapToResponse(ConversationProjection proj) {
         String finalAvatarUrl = null;
         if (proj.getGroupImageURL() != null) {

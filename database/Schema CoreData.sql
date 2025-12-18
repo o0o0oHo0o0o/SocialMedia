@@ -33,15 +33,13 @@ CREATE TABLE CoreData.Users (
 	ProfilePictureURL NVARCHAR(2048),
     CreatedAt DATETIME DEFAULT GETDATE(),
 	LastLogin DateTime,
-	AuthProvider NVARCHAR,
+	AuthProvider NVARCHAR(20),
 	IsVerified BIT NOT NULL DEFAULT 0,
 	IsDeleted BIT NOT NULL DEFAULT 0,
     DeletedAt DATETIME2 NULL
 );
 GO
-USE SocialMedia;
-DECLARE @maxTokenId INT = (SELECT ISNULL(MAX(TokenID), 0) FROM CoreData.RefreshTokens);
-DBCC CHECKIDENT ('CoreData.RefreshTokens', RESEED, @maxTokenId);
+
 
 -- *******************************************************************
 -- 0. REFRESH TOKENS
@@ -140,7 +138,7 @@ CREATE TABLE CoreData.Stories (
     ExpiresAt AS DATEADD(hour, 24, CreatedAt) PERSISTED, -- Cột tính toán tự động
 	
     FOREIGN KEY (UserID) REFERENCES CoreData.Users(UserID) ON DELETE CASCADE,
-	FOREIGN KEY (InteractableItemID) REFERENCES CoreData.InteractableItems 
+	FOREIGN KEY (InteractableItemID) REFERENCES CoreData.InteractableItems(InteractableItemID) 
 );
 GO
 
@@ -493,7 +491,7 @@ CREATE TABLE CoreData.WebSocketSessions (
     ExpiresAt DATETIME NOT NULL,
     FOREIGN KEY (UserID) REFERENCES CoreData.Users(UserID) ON DELETE CASCADE,
 	CONSTRAINT CK_WebSocketSessions_ExpiresAfterCreated
-CHECK (ExpiresAt > CreatedAt),
+CHECK (ExpiresAt > CreatedAt)
 );
 CREATE UNIQUE INDEX UQ_WebSocketSessions_SessionToken
 ON CoreData.WebSocketSessions(SessionToken);
@@ -507,3 +505,6 @@ ON CoreData.WebSocketSessions(ExpiresAt, IsActive)
 WHERE (IsActive = 1);
 
 
+USE SocialMedia;
+DECLARE @maxTokenId BIGINT = (SELECT ISNULL(MAX(TokenID), 0) FROM CoreData.RefreshTokens);
+DBCC CHECKIDENT ('CoreData.RefreshTokens', RESEED, @maxTokenId);

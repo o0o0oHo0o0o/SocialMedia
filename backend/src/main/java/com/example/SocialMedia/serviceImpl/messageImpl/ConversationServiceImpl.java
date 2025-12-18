@@ -1,5 +1,6 @@
 package com.example.SocialMedia.serviceImpl.messageImpl;
 
+import com.example.SocialMedia.constant.TargetType;
 import com.example.SocialMedia.dto.message.FileUploadResponse;
 import com.example.SocialMedia.dto.response.ReactionResponse;
 import com.example.SocialMedia.dto.response.SocketResponse;
@@ -185,11 +186,10 @@ public class ConversationServiceImpl implements ConversationService {
      */
     private void createSystemMessage(Conversation conversation, User actor, String content) {
         InteractableItems item = new InteractableItems();
-        item.setItemType("MESSAGE");
+        item.setItemType(TargetType.MESSAGE);
         item.setCreatedAt(LocalDateTime.now());
         item = interactableItemRepository.save(item);
 
-        // ✅ FIX LỖI: lastMessageID là long primitive nên không check null, chỉ check > 0
         long nextSequence = 1;
         if (conversation.getLastMessageID() > 0) {
             nextSequence = conversation.getLastMessageID() + 1;

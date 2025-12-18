@@ -1,0 +1,116 @@
+/* Styles specific to the Messenger page.
+   Migrate relevant rules from src/styles/chat.css into this file
+   to scope styles to the Messenger page. */
+
+.chat-messenger-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.chat-messages {
+  flex: 1 1 auto;
+  overflow: auto;
+  padding: 12px;
+}
+
+.chat-global-actions {
+  padding: 8px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Reactions UI */
+.reaction-bar {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+  align-items: center;
+}
+
+.reaction-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.03);
+  color: #fff;
+  font-size: 13px;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  cursor: pointer;
+}
+
+.reaction-badge.mine {
+  background: linear-gradient(90deg, rgba(100, 120, 255, 0.16), rgba(120, 90, 255, 0.12));
+  box-shadow: 0 6px 18px rgba(100, 120, 255, 0.08);
+}
+
+.reaction-picker button {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+}
+
+/* Modal for reaction details */
+.reaction-dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1200;
+}
+
+.reaction-dialog {
+  background: #0f1720;
+  border-radius: 8px;
+  padding: 16px;
+  min-width: 280px;
+  max-width: 420px;
+  color: #fff;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.reaction-dialog h3 {
+  margin: 0 0 8px 0;
+  font-size: 16px;
+}
+
+.reaction-list {
+  max-height: 320px;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.reaction-item {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 8px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.reaction-item .avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #667eea;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+
+.reaction-dialog .close-btn {
+  margin-top: 10px;
+  display: flex;
+  justify-content: flex-end;
+}

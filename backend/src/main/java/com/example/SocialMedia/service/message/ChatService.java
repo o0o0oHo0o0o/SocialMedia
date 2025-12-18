@@ -15,5 +15,5 @@ public interface ChatService {
     List<MessageResponse> getMessages(String username, int conversationId, int page, int size);
 
     @Transactional
-    void reactToMessage(String username, ReactionRequest request);
+    String reactToMessage(String username, ReactionRequest request);
 }

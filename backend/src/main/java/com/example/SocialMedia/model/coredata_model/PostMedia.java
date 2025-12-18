@@ -14,7 +14,7 @@ public class PostMedia {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "MediaID")
-    private int postMediaId;
+    private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "PostID")
@@ -24,17 +24,12 @@ public class PostMedia {
     @JoinColumn(name = "InteractableItemID")
     private InteractableItems interactableItem;
 
-    @Column(name = "MediaURL", unique = true, nullable = false)
-    private String mediaURL;
+    @Column(name = "FileName", nullable = false)
+    private String fileName;
 
     @Column(name = "MediaType", nullable = false)
-    private String mediaType;
+    private String mediaType; // IMAGE, VIDEO
 
-    @Column(name = "SortOrder", unique = true, nullable = false)
+    @Column(name = "SortOrder")
     private int sortOrder;
-
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "InteractableItemID",referencedColumnName = "InteractableItemID")
-    private List<Reaction> reactions;
-
 }

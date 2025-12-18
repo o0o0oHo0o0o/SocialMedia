@@ -1,5 +1,6 @@
 package com.example.SocialMedia.model.coredata_model;
 
+import com.example.SocialMedia.constant.TargetType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,8 +18,9 @@ public class InteractableItems {
     @Column(name = "InteractableItemID")
     private int interactableItemId;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "ItemType")
-    private String itemType;
+    private TargetType itemType;
 
     @Column(name = "CreatedAt")
     private LocalDateTime createdAt;

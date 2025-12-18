@@ -48,16 +48,12 @@ public class ChatController {
             @AuthenticationPrincipal UserDetails userDetails
     ) {
         try {
-            // Validate cơ bản
-            if (request.getMessageId() == null) {
-                return ResponseEntity.badRequest().body(Map.of("message", "Message ID is required"));
-            }
-
-            // Gọi Service xử lý
-            chatService.reactToMessage(userDetails.getUsername(), request);
+            String action = chatService.reactToMessage(userDetails.getUsername(), request);
 
             return ResponseEntity.ok(Map.of(
-                    "message", "Reaction updated successfully"
+                    "message", "Reaction updated successfully",
+                    "action", action,
+                    "targetId", request.getTargetId()
             ));
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
@@ -65,7 +61,6 @@ public class ChatController {
             return ResponseEntity.internalServerError().body(Map.of("message", "Lỗi server: " + e.getMessage()));
         }
     }
-
     // 2. Endpoint Lấy danh sách chi tiết người thả tim (Lazy Loading)
     // Dùng khi user click vào icon reaction để xem "Ai đã thả tim?"
     @GetMapping("/messages/{messageId}/reactions")
