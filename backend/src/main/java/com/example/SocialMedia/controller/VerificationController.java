@@ -20,8 +20,8 @@ import java.util.Optional;
 
 
 @RestController
-@RequestMapping("/verification")
 @RequiredArgsConstructor
+@RequestMapping("/verification")
 public class VerificationController {
 
     private final OtpService otpService;

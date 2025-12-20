@@ -48,3 +48,12 @@
   padding-left: 32px;
   border-left: var(--border);
 }
+.comment-item {
+  position: relative;
+}
+.close-reply-btn {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: transparent;
+}

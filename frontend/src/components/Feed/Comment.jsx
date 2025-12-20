@@ -28,7 +28,10 @@ const Item = ({
         console.log("this should refresh");
       }
       const data = await response.json();
+      comment.showReplies = true;
+      // setCommentList([...commentList]);
       setCommentList([...commentList, { ...data, showReplies: false }]);
+      console.log(commentList);
     } catch (err) {
       console.log("Something went wrong", err);
     }
@@ -109,15 +112,38 @@ const Item = ({
             parentCommentId={comment.id}
             onSubmit={handleCommentReply}
           ></ReplyInput>
-          <OptionButton onDelete={onDelete} onReport={() => { }}></OptionButton>
+          <OptionButton onDelete={onDelete} onReport={() => {}}></OptionButton>
         </footer>
         {comment.showReplies ? (
-          <Comment
-            userId={userId}
-            parentCommentId={comment.id}
-            setCommentList={setCommentList}
-            commentList={commentList}
-          ></Comment>
+          <>
+            <button
+              className="close-reply-btn"
+              onClick={() => {
+                comment.showReplies = false;
+                setCommentList([...commentList]);
+              }}
+            >
+              <svg
+                rpl=""
+                fill="currentColor"
+                height="16"
+                icon-name="subtract-circle"
+                viewBox="0 0 20 20"
+                width="16"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                {" "}
+                <path d="M10 2.8A7.2 7.2 0 112.8 10 7.208 7.208 0 0110 2.8zM10 1a9 9 0 100 18 9 9 0 000-18zm4 8.1H6v1.8h8V9.1z"></path>{" "}
+              </svg>
+            </button>
+            <Comment
+              userId={userId}
+              postId={postId}
+              parentCommentId={comment.id}
+              setCommentList={setCommentList}
+              commentList={commentList}
+            ></Comment>
+          </>
         ) : (
           comment.replied && (
             <button
@@ -142,102 +168,42 @@ const Comment = ({
   commentList,
   setCommentList,
 }) => {
-  // Require either a postId (top-level comments) or a parentCommentId (replies).
-  if (!postId && !parentCommentId) return null;
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  // useEffect(() => {
-  //   const mockComments = [
-  //     {
-  //       id: 1,
-  //       content: "Bài viết này thật tuyệt vời!",
-  //       user: {
-  //         id: 1,
-  //         name: "nguyenan",
-  //       },
-  //       reaction: [],
-  //       replied: true,
-  //     },
-  //     {
-  //       id: 2,
-  //       content: "Mình học được rất nhiều từ bài này, cảm ơn bạn!",
-  //       user: {
-  //         id: 2,
-  //         name: "tranbinh",
-  //       },
-  //       reaction: [
-  //         ["LIKE", 12],
-  //         ["LOVE", 5],
-  //       ],
-  //       replied: false,
-  //     },
-  //     {
-  //       id: 3,
-  //       content: "Có thể giải thích thêm phần useEffect không ạ?",
-  //       user: {
-  //         id: 3,
-  //         name: "phamlan",
-  //       },
-  //       reaction: [["LIKE", 8]],
-  //       replied: true,
-  //     },
-  //     {
-  //       id: 4,
-  //       content: "Code rất sạch và dễ hiểu, vote 10 điểm",
-  //       user: {
-  //         id: 4,
-  //         name: "levan",
-  //       },
-  //       reaction: [
-  //         ["LIKE", 25],
-  //         ["LOVE", 10],
-  //         ["WOW", 3],
-  //       ],
-  //       replied: false,
-  //     },
-  //     {
-  //       id: 5,
-  //       content: "Mình thử chạy thì bị lỗi CORS, bạn có cách nào fix không?",
-  //       user: {
-  //         id: 5,
-  //         name: "hoangminh",
-  //       },
-  //       reaction: [["LIKE", 3]],
-  //       replied: true,
-  //     },
-  //   ];
-  // Khi đang dev hoặc backend chưa xong → dùng mock
-  //   setComments(mockComments);
-  // }, [postId]);
-
   useEffect(() => {
     let ignore = false;
     const fetchComments = async () => {
       try {
         setLoading(true);
-        const response = await (postId
-          ? CommentApi.getFromPost(postId)
-          : CommentApi.getFromComment(parentCommentId));
-        // const response = await fetch(
-        //   postId
-        //     ? `http://localhost:8080/api/comments/${postId}?page=0&size=10`
-        //     : `http://localhost:8080/api/comments/parent/${parentCommentId}?page=0&size=10`,
-        // );
+        if (
+          !commentList.some(
+            (comment) => comment.parentCommentId == parentCommentId,
+          )
+        ) {
+          const response = await (parentCommentId
+            ? CommentApi.getFromComment(parentCommentId)
+            : CommentApi.getFromPost(postId));
+          // const response = await fetch(
+          //   postId
+          //     ? `http://localhost:8080/api/comments/${postId}?page=0&size=10`
+          //     : `http://localhost:8080/api/comments/parent/${parentCommentId}?page=0&size=10`,
+          // );
 
-        if (!response.ok) {
-          throw new Error("Không tải được bình luận");
-        }
+          if (!response.ok) {
+            throw new Error("Không tải được bình luận");
+          }
 
-        const data = await response.json();
-        if (!ignore) {
-          setCommentList((prevComments) => [
-            ...prevComments,
+          const data = await response.json();
+          if (!ignore) {
+            setCommentList((prevComments) => [
+              ...prevComments,
 
-            ...data.map((comment) => {
-              comment.showReplies = false;
-              return comment;
-            }),
-          ]);
+              ...data.map((comment) => {
+                comment.showReplies = false;
+                return comment;
+              }),
+            ]);
+          }
         }
       } catch (err) {
         setError(err.message || "Có lỗi xảy ra");
@@ -250,6 +216,10 @@ const Comment = ({
       ignore = true;
     };
   }, [parentCommentId, postId, setCommentList]);
+  // Require either a postId (top-level comments) or a parentCommentId (replies).
+  if (!postId && !parentCommentId) {
+    return null;
+  }
 
   if (loading) {
     return <div className="comments-loading">Loading comments...</div>;
@@ -272,10 +242,7 @@ const Comment = ({
     <section className="comments-section">
       <div className="comments-list">
         {commentList.map((comment, index) => {
-          if (
-            (postId && comment.parentCommentId == null) ||
-            (parentCommentId && comment.parentCommentId == parentCommentId)
-          ) {
+          if (comment.parentCommentId == parentCommentId) {
             return (
               <Item
                 key={comment.id}

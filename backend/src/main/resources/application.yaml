@@ -11,13 +11,13 @@ spring:
     host: localhost
     port: 5672
     username: admin
-    password: admin
+    password: admin123
     stomp:
       port: 1613
 
   # --- DATABASE ---
   datasource:
-    url: jdbc:sqlserver://localhost:1434;databaseName=SocialMedia;encrypt=true;trustServerCertificate=true
+    url: jdbc:sqlserver://localhost:${SQL_PORT};databaseName=SocialMedia;encrypt=true;trustServerCertificate=true
     username: ${DB_USER}
     password: ${DB_PASSWORD}
     driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver

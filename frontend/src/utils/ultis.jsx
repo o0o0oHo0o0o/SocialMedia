@@ -1,29 +1,28 @@
 const FeedApi = (function () {
   async function getFeedFrom(api) {
     return await fetch(api, {
-      credentials: 'include'
+      credentials: "include",
     });
   }
   return { getFeedFrom };
 })();
 const CommentApi = (function () {
   const getFromPost = async function (postId) {
-    return await fetch(
-      `http://localhost:8080/api/comments/post/${postId}`,
-      { credentials: 'include' }
-    );
+    return await fetch(`/api/comments/post/${postId}`, {
+      credentials: "include",
+    });
   };
   const getFromComment = async function (parentCommentId) {
     return await fetch(
       `http://localhost:8080/api/comments/replies/${parentCommentId}`,
-      { credentials: 'include' }
+      { credentials: "include" },
     );
   };
   const createForPost = async function (replyData) {
     return await fetch("http://localhost:8080/api/comments", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      credentials: 'include',
+      credentials: "include",
       body: JSON.stringify({
         content: replyData.content,
         targetInteractableItemID: replyData.postId,
@@ -34,7 +33,7 @@ const CommentApi = (function () {
     return await fetch("http://localhost:8080/api/comments", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      credentials: 'include',
+      credentials: "include",
       body: JSON.stringify({
         content: replyData.content,
         targetInteractableItemID: replyData.postId,
@@ -86,7 +85,7 @@ const ReactionApi = (function () {
   async function fetchReaction(interactableItemId) {
     const url = `http://localhost:8080/api/reactions/stats/${interactableItemId}`;
 
-    const response = await fetch(url, { credentials: 'include' });
+    const response = await fetch(url, { credentials: "include" });
 
     if (!response.ok) {
       throw new Error("Failed to fetch reaction stats");
@@ -98,7 +97,7 @@ const ReactionApi = (function () {
     const res = await fetch("http://localhost:8080/api/reactions", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      credentials: 'include',
+      credentials: "include",
       body: JSON.stringify({
         targetId: targetId,
         reactionType: reactionType,
@@ -107,9 +106,16 @@ const ReactionApi = (function () {
     });
     if (!res.ok) {
       // try to include server error message for easier debugging
-      let bodyText = '';
-      try { bodyText = await res.text(); } catch (e) { /* ignore */ }
-      console.error(`ReactionApi.createReaction failed: HTTP ${res.status}`, bodyText);
+      let bodyText = "";
+      try {
+        bodyText = await res.text();
+      } catch (e) {
+        console.log(e);
+      }
+      console.error(
+        `ReactionApi.createReaction failed: HTTP ${res.status}`,
+        bodyText,
+      );
     }
     return res;
   }
