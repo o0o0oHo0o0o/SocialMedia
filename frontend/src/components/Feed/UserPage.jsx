@@ -13,11 +13,11 @@ function UserPage({ userInfo, target, openPost }) {
 
   useEffect(() => {
     async function fetchUserData() {
-      if (currentPage == "post" && postList.length == 0) {
+      if (currentPage == "post") {
         const response = await PostApi.getFromUser(target.username);
         const data = await response.json();
         setPostList([...data]);
-      } else if (commentList.length == 0) {
+      } else {
         const response = await CommentApi.getFromUser(target.username);
         const data = await response.json();
         console.log(data);
@@ -124,7 +124,8 @@ function UserPage({ userInfo, target, openPost }) {
       <div className="more-info-bar">
         {
           <UserInfoCard
-            user={target}
+            user={userInfo}
+            target={target}
             postNumber={postList.length}
           ></UserInfoCard>
         }

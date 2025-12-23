@@ -29,4 +29,12 @@ public class FollowController {
         // Truyền username xuống service
         return ResponseEntity.ok(followService.createFollower(username, userDetails.getUsername()));
     }
+    @DeleteMapping("/{username}")
+    public ResponseEntity<ShortUserResponse> deleteFollow(
+            @PathVariable String username,
+            @AuthenticationPrincipal UserDetails userDetails // <--- Bảo mật
+    ) {
+        // Truyền username xuống service
+        return ResponseEntity.ok(followService.deleteFollower(username, userDetails.getUsername()));
+    }
 }

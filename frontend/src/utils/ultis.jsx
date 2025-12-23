@@ -141,10 +141,25 @@ const ReactionApi = (function () {
 })();
 const FollowApi = (function () {
   const checkUser = async function (username) {
-    return await fetch(`/api/comments/follows/${username}`, {
+    return await fetch(`/api/follows/${username}`, {
       credentials: "include",
     });
   };
-  return { checkUser };
+  const addUser = async function (username) {
+    return await fetch(`/api/follows/${username}`, {
+      method: "POST",
+      credentials: "include",
+    });
+  };
+  async function deleteFollow(username) {
+    return await fetch(`/api/follows/${username}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    });
+  }
+  return { checkUser, addUser, deleteFollow };
 })();
 export { CommentApi, PostApi, ReactionApi, FeedApi, FollowApi };
