@@ -17,4 +17,6 @@ public interface PostService {
     PostResponse updatePost(String username, PostRequest postRequest);
 
     PostResponse deletePost(int postId);
+
+    List<PostResponse> getPostsByKeyword(String keyword, Pageable pageable);
 }

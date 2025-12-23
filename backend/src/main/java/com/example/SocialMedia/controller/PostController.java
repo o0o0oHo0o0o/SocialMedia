@@ -101,4 +101,9 @@ public class PostController {
     public ResponseEntity<PostResponse> deletePost(@PathVariable Integer id) {
         return ResponseEntity.ok(postService.deletePost(id));
     }
+
+    @GetMapping("/search/{keyword}")
+    public ResponseEntity<List<PostResponse>> getPostsByKeyword(@PathVariable String keyword, Pageable pageable) {
+        return  ResponseEntity.ok(postService.getPostsByKeyword(keyword, pageable));
+    }
 }

@@ -8,6 +8,7 @@ import { FeedApi } from "../utils/ultis";
 import "../styles/feed.css";
 import UserPage from "../components/Feed/UserPage";
 import UserInfoCard from "../components/Feed/UserInfoCard";
+import SearchPage from "../components/Feed/SearchPage";
 
 const FeedPage = ({
   userInfo,
@@ -23,6 +24,7 @@ const FeedPage = ({
   const [selectedPost, setSelectedPost] = useState(null);
   const [selectedUser, setSelectedUser] = useState(null);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [keyword, setKeyword] = useState("");
 
   const fetchFeed = async () => {
     setLoading(true);
@@ -84,9 +86,14 @@ const FeedPage = ({
   };
 
   const openUser = (user) => {
-    console.log(user);
     setSelectedUser(user);
     setCurrentView("user");
+    window.scrollTo(0, 0);
+  };
+
+  const openSearch = (keyword) => {
+    setKeyword(keyword);
+    setCurrentView("search");
     window.scrollTo(0, 0);
   };
 
@@ -101,6 +108,7 @@ const FeedPage = ({
         user={userInfo}
         onCreatePost={handleCreatePost}
         openUser={openUser}
+        openSearch={openSearch}
       />
       <Sidebar
         isDark={isDark}
@@ -125,6 +133,12 @@ const FeedPage = ({
         ></UserPage>
       ) : loading ? (
         <div className="loading">Loading...</div>
+      ) : currentView == "search" ? (
+        <SearchPage
+          userIndo={userInfo}
+          keyword={keyword}
+          openPost={openPost}
+        ></SearchPage>
       ) : (
         <div className="content-container">
           <div className="feed-container">

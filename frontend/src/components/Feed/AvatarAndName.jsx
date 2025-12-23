@@ -1,7 +1,26 @@
+import { useState } from "react";
+
 const AvatarAndName = ({ target }) => {
+  const [hasError, setHasError] = useState(false);
+
+  const handleError = () => {
+    console.log(target.avatarUrl, target.avatar);
+    setHasError(true); // Image failed to load, fallback to SVG
+  };
+  if (!(target.avatarUrl || target.avatar) && hasError == false) {
+    setHasError(true);
+  }
+
   return (
-    <>
-      {target.avatarUrl || target.avatar || (
+    <div className="avatar-name">
+      {!hasError ? (
+        <img
+          src={target.avatarUrl}
+          alt={"uh huh i fuck accessibility"}
+          className="icon avatar"
+          onError={handleError}
+        />
+      ) : (
         <svg
           viewBox="0 0 1024 1024"
           className="icon avatar"
@@ -48,7 +67,7 @@ const AvatarAndName = ({ target }) => {
         </svg>
       )}
       <span className="username">{target.username}</span>
-    </>
+    </div>
   );
 };
 export default AvatarAndName;

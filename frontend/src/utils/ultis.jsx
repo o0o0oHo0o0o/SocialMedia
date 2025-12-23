@@ -55,6 +55,12 @@ const CommentApi = (function () {
       credentials: "include",
     });
   }
+  const getFromKeyword = async function (keyword) {
+    return await fetch(`/api/comments/search/${keyword}`, {
+      method: "GET",
+      credentials: "include",
+    });
+  };
   return {
     getFromUser,
     getFromComment,
@@ -62,6 +68,7 @@ const CommentApi = (function () {
     createForPost,
     createForComment,
     deleteComment,
+    getFromKeyword,
   };
 })();
 const PostApi = (function () {
@@ -97,7 +104,19 @@ const PostApi = (function () {
       },
     );
   }
-  return { getFromId, getFromUser, deletePost, updateOrCreatePost };
+  async function getFromKeyword(keyword) {
+    return await fetch(`/api/posts/search/${keyword}`, {
+      method: "GET",
+      credentials: "include",
+    });
+  }
+  return {
+    getFromId,
+    getFromUser,
+    deletePost,
+    updateOrCreatePost,
+    getFromKeyword,
+  };
 })();
 const ReactionApi = (function () {
   async function fetchReaction(interactableItemId) {
@@ -162,4 +181,13 @@ const FollowApi = (function () {
   }
   return { checkUser, addUser, deleteFollow };
 })();
-export { CommentApi, PostApi, ReactionApi, FeedApi, FollowApi };
+const UserApi = (function () {
+  const getFromKeyword = async function (keyword) {
+    return await fetch(`/api/users/search/${keyword}`, {
+      credentials: "include",
+    });
+  };
+
+  return { getFromKeyword };
+})();
+export { CommentApi, PostApi, ReactionApi, FeedApi, FollowApi, UserApi };

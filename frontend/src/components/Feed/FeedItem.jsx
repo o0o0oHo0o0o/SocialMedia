@@ -171,10 +171,16 @@ const FeedItem = ({ userId, post, openPost, openUser, goBack }) => {
                   <div
                     className="background-image"
                     style={{
-                      backgroundImage: `url(${media.mediaURL || media.fileName})`,
+                      backgroundImage: `url(${media.mediaURL}), url(${media.fileName})`,
                     }}
                   ></div>
-                  <img src={media.mediaURL || media.fileName} alt="" />
+                  <img
+                    src={media.mediaURL}
+                    alt=""
+                    onError={(e) => {
+                      return (e.target.src = `${media.fileName}`);
+                    }}
+                  />
                 </div>
               ))}
           </Carousel>

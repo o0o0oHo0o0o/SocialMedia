@@ -138,4 +138,10 @@ public class CommentServiceImpl implements CommentService {
         // Trả về response đơn giản
         return convertToSingleCommentResponse(comment);
     }
+
+    @Override
+    public List<CommentResponse> getCommentsByKeyword(String keyword, Pageable pageable){
+        Page<Comment> comments = commentRepository.findByContentContainingIgnoreCase(keyword, pageable);
+        return convertToCommentResponse(comments.getContent());
+    }
 }

@@ -61,4 +61,12 @@ public class CommentController {
     public ResponseEntity<CommentResponse> deleteComment(@PathVariable int id) {
         return ResponseEntity.ok(commentService.deleteComment(id));
     }
+
+    @GetMapping("/search/{keyword}")
+    public ResponseEntity<List<CommentResponse>> getCommentByKeyword(
+            @PathVariable String keyword,
+            Pageable pageable
+    ) {
+        return ResponseEntity.ok(commentService.getCommentsByKeyword(keyword, pageable));
+    }
 }

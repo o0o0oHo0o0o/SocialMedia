@@ -3,13 +3,15 @@ import Modal from "./Modal";
 import "../../styles/searchbar.css";
 import ProfileButton from "../Feed/ProfileButton";
 
-const Header = ({ user, onCreatePost, openUser }) => {
+const Header = ({ user, onCreatePost, openUser, openSearch }) => {
   const userId = user.id;
   const [searchQuery, setSearchQuery] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
 
   const handleSearch = (e) => {
     e.preventDefault();
+    openSearch(searchQuery);
+
     console.log("Search:", searchQuery);
   };
 

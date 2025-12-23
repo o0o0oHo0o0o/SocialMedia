@@ -17,4 +17,6 @@ public interface CommentService {
     CommentResponse createComment(String username, CommentRequest commentRequest);
 
     CommentResponse deleteComment(Integer commentId);
+
+    List<CommentResponse> getCommentsByKeyword(String keyword, Pageable pageable);
 }

@@ -134,4 +134,12 @@ public class PostServiceImpl implements PostService {
         post.setDeleted(true);
         return postMapper.toPostResponse(post);
     }
+
+    @Override
+    public List<PostResponse> getPostsByKeyword(String keyword, Pageable pageable) {
+        Page<Post> posts = postRepository.findByContentContainingIgnoreCase(keyword, pageable);
+        return posts.getContent().stream()
+                .map(postMapper::toPostResponse) // Gọi sang class Mapper
+                .collect(Collectors.toList());
+    }
 }

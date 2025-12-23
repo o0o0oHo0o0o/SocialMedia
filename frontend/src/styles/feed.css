@@ -99,7 +99,8 @@ svg {
 /* Feed Container */
 .feed-container,
 .post-page,
-.user-page {
+.user-page,
+.search-page {
   padding: 1.5rem;
   overflow: scroll;
   font-family: "Arial", sans-serif;
