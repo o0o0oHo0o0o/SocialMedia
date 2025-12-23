@@ -30,12 +30,12 @@ public class CommentController {
     }
 
     // Lấy comment của user
-    @GetMapping("/user/{userId}")
+    @GetMapping("/user/{userName}")
     public ResponseEntity<List<CommentResponse>> getUserComments(
-            @PathVariable int userId,
+            @PathVariable String userName,
             Pageable pageable
     ) {
-        return ResponseEntity.ok(commentService.getCommentsByUserId(userId, pageable));
+        return ResponseEntity.ok(commentService.getCommentsByUserName(userName, pageable));
     }
 
     // Lấy replies của 1 comment

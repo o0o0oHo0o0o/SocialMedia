@@ -64,9 +64,9 @@ public class PostController {
         return ResponseEntity.ok(postService.createPost(userDetails.getUsername(), postRequest, files));
     }
 
-    @GetMapping("/user/{id}")
-    public ResponseEntity<List<PostResponse>> getPostByUserId(@PathVariable Integer id, Pageable pageable) {
-        return ResponseEntity.ok(postService.getPostByUserId(id, pageable));
+    @GetMapping("/user/{name}")
+    public ResponseEntity<List<PostResponse>> getPostByUserName(@PathVariable String name, Pageable pageable) {
+        return ResponseEntity.ok(postService.getPostByUserName(name, pageable));
     }
 
     // UPDATE: Multipart Form (Json + Files mới + IDs file xóa)

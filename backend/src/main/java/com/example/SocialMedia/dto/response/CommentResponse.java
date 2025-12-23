@@ -17,6 +17,7 @@ public class CommentResponse {
     private String content;
     private ShortUserResponse user; // Info người comment
     private Integer interactableItemId;
+    private Integer targetInteractableItemId;
     private Integer parentCommentId; // Null nếu là comment gốc
     private boolean replied; // Có người trả lời chưa?
 

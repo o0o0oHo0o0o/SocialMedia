@@ -19,6 +19,7 @@
   display: grid;
   grid-template-columns: 32px minmax(0px, 1fr);
   padding-bottom: 2px;
+  cursor: pointer;
 }
 .comment-author {
   font-weight: 700;

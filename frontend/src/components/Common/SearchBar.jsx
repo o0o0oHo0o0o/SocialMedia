@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import Modal from "./Modal";
 import "../../styles/searchbar.css";
+import ProfileButton from "../Feed/ProfileButton";
 
-const Header = ({ userId, onCreatePost }) => {
+const Header = ({ user, onCreatePost, openUser }) => {
+  const userId = user.id;
   const [searchQuery, setSearchQuery] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
 
@@ -72,11 +74,8 @@ const Header = ({ userId, onCreatePost }) => {
           </svg>
           Create Post
         </button>
-        <Modal
-          userId={userId}
-          isOpen={modalOpen}
-          onClose={handlePostCreated}
-        />
+        <Modal userId={userId} isOpen={modalOpen} onClose={handlePostCreated} />
+        <ProfileButton openUser={openUser} user={user}></ProfileButton>
       </div>
     </header>
   );

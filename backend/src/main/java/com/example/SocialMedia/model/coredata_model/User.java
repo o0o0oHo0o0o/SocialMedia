@@ -146,9 +146,11 @@ public class User implements UserDetails {
                 this.id,
                 this.email,
                 this.phoneNumber,
+                this.userName,
                 this.fullName,
                 this.profilePictureURL,
-                this.authProvider
+                this.authProvider,
+                this.createdLocalDateTime
         );
     }
 }

@@ -2,9 +2,9 @@ USE SocialMedia
 -- 15 active users
 INSERT INTO CoreData.Users (Username, Email, PasswordHash, FullName, Bio, ProfilePictureURL, CreatedAt, IsDeleted, DeletedAt)
 VALUES
-    ('nguyenan', 'nguyenan@example.com', 'passwordhash1', N'Nguyễn An', N'Lập trình viên yêu thích công nghệ.', 'https://profilepic1.com', '2020-01-15 08:30:00', 0, NULL),
-    ('hoangbui', 'hoangbui@example.com', 'passwordhash2', N'Hoàng Bùi', N'Đam mê ẩm thực và nhiếp ảnh.', 'https://profilepic2.com', '2020-03-22 14:45:20', 0, NULL),
-    ('lanhien', 'lanhien@example.com', 'passwordhash3', N'Lân Hiền', N'Du lịch và âm nhạc là đam mê của tôi.', 'https://profilepic3.com', '2020-05-10 16:20:50', 0, NULL),
+    ('Debater_WiseTiger', 'nguyenan@example.com', 'passwordhash1', N'Nguyễn An', N'Lập trình viên yêu thích công nghệ.', 'https://profilepic1.com', '2020-01-15 08:30:00', 0, NULL),
+    ('Debater_FastEagle', 'hoangbui@example.com', 'passwordhash2', N'Hoàng Bùi', N'Đam mê ẩm thực và nhiếp ảnh.', 'https://profilepic2.com', '2020-03-22 14:45:20', 0, NULL),
+    ('Debater_QuietLion', 'lanhien@example.com', 'passwordhash3', N'Lân Hiền', N'Du lịch và âm nhạc là đam mê của tôi.', 'https://profilepic3.com', '2020-05-10 16:20:50', 0, NULL),
     ('minhhoang', 'minhhoang@example.com', 'passwordhash4', N'Minh Hoàng', N'Nghiên cứu viên và giảng viên thể dục.', 'https://profilepic4.com', '2021-06-05 11:00:00', 0, NULL),
     ('thienthai', 'thienthai@example.com', 'passwordhash5', N'Thiện Thái', N'Yêu thích thiên nhiên và du lịch.', 'https://profilepic5.com', '2021-08-18 13:10:10', 0, NULL),
     ('quanghieu', 'quanghieu@example.com', 'passwordhash6', N'Quang Hiếu', N'Thiết kế đồ họa và sáng tạo nội dung.', 'https://profilepic6.com', '2021-10-25 09:30:05', 0, NULL),
@@ -221,6 +221,28 @@ VALUES
     (10, 39, 'https://example.com/video8.mp4', 'VIDEO', N'Hướng dẫn sử dụng phần mềm mới', 0),
     (11, 40, 'https://example.com/media12.jpg', 'IMAGE', N'Thưởng thức cà phê sáng tại Hà Nội', 0);
 
+INSERT INTO CoreData.PostMedia (PostID, InteractableItemID, FileName, MediaType, Caption, SortOrder)
+VALUES
+    (1, 41, 'https://i.imgur.com/65pgF1u.jpeg', 'IMAGE', N'Ảnh đẹp từ chuyến đi biển', 0),
+    (1, 42, 'https://i.imgur.com/4o8cGKu.jpeg', 'IMAGE', N'Chuyến đi tuyệt vời', 1),
+    (2, 43, 'https://i.imgur.com/PRXq4ct.jpeg', 'VIDEO', N'Video giới thiệu sản phẩm mới', 0),
+    (2, 44, 'https://i.imgur.com/5IqIwNF.jpeg', 'IMAGE', N'Đừng bỏ lỡ sự kiện này!', 0),
+    (3, 45, 'https://i.imgur.com/5LHPAuk.jpeg', 'IMAGE', N'Cảnh hoàng hôn tuyệt vời', 0),
+    (3, 46, 'https://i.imgur.com/AaevbdO.png', 'VIDEO', N'Video vui nhộn từ buổi tiệc', 1),
+    (4, 47, 'https://i.imgur.com/EwyEwP3.jpeg', 'IMAGE', N'Cảm giác tuyệt vời khi leo núi', 0),
+    (4, 48, 'https://i.imgur.com/IhXbLK1.jpeg', 'VIDEO', N'Sự kiện thể thao cuối tuần', 0),
+    (5, 49, 'https://i.imgur.com/TwwKoyf.jpeg', 'IMAGE', N'Sản phẩm mới ra mắt', 0),
+    (6, 50, 'https://i.imgur.com/w7Yr6AW.jpeg', 'IMAGE', N'Khám phá vẻ đẹp của thiên nhiên', 0),
+    (6, 51, 'https://i.imgur.com/nzXlEqo.jpeg', 'VIDEO', N'Buổi hòa nhạc mùa hè', 0),
+    (7, 52, 'https://i.imgur.com/YlvNR4G.jpeg', 'IMAGE', N'Bữa tiệc sinh nhật vui nhộn', 0),
+    (7, 53, 'https://i.imgur.com/5T3JiQ4.jpeg', 'VIDEO', N'Phỏng vấn đặc biệt với diễn viên nổi tiếng', 1),
+    (8, 54, 'https://i.imgur.com/KTkIC28.jpeg', 'IMAGE', N'Kỳ nghỉ hè tại Đà Lạt', 0),
+    (8, 55, 'https://i.imgur.com/CSKZw5e.jpeg', 'VIDEO', N'Chuyến du lịch sang trọng tại Phú Quốc', 0),
+    (9, 56, 'https://i.imgur.com/qWBpal6.jpeg', 'IMAGE', N'Ảnh chụp từ sự kiện âm nhạc lớn', 0),
+    (9, 57, 'https://i.imgur.com/xs0swhi.jpeg', 'VIDEO', N'Trải nghiệm thử xe mới', 1),
+    (10, 58, 'https://i.imgur.com/HDEHPJZ.jpeg', 'IMAGE', N'Phong cảnh tuyệt đẹp ở Đà Nẵng', 0),
+    (10, 59, 'https://i.imgur.com/B7pxAXh.jpeg', 'VIDEO', N'Hướng dẫn sử dụng phần mềm mới', 0),
+    (11, 60, 'https://i.imgur.com/FvbUkY5.png', 'IMAGE', N'Thưởng thức cà phê sáng tại Hà Nội', 0);
 
 -- Dữ liệu cho bảng Shares với InteractableItemID bắt đầu từ 41
 INSERT INTO CoreData.InteractableItems (ItemType, CreatedAt)

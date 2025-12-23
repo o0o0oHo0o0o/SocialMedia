@@ -6,18 +6,22 @@ import Sidebar from "../components/Common/Sidebar";
 import SearchBar from "../components/Common/SearchBar";
 import { FeedApi } from "../utils/ultis";
 import "../styles/feed.css";
+import UserPage from "../components/Feed/UserPage";
+import UserInfoCard from "../components/Feed/UserInfoCard";
 
 const FeedPage = ({
-  userId,
+  userInfo,
   isDark,
   setIsDark,
   onNavigateToMessenger,
   onLogout,
 }) => {
+  const userId = userInfo.id;
   const [feed, setFeed] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentView, setCurrentView] = useState("home");
   const [selectedPost, setSelectedPost] = useState(null);
+  const [selectedUser, setSelectedUser] = useState(null);
   const [refreshKey, setRefreshKey] = useState(0);
 
   const fetchFeed = async () => {
@@ -36,7 +40,7 @@ const FeedPage = ({
           api = link + `discussion`;
           break;
         default:
-          api = link + `home`;
+          return;
       }
 
       const response = await FeedApi.getFeedFrom(api);
@@ -57,16 +61,16 @@ const FeedPage = ({
     const handlePostCreated = () => {
       fetchFeed();
     };
-    window.addEventListener('postCreated', handlePostCreated);
-    return () => window.removeEventListener('postCreated', handlePostCreated);
+    window.addEventListener("postCreated", handlePostCreated);
+    return () => window.removeEventListener("postCreated", handlePostCreated);
   }, [currentView, userId]);
 
   useEffect(() => {
     const handlePostCreated = () => {
       fetchFeed();
     };
-    window.addEventListener('postCreated', handlePostCreated);
-    return () => window.removeEventListener('postCreated', handlePostCreated);
+    window.addEventListener("postCreated", handlePostCreated);
+    return () => window.removeEventListener("postCreated", handlePostCreated);
   }, [currentView, userId]);
 
   const handleCreatePost = () => {
@@ -79,6 +83,13 @@ const FeedPage = ({
     window.scrollTo(0, 0);
   };
 
+  const openUser = (user) => {
+    console.log(user);
+    setSelectedUser(user);
+    setCurrentView("user");
+    window.scrollTo(0, 0);
+  };
+
   const goBack = () => {
     setCurrentView("home");
     setSelectedPost(null);
@@ -86,7 +97,11 @@ const FeedPage = ({
 
   return (
     <div className={`app grid ${isDark ? "dark" : "light"}`}>
-      <SearchBar userId={userId} onCreatePost={handleCreatePost} />
+      <SearchBar
+        user={userInfo}
+        onCreatePost={handleCreatePost}
+        openUser={openUser}
+      />
       <Sidebar
         isDark={isDark}
         setIsDark={setIsDark}
@@ -95,23 +110,39 @@ const FeedPage = ({
         onNavigateToMessenger={onNavigateToMessenger}
         onLogout={onLogout}
       />
-      {currentView !== "post" ? (
-        loading ? (
-          <div className="loading">Loading...</div>
-        ) : (
+      {currentView == "post" ? (
+        <Post
+          userId={userId}
+          post={selectedPost}
+          openUser={openUser}
+          goBack={goBack}
+        />
+      ) : currentView == "user" ? (
+        <UserPage
+          userInfo={userInfo}
+          target={selectedUser}
+          openPost={openPost}
+        ></UserPage>
+      ) : loading ? (
+        <div className="loading">Loading...</div>
+      ) : (
+        <div className="content-container">
           <div className="feed-container">
             {feed.map((post) => (
               <React.Fragment key={post.id}>
-                <FeedItem userId={userId} post={post} openPost={openPost} />
+                <FeedItem
+                  userId={userId}
+                  post={post}
+                  openPost={openPost}
+                  openUser={openUser}
+                />
                 <hr />
               </React.Fragment>
             ))}
           </div>
-        )
-      ) : (
-        <Post userId={userId} post={selectedPost} goBack={goBack} />
+          <div className="more-info-bar"></div>
+        </div>
       )}
-      <div></div>
     </div>
   );
 };

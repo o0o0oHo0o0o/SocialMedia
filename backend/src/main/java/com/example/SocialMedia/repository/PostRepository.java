@@ -14,7 +14,7 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
     // Find a post by its ID
     Optional<Post> findByPostId(long postId);
 
-    Page<Post> findByUserAndDeletedFalse(User user, Pageable pageable);
+    Page<Post> findByUserAndIsDeletedIsFalse(User user, Pageable pageable);
 
     Optional<Post> findByInteractableItem_InteractableItemId(int interactableItemId);
 }

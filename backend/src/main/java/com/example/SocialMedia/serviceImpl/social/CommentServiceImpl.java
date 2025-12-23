@@ -49,8 +49,14 @@ public class CommentServiceImpl implements CommentService {
         return CommentResponse.builder()
                 .id(comment.getCommentId())
                 .content(comment.getContent())
-                .user(new ShortUserResponse(comment.getUser().getId(), comment.getUser().getUsername()))
+                .user(new ShortUserResponse(
+                        comment.getUser().getId(),
+                        comment.getUser().getFullName(),
+                        comment.getUser().getUsername(),
+                        comment.getUser().getProfilePictureURL(),
+                        comment.getUser().getCreatedLocalDateTime()))         // Assuming `getAge()` exists
                 .interactableItemId(comment.getOwnInteractableItem().getInteractableItemId())
+                .targetInteractableItemId(comment.getPost().getInteractableItem().getInteractableItemId())
                 .parentCommentId(comment.getParentComment() != null ? comment.getParentComment().getCommentId() : null)
                 // Lưu ý: existsBy... trong vòng lặp sẽ gây N+1 query (Tạm chấp nhận nếu app nhỏ)
                 .replied(commentRepository.existsByParentComment_CommentId(comment.getCommentId()))
@@ -75,8 +81,10 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public List<CommentResponse> getCommentsByUserId(Integer userId, Pageable pageable) {
-        Page<Comment> comments = commentRepository.findByUserId(userId, pageable);
+    public List<CommentResponse> getCommentsByUserName(String userName, Pageable pageable) {
+        User user = userRepository.findByUserName(userName)
+                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + userName));
+        Page<Comment> comments = commentRepository.findByUserAndIsDeletedIsFalse(user, pageable);
         return convertToCommentResponse(comments.getContent());
     }
 

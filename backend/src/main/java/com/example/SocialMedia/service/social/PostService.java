@@ -12,7 +12,7 @@ public interface PostService {
 
     PostResponse createPost(String username, PostRequest postRequest, MultipartFile[] files);
 
-    List<PostResponse> getPostByUserId(Integer userId, Pageable pageable);
+    List<PostResponse> getPostByUserName(String userName, Pageable pageable);
 
     PostResponse updatePost(String username, PostRequest postRequest);
 

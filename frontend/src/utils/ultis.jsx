@@ -7,6 +7,11 @@ const FeedApi = (function () {
   return { getFeedFrom };
 })();
 const CommentApi = (function () {
+  const getFromUser = async function (userId) {
+    return await fetch(`/api/comments/user/${userId}`, {
+      credentials: "include",
+    });
+  };
   const getFromPost = async function (postId) {
     return await fetch(`/api/comments/post/${postId}`, {
       credentials: "include",
@@ -51,6 +56,7 @@ const CommentApi = (function () {
     });
   }
   return {
+    getFromUser,
     getFromComment,
     getFromPost,
     createForPost,
@@ -59,6 +65,18 @@ const CommentApi = (function () {
   };
 })();
 const PostApi = (function () {
+  async function getFromId(postId) {
+    return await fetch(`/api/posts/${postId}`, {
+      method: "GET",
+      credentials: "include",
+    });
+  }
+  async function getFromUser(userId) {
+    return await fetch(`/api/posts/user/${userId}`, {
+      method: "GET",
+      credentials: "include",
+    });
+  }
   async function deletePost(post) {
     return await fetch(`http://localhost:8080/api/posts/${post.id}`, {
       method: "DELETE",
@@ -79,7 +97,7 @@ const PostApi = (function () {
       },
     );
   }
-  return { deletePost, updateOrCreatePost };
+  return { getFromId, getFromUser, deletePost, updateOrCreatePost };
 })();
 const ReactionApi = (function () {
   async function fetchReaction(interactableItemId) {
@@ -121,4 +139,12 @@ const ReactionApi = (function () {
   }
   return { fetchReaction, createReaction };
 })();
-export { CommentApi, PostApi, ReactionApi, FeedApi };
+const FollowApi = (function () {
+  const checkUser = async function (username) {
+    return await fetch(`/api/comments/follows/${username}`, {
+      credentials: "include",
+    });
+  };
+  return { checkUser };
+})();
+export { CommentApi, PostApi, ReactionApi, FeedApi, FollowApi };
