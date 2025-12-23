@@ -3,10 +3,9 @@ import FeedItem from "./FeedItem";
 import { PostApi, CommentApi, UserApi } from "../../utils/ultis";
 import CommentItem from "./CommentItem";
 import "../../styles/searchPage.css";
-import UserInfoCard from "./UserInfoCard";
 import AvatarAndName from "./AvatarAndName";
 
-function SearchPage({ keyword, openPost }) {
+function SearchPage({ keyword, openPost, openUser }) {
   const userId = 1;
   const [userList, setUserList] = useState([]);
   const [postList, setPostList] = useState([]);
@@ -87,7 +86,9 @@ function SearchPage({ keyword, openPost }) {
             ></CommentItem>
           ))}
         {currentPage == "user" &&
-          userList.map((user) => <AvatarAndName target={user}></AvatarAndName>)}
+          userList.map((user) => (
+            <AvatarAndName target={user} openUser={openUser}></AvatarAndName>
+          ))}
       </div>
       <div className="more-info-bar"></div>
     </div>

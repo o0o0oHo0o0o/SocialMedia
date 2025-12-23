@@ -109,6 +109,9 @@ const FeedPage = ({
         onCreatePost={handleCreatePost}
         openUser={openUser}
         openSearch={openSearch}
+        onLogout={onLogout}
+        isDark={isDark}
+        setIsDark={setIsDark}
       />
       <Sidebar
         isDark={isDark}
@@ -123,7 +126,9 @@ const FeedPage = ({
           userId={userId}
           post={selectedPost}
           openUser={openUser}
+          openPost={openPost}
           goBack={goBack}
+          otherPosts={feed.filter((post) => selectedPost != post)}
         />
       ) : currentView == "user" ? (
         <UserPage
@@ -138,6 +143,7 @@ const FeedPage = ({
           userIndo={userInfo}
           keyword={keyword}
           openPost={openPost}
+          openUser={openUser}
         ></SearchPage>
       ) : (
         <div className="content-container">

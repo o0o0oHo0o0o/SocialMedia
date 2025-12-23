@@ -3,7 +3,15 @@ import Modal from "./Modal";
 import "../../styles/searchbar.css";
 import ProfileButton from "../Feed/ProfileButton";
 
-const Header = ({ user, onCreatePost, openUser, openSearch }) => {
+const Header = ({
+  user,
+  onCreatePost,
+  openUser,
+  openSearch,
+  onLogout,
+  isDark,
+  setIsDark,
+}) => {
   const userId = user.id;
   const [searchQuery, setSearchQuery] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
@@ -77,7 +85,13 @@ const Header = ({ user, onCreatePost, openUser, openSearch }) => {
           Create Post
         </button>
         <Modal userId={userId} isOpen={modalOpen} onClose={handlePostCreated} />
-        <ProfileButton openUser={openUser} user={user}></ProfileButton>
+        <ProfileButton
+          openUser={openUser}
+          user={user}
+          onLogout={onLogout}
+          isDark={isDark}
+          setIsDark={setIsDark}
+        ></ProfileButton>
       </div>
     </header>
   );

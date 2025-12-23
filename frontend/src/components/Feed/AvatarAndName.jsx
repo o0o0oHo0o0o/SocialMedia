@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-const AvatarAndName = ({ target }) => {
+const AvatarAndName = ({ target, openUser }) => {
   const [hasError, setHasError] = useState(false);
 
   const handleError = () => {
@@ -12,7 +12,7 @@ const AvatarAndName = ({ target }) => {
   }
 
   return (
-    <div className="avatar-name">
+    <div className="avatar-name" onClick={() => openUser && openUser(target)}>
       {!hasError ? (
         <img
           src={target.avatarUrl}

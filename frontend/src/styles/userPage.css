@@ -1,4 +1,4 @@
-.profile-info {
+.user-page .avatar-name {
   display: flex;
   align-items: center;
   gap: 1rem;
@@ -10,8 +10,8 @@
   font-weight: 700;
 }
 .profile-info .icon {
-  width: 4rem;
-  height: 4rem;
+  max-width: 4rem;
+  max-height: 4rem;
 }
 .page-controller {
   padding: 1rem 0.25rem;

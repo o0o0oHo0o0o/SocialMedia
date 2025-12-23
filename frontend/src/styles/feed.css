@@ -416,7 +416,8 @@ button:hover {
   display: flex;
   padding-top: 10rem;
   justify-content: center;
-  align-items: start;
+  align-items: center;
+  border-left: 1px solid var(--text-color);
 }
 /* Responsive */
 @media (max-width: 768px) {
@@ -437,4 +438,28 @@ button:hover {
     border-right: none;
     border-top: var(--border);
   }
+}
+.more-info-bar .collection-card {
+  width: 100%;
+}
+.more-info-bar hr {
+  width: 90%;
+}
+.more-info-bar .post-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.other-posts .more-info-bar .post-media,
+.other-posts .more-info-bar .image-container {
+  height: 84px;
+  width: 84px;
+}
+.other-posts .more-info-bar {
+  flex-direction: column;
+  justify-content: start;
+  padding-top: 0;
+}
+.carousel {
+  min-height: 0;
 }

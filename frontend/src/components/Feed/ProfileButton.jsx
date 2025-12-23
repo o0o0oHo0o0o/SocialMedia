@@ -1,8 +1,16 @@
 import React, { useState } from "react";
 import "../../styles/optionButton.css"; // optional, see CSS at the bottom
 
-function ProfileButton({ openUser, user }) {
-  const [isOpen, setIsOpen] = useState(false);
+function ProfileButton({ openUser, user, onLogout, isDark, setIsDark }) {
+  const [isOpen, setIsOpen] = useState(true);
+  const toggle = () => {
+    if (isDark) {
+      localStorage.setItem("theme", "light");
+    } else {
+      localStorage.setItem("theme", "dark");
+    }
+    setIsDark(!isDark);
+  };
 
   return (
     <div className="post-menu profile">
@@ -73,17 +81,35 @@ function ProfileButton({ openUser, user }) {
           </button>
           <button
             onMouseDown={(e) => e.preventDefault()}
-            onClick={() => {
-              setIsOpen(false);
-            }}
             className="post-menu-item profile-setting"
           >
-            Setting
+            <div className="darkmode container">
+              <svg
+                rpl=""
+                fill="currentColor"
+                height="20"
+                icon-name="night"
+                viewBox="0 0 20 20"
+                width="20"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path d="M9.642 18.642a8.946 8.946 0 01-8.073-5.04 1.625 1.625 0 01.205-1.76 1.602 1.602 0 011.659-.545c.938.243 1.907.27 2.877.081 2.535-.496 4.572-2.532 5.068-5.068a6.44 6.44 0 00-.082-2.876 1.602 1.602 0 01.546-1.66 1.628 1.628 0 011.76-.205c3.365 1.65 5.33 5.134 5.005 8.874-.371 4.283-3.881 7.793-8.163 8.165a9.402 9.402 0 01-.802.034zm-6.293-5.517a7.175 7.175 0 006.938 3.688c3.424-.297 6.229-3.103 6.526-6.527a7.162 7.162 0 00-3.688-6.938 8.236 8.236 0 01.019 3.307c-.635 3.246-3.242 5.854-6.488 6.49a8.272 8.272 0 01-3.307-.02z"></path>
+              </svg>
+              <span className="text">Dark mode</span>
+              <input
+                type="checkbox"
+                id="toggle"
+                checked={isDark}
+                onChange={toggle}
+              />
+              <label htmlFor="toggle" className="switch"></label>
+            </div>
           </button>
 
           <button
             onMouseDown={(e) => e.preventDefault()}
             onClick={() => {
+              onLogout();
               setIsOpen(false);
             }}
             className="post-menu-item profile-logout"
