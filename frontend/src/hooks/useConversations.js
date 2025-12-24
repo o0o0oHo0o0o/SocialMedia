@@ -8,7 +8,9 @@ export function useConversations() {
 
   const refreshConversations = useCallback(async () => {
     try {
-      const list = await api.getConversations();
+      // SỬA: Truyền page = 1, size = 20 (hoặc số bất kỳ > 0)
+      const list = await api.getConversations(1, 10);
+
       const convList = Array.isArray(list) ? list : (list?.items || []);
       setConversations(convList);
       return convList;

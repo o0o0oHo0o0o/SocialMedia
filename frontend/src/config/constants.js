@@ -41,7 +41,8 @@ const API_PREFIX = (env.VITE_API_PREFIX || '').trim();
 
 export const CONFIG = {
   // API Configuration
-  API_BASE_URL: API_BASE,
+  // Sửa thành cổng Backend Spring Boot (8080) per request
+  API_BASE_URL: 'http://localhost:8080',
   API_PREFIX: API_PREFIX,
 
   // App Info

@@ -15,4 +15,6 @@ public interface ConversationProjection {
     Long getLastReadMessageID();
     LocalDateTime getMutedUntil();
     Long getUnreadCount();
+    String getOtherUserFullName();      // Tên người kia (cho chat 1-1)
+    String getOtherUserAvatar();
 }

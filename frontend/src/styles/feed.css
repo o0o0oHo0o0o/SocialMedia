@@ -89,6 +89,9 @@ svg {
 /* Header spans all columns */
 .header {
   grid-column: span 3;
+  /* Make feed page header background black */
+  background-color: #000000;
+  color: #ffffff;
 }
 
 /* Feed Container */

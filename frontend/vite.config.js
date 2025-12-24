@@ -17,10 +17,16 @@ export default defineConfig(({ mode }) => {
     ],
     server: {
       port,
-      strictPort: true, // Giữ nguyên cổng. Nếu bận, Vite sẽ báo lỗi thay vì tự nhảy sang cổng khác
+      strictPort: true,
       host: true,
       proxy: {
         '/api': {
+          target: 'http://localhost:8080',
+          changeOrigin: true,
+          secure: false,
+          cookieDomainRewrite: { '*': '' }
+        },
+        '/verification': {
           target: 'http://localhost:8080',
           changeOrigin: true,
           secure: false,

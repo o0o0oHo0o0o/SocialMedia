@@ -16,6 +16,7 @@ public class TypingRequest {
     private Integer conversationId;
     private Integer userId;
     private String username;
+    private String avatarUrl;
     @JsonProperty("isTyping")
     private boolean isTyping;
     private LocalDateTime timestamp;

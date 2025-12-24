@@ -14,6 +14,7 @@ export default function MessengerMessages({
   onImagePreview,
   readReceipts,
   conversationRecipient
+  , onReplyClick
 }) {
   return (
     <section className="chat-messages" ref={msgContainerRef} onScroll={onMessagesScroll}>
@@ -27,6 +28,7 @@ export default function MessengerMessages({
         onImagePreview={onImagePreview}
         readReceipts={readReceipts}
         recipientOverride={conversationRecipient}
+        onReplyClick={onReplyClick}
       />
     </section>
   );

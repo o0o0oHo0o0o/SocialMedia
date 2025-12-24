@@ -32,6 +32,7 @@ const MessageBubble = memo(function MessageBubble({
   me,
   readReceipt
 }) {
+  const [avatarFailed, setAvatarFailed] = useState(false);
   const bubbleRef = useRef(null);
   const baseReactions = msg?.reactions || msg?.interactableItem?.reactions || [];
   const [reactionsState, setReactionsState] = useState(baseReactions);
@@ -86,9 +87,19 @@ const MessageBubble = memo(function MessageBubble({
         {/* Avatar / spacer */}
         {!isMe && isLastInGroup ? (
           <div className="chat-bubble-avatar" title={senderName} onClick={onAvatarClick} style={{ cursor: 'pointer' }}>
-            {msg?.sender?.profilePictureURL || msg?.sender?.avatarUrl ? (
-              <img src={msg?.sender?.profilePictureURL || msg?.sender?.avatarUrl} alt={senderName} />
-            ) : senderInitial}
+            {(() => {
+              const avatarUrl = msg?.sender?.profilePictureURL || msg?.sender?.avatarUrl;
+              return (avatarUrl && !avatarFailed) ? (
+                <img
+                  src={avatarUrl}
+                  alt={senderName}
+                  loading="lazy"
+                  onError={(e) => { setAvatarFailed(true); e.target.onerror = null; }}
+                />
+              ) : (
+                senderInitial
+              );
+            })()}
           </div>
         ) : (!isMe && !isLastInGroup) ? (
           <div style={{ width: '32px', flexShrink: 0 }} />
@@ -102,11 +113,7 @@ const MessageBubble = memo(function MessageBubble({
             data-is-me={isMe}
             ref={bubbleRef}
           >
-            {!isMe && isGroupChat && (
-              <div style={{ fontSize: '11px', fontWeight: 600, color: '#aaa', marginBottom: '2px' }}>
-                {senderName}
-              </div>
-            )}
+            {/* Sender name is rendered by the surrounding message-group header to avoid duplicates */}
 
             {msg?.content && (
               <div className="chat-bubble-content" title={messageTime}>
@@ -167,6 +174,41 @@ const MessageBubble = memo(function MessageBubble({
             me={me}
             isMe={isMe}
           />
+
+          {/* Message status (sent / delivered / seen) positioned bottom-right of the bubble */}
+          {(isMe && isLastMessage) && (
+            <div className="chat-message-status">
+              {isRead ? (
+                <div className="chat-read-receipt">
+                  <div className="chat-seen-avatar" title={(readReceipt?.reader?.fullName || readReceipt?.user?.fullName || readReceipt?.reader?.username || readReceipt?.user?.username || 'Đã xem') + ' đang xem'}>
+                    {(() => {
+                      const rUrl =
+                        readReceipt?.reader?.avatarUrl ||
+                        readReceipt?.reader?.profilePictureURL ||
+                        readReceipt?.reader?.profilePictureUrl ||
+                        readReceipt?.user?.avatarUrl ||
+                        readReceipt?.user?.profilePictureURL ||
+                        readReceipt?.user?.profilePictureUrl ||
+                        null;
+                      return rUrl ? (
+                        <img src={rUrl}
+                          alt="Seen"
+                          onError={(e) => { e.target.style.display = 'none'; }}
+                        />
+                      ) : (
+                        (readReceipt?.reader?.fullName || readReceipt?.reader?.username || readReceipt?.user?.fullName || readReceipt?.user?.username || recipientInitial)
+                      );
+                    })()}
+                  </div>
+                  <span>Đã xem</span>
+                </div>
+              ) : isDelivered ? (
+                <span>Đã nhận</span>
+              ) : (
+                <span>Đã gửi</span>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Trigger button beside the bubble (click to open picker) */}

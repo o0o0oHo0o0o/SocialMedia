@@ -292,7 +292,26 @@ const ChatMessages = ({
               {!isOwn && (
                 <div className="message-group-avatar">
                   {group.sender?.avatarUrl || group.sender?.avatar ? (
-                    <img src={group.sender.avatarUrl || group.sender.avatar} alt="avatar" />
+                    <img
+                      src={group.sender.avatarUrl || group.sender.avatar}
+                      alt="avatar"
+                      loading="lazy"
+                      onError={(e) => {
+                        try {
+                          e.target.onerror = null;
+                          e.target.style.display = 'none';
+                          const parent = e.target.parentNode;
+                          if (parent && !parent.querySelector('.avatar-placeholder')) {
+                            const ph = document.createElement('div');
+                            ph.className = 'avatar-placeholder';
+                            ph.textContent = ((group.sender?.fullName || group.sender?.username || '?').charAt(0) || '?').toUpperCase();
+                            parent.appendChild(ph);
+                          }
+                        } catch (err) {
+                          // ignore
+                        }
+                      }}
+                    />
                   ) : (
                     <div className="avatar-placeholder">
                       {(group.sender?.fullName || group.sender?.username || '?').charAt(0).toUpperCase()}
@@ -302,7 +321,7 @@ const ChatMessages = ({
               )}
 
               <div className="message-group-content">
-                {!isOwn && (
+                {!isOwn && members && members.length > 2 && (
                   <div className="message-group-name">{getNickname(group.sender)}</div>
                 )}
 
@@ -380,7 +399,12 @@ const ChatMessages = ({
           <div className="typing-indicator-wrapper">
             <div className="typing-avatar">
               {typingUser.avatar ? (
-                <img src={typingUser.avatar} alt={typingUser.username} />
+                <img
+                  src={typingUser.avatar}
+                  alt={typingUser.username}
+                  loading="lazy"
+                  onError={(e) => { e.target.onerror = null; e.target.style.display = 'none'; }}
+                />
               ) : (
                 <div className="avatar-placeholder">
                   {(typingUser.username || '?').charAt(0).toUpperCase()}

@@ -17,21 +17,24 @@ import useConversations from '../hooks/useConversations';
 import useConversationActions from '../hooks/useConversationActions';
 import useRecording from '../hooks/useRecording';
 
+
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
-export default function Messenger({ onBack }) {
+export default function Messenger({ onBack, onStartVideoCall }) {
   const [conversationId, setConversationId] = useState('');
   const { conversations, setConversations, activeConv, setActiveConv, addConversation, refreshConversations } = useConversations();
   const [messages, setMessages] = useState([]);
   const [me, setMe] = useState(null);
   const [content, setContent] = useState('');
   const [files, setFiles] = useState([]);
+  const [replyMessage, setReplyMessage] = useState(null);
   const replacedTempIdsRef = useRef(new Set()); // Track replaced temp IDs to prevent duplicate replace
   const [msgLoading, setMsgLoading] = useState(false);
   const [hasMoreMessages, setHasMoreMessages] = useState(true);
   const msgContainerRef = useRef(null);
   const prevLastMessageIdRef = useRef(null);
   const initialLoadRef = useRef(true);
+  const prevTypingLengthRef = useRef(0);
   const isPrependingRef = useRef(false);
   const loadMoreObserverRef = useRef(null);
   const USE_SENTINEL = true;
@@ -111,6 +114,39 @@ export default function Messenger({ onBack }) {
     onReaction: handleReactionEvent
     ,
     onReadReceipt: handleReadReceipt
+    ,
+    onAvatarUpdate: useCallback((payload) => {
+      try {
+        const convId = payload?.conversationId || payload?.conversationId?.toString();
+        const newAvatar = payload?.newAvatar || payload?.avatarUrl || payload?.newAvatarUrl || payload?.newAvatarUrl;
+        if (!convId || !newAvatar) return;
+
+        // Update conversations list
+        setConversations(prev => {
+          if (!Array.isArray(prev)) return prev;
+          return prev.map(c => {
+            if (Number(c.conversationId) === Number(convId)) {
+              return { ...c, avatarUrl: newAvatar };
+            }
+            return c;
+          });
+        });
+
+        // Update active conversation if matches
+        setActiveConv(prev => {
+          if (!prev) return prev;
+          try {
+            if (Number(prev.conversationId) === Number(convId)) {
+              return { ...prev, avatarUrl: newAvatar };
+            }
+          } catch (e) { /* ignore */ }
+          return prev;
+        });
+
+        // If drawer is open for this conversation, trigger a small refresh key so drawer hooks can refetch if needed
+        setDrawerRefreshKey(k => k + 1);
+      } catch (e) { console.error('[Messenger] onAvatarUpdate failed', e); }
+    }, [setConversations, setActiveConv])
   });
 
   useEffect(() => {
@@ -147,7 +183,9 @@ export default function Messenger({ onBack }) {
         prevLastMessageIdRef.current = null;
         return;
       }
-      if (isPrependingRef.current) return; // don't auto-scroll when we're prepending older messages
+      // Don't auto-scroll when we're prepending older messages or during initial load
+      if (isPrependingRef.current) return;
+      if (initialLoadRef.current) return;
 
       const last = messages[messages.length - 1];
       const lastId = last?.messageId || last?.payload?.messageId || null;
@@ -158,6 +196,53 @@ export default function Messenger({ onBack }) {
       prevLastMessageIdRef.current = lastId;
     } catch (e) { /* noop */ }
   }, [messages, scrollToBottom]);
+  // --- LOGIC SCROLL THÔNG MINH ---
+  useEffect(() => {
+    const el = msgContainerRef.current || document.querySelector('.chat-messages');
+    if (!el) return;
+
+    try {
+      // 1. Lấy ID tin nhắn cuối cùng hiện tại
+      const lastMsg = messages && messages.length > 0 ? messages[messages.length - 1] : null;
+      const currentLastId = lastMsg?.messageId || lastMsg?.payload?.messageId || lastMsg?._tempId || null;
+
+      // 2. Kiểm tra xem có tin nhắn MỚI ở dưới đáy không
+      const isNewMessageArrived = currentLastId !== prevLastMessageIdRef.current;
+
+      // 3. Kiểm tra trạng thái Typing
+      const isTyping = typingUsers && typingUsers.length > 0;
+      const isTypingChanged = (typingUsers?.length || 0) !== prevTypingLengthRef.current;
+
+      // If we're in the middle of prepending older messages, do nothing (scroll restoration handled elsewhere)
+      if (isPrependingRef.current) {
+        // still update refs so future comparisons are correct
+        prevLastMessageIdRef.current = currentLastId;
+        prevTypingLengthRef.current = typingUsers?.length || 0;
+        return;
+      }
+
+      // --- ĐIỀU KIỆN SCROLL ---
+      if (isNewMessageArrived || (isTyping && isTypingChanged)) {
+        const t = setTimeout(() => {
+          try {
+            const isNearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 500;
+            el.scrollTo({ top: el.scrollHeight, behavior: isNearBottom ? 'smooth' : 'auto' });
+          } catch (e) {
+            el.scrollTop = el.scrollHeight;
+          }
+        }, 50);
+
+        prevLastMessageIdRef.current = currentLastId;
+        prevTypingLengthRef.current = typingUsers?.length || 0;
+
+        return () => clearTimeout(t);
+      }
+
+      // Cập nhật refs ngay cả khi không scroll để lần sau so sánh đúng
+      prevLastMessageIdRef.current = currentLastId;
+      prevTypingLengthRef.current = typingUsers?.length || 0;
+    } catch (e) { /* noop */ }
+  }, [messages, typingUsers]);
 
   // Conversation actions (rename, nickname updates)
   const { handleRenameGroup, handleNicknameUpdated } = useConversationActions({ activeConv, setActiveConv, setConversations, setDrawerRefreshKey });
@@ -176,6 +261,7 @@ export default function Messenger({ onBack }) {
     const others = convMembers.filter(member => Number(member.userId) !== Number(me.id));
     return others.length > 0 ? others[0] : null;
   }, [convMembers, me]);
+
 
   // Determine whether this conversation should be treated as a group
   const isGroup = useMemo(() => {
@@ -445,11 +531,38 @@ export default function Messenger({ onBack }) {
   const handleStopRecording = async () => {
     try {
       const file = await stopRecording();
-      if (file) setFiles(prev => [...prev, file]);
+      if (file) {
+        // Attempt to send the audio file immediately
+        try {
+          if (!activeConv || !activeConv.conversationId) {
+            // Fallback: add to files list so user can send manually
+            setFiles(prev => [...prev, file]);
+            return;
+          }
+          const payload = { conversationId: activeConv.conversationId, content: '' };
+          const jsonData = JSON.stringify(payload);
+          await api.sendChatMessage({ jsonData, files: [file] });
+          // Clear composer state and scroll
+          setContent('');
+          setFiles([]);
+          try { scrollToBottom(true); } catch (e) { /* noop */ }
+        } catch (sendErr) {
+          console.error('[Messenger] auto-send recording failed', sendErr);
+          // Fallback: keep file in attachments so user can retry
+          setFiles(prev => [...prev, file]);
+        }
+      }
     } catch (e) {
       console.error('[Messenger] stopRecording failed', e);
     }
   };
+
+  const handleReply = (msg) => {
+    setReplyMessage(msg);
+    try { document.querySelector('.composer-textarea')?.focus(); } catch (e) { }
+  };
+
+  const handleCancelReply = () => setReplyMessage(null);
 
   const handleCancelRecording = () => {
     try {
@@ -460,6 +573,8 @@ export default function Messenger({ onBack }) {
   };
 
   // Use shared formatTime from utils
+
+
 
   const myTypingTimerRef = useRef(null); // Timer for sending typing=false
   const connected = chatHooks?.connected;
@@ -479,12 +594,19 @@ export default function Messenger({ onBack }) {
   // Send message via API (files + json payload). WS will deliver the message back via subscription.
   const sendMessage = async () => {
     if (!activeConv || !activeConv.conversationId) return;
-    const payload = { conversationId: activeConv.conversationId, content: content || '' };
+    const payload = {
+      conversationId: activeConv.conversationId,
+      content: content || '',
+      replyToMessageId: replyMessage ? (replyMessage.messageId || replyMessage._tempId) : null
+    };
     const jsonData = JSON.stringify(payload);
     try {
       await api.sendChatMessage({ jsonData, files });
       setContent('');
       setFiles([]);
+      setReplyMessage(null);
+      // Force-scroll to bottom after sending a message so sender always sees newest
+      try { scrollToBottom(true); } catch (e) { /* noop */ }
     } catch (e) {
       console.error('[Messenger] sendMessage failed', e);
       alert('Gửi tin nhắn thất bại: ' + (e?.message || e));
@@ -545,15 +667,6 @@ export default function Messenger({ onBack }) {
   // Render
   return (
     <>
-      <div className="chat-global-actions">
-        <button className="chat-action-btn chat-back-btn" title="Quay lại Feed" onClick={onBack}>
-          <svg fill="currentColor" height="20" viewBox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg">
-            <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
-          </svg>
-          Feed
-        </button>
-        <button className="chat-action-btn" title="Đăng xuất" onClick={() => setLogoutOpen(true)}>🚪 Đăng xuất</button>
-      </div>
       <MessengerMain
         conversations={conversations}
         activeConv={activeConv}
@@ -581,10 +694,35 @@ export default function Messenger({ onBack }) {
         onPickFiles={onPickFiles}
         removeFile={(i) => setFiles(prev => prev.filter((_, idx) => idx !== i))}
         sendMessage={sendMessage}
+        onReplyClick={handleReply}
+        replyMessage={replyMessage}
+        onCancelReply={handleCancelReply}
         setDrawerOpen={setDrawerOpen}
         drawerOpen={drawerOpen}
         readReceipts={readReceipts}
         conversationRecipient={conversationRecipient}
+        onOpenProfile={() => setMeOpen(true)}
+        // 1. Nút Gọi Thoại (Audio) -> Truyền false
+        onStartCall={() => {
+          try {
+            const dest = conversationRecipient?.username || conversationRecipient?.userId || null;
+            if (!dest) return;
+            // Gọi hàm onStartVideoCall nhận từ Props (App.js), tham số thứ 2 là isVideo = false
+            if (typeof onStartVideoCall === 'function') onStartVideoCall(dest, false);
+          } catch (e) { console.error('Start audio call failed', e); }
+        }}
+
+        // 2. Nút Gọi Video (Camera) -> Truyền true
+        onStartVideoCall={() => {
+          try {
+            const dest = conversationRecipient?.username || conversationRecipient?.userId || null;
+            if (!dest) return;
+            // Gọi hàm onStartVideoCall nhận từ Props (App.js), tham số thứ 2 là isVideo = true
+            if (typeof onStartVideoCall === 'function') onStartVideoCall(dest, true);
+          } catch (e) { console.error('Start video call failed', e); }
+        }}
+        onBack={onBack}
+        onLogout={() => setLogoutOpen(true)}
       />
 
       {/* Dialogs */}
@@ -609,6 +747,8 @@ export default function Messenger({ onBack }) {
         onClose={() => setUserInfoOpen(false)}
         selectedUser={selectedUser}
       />
+
+
 
       {/* Image Preview Modal */}
       {imagePreview && (

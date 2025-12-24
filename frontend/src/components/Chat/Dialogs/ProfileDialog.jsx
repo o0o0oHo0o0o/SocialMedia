@@ -14,8 +14,12 @@ const ProfileDialog = ({ open, onClose, me }) => {
     >
       {me ? (
         <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: 12, alignItems: 'center' }}>
-          <div className="chat-avatar" style={{ width: 80, height: 80, fontSize: 28 }}>
-            {me.fullName?.[0] || me.username?.[0] || 'M'}
+          <div className="chat-avatar" style={{ width: 80, height: 80, fontSize: 28, overflow: 'hidden' }}>
+            {me.avatarUrl ? (
+              <img src={me.avatarUrl} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} referrerPolicy="no-referrer" onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = ''; }} />
+            ) : (
+              (me.fullName?.[0] || me.username?.[0] || 'M')
+            )}
           </div>
           <div>
             <div style={{ fontWeight: 700, fontSize: 16 }}>{me.fullName || me.username}</div>

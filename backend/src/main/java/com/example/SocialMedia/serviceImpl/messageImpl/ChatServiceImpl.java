@@ -1,8 +1,10 @@
 package com.example.SocialMedia.serviceImpl.messageImpl;
 
+import com.example.SocialMedia.constant.MessageType;
 import com.example.SocialMedia.constant.ReactionType;
 import com.example.SocialMedia.constant.TargetType;
 import com.example.SocialMedia.dto.message.MessageStatusSummary;
+import com.example.SocialMedia.dto.message.ReplyMessageDto;
 import com.example.SocialMedia.dto.message.UserReadStatus;
 import com.example.SocialMedia.dto.projection.ConversationProjection;
 import com.example.SocialMedia.dto.request.ReactionRequest;
@@ -74,7 +76,7 @@ public class ChatServiceImpl implements ChatService {
         message.setConversation(conversation);
         message.setSender(sender);
         message.setSentAt(LocalDateTime.now());
-        message.setMessageType("TEXT");
+        message.setMessageType(MessageType.TEXT);
 
         // Gắn InteractableItem vừa tạo vào Message
         message.setInteractableItem(interactableItem);
@@ -84,7 +86,17 @@ public class ChatServiceImpl implements ChatService {
 
         // Handle Reply
         if (request.getReplyToMessageId() != null) {
-            messageRepo.findById(request.getReplyToMessageId()).ifPresent(message::setReplyMessage);
+            // 1. Tìm tin nhắn gốc từ DB
+            Messages originalMessage = messageRepo.findById(request.getReplyToMessageId())
+                    .orElseThrow(() -> new RuntimeException("Tin nhắn phản hồi không tồn tại (ID: " + request.getReplyToMessageId() + ")"));
+
+            // 2. Kiểm tra xem tin nhắn gốc có thuộc cùng cuộc trò chuyện không (Bảo mật)
+            if (!(originalMessage.getConversation().getConversationId()==conversation.getConversationId())) {
+                throw new RuntimeException("Không thể reply tin nhắn của cuộc trò chuyện khác");
+            }
+
+            // 3. SET vào Entity (Để Hibernate tự tạo khóa ngoại self-referencing)
+            message.setReplyMessage(originalMessage);
         }
 
         Messages savedMessage = messageRepo.save(message);
@@ -157,6 +169,40 @@ public class ChatServiceImpl implements ChatService {
                 .orElse(null);
         String nickname = memberInfo != null ? memberInfo.getNickname() : null;
 
+
+        //reply message
+        // ... (Code lưu DB ở trên giữ nguyên) ...
+
+        // reply message DTO construction
+        ReplyMessageDto replyDto = null;
+
+        // Kiểm tra tin nhắn vừa lưu có quan hệ reply không
+        if (savedMessage.getReplyMessage() != null) {
+            Messages original = savedMessage.getReplyMessage(); // Tin nhắn gốc
+
+            // 1. Lấy nội dung text (nếu có)
+            String originalContent = (original.getMessageBody() != null)
+                    ? original.getMessageBody().getContent()
+                    : "";
+
+            // 2. Kiểm tra Media và xác định loại
+            boolean hasMedia = original.getMessageMedia() != null && !original.getMessageMedia().isEmpty();
+            String detectedMediaType = null;
+
+            if (hasMedia) {
+                // Lấy file đầu tiên để xác định loại đại diện
+                MessageMedia media = original.getMessageMedia().stream().findFirst().orElse(null);
+                detectedMediaType = media.getMediaType();
+            }
+
+            replyDto = ReplyMessageDto.builder()
+                    .messageId(original.getMessageId())
+                    .content(originalContent)
+                    .senderName(original.getSender().getFullName())
+                    .hasMedia(hasMedia)
+                    .mediaType(detectedMediaType) // <--- [MỚI] Gán loại media vào đây
+                    .build();
+        }
         // 8. Build Response
         MessageResponse response = MessageResponse.builder()
                 .messageId(savedMessage.getMessageId())
@@ -166,6 +212,7 @@ public class ChatServiceImpl implements ChatService {
                 .sender(SenderDto.fromUser(sender, nickname))
                 .sentAt(savedMessage.getSentAt().toString())
                 .replyToMessageId(request.getReplyToMessageId())
+                .replyToMessage(replyDto)
                 .isRead(false)
                 .isDelivered(false)
                 .build();
@@ -181,13 +228,21 @@ public class ChatServiceImpl implements ChatService {
         return response;
     }
 
-    // ... (Giữ nguyên các hàm getUserConversations và getMessages từ code đã fix trước đó)
     @Override
     public List<ConversationResponse> getUserConversations(String username, int page, int size) {
         User user = userRepo.findByUserName(username)
                 .orElseThrow(() -> new RuntimeException("User not found: " + username));
+        //Đặt giá trị mặc định nếu size <= 0
+        if (size <= 0) {
+            size = 10;
+        }
         int dbPage = (page > 0) ? page - 1 : 0;
-        List<ConversationProjection> rawData = conversationRepo.getUserConversations(user.getId(), dbPage, size);
+        List<ConversationProjection> rawData = conversationRepo.getUserConversations(
+                user.getId(),
+                size,
+                dbPage
+        );
+
         return rawData.stream().map(this::mapToResponse).toList();
     }
 
@@ -260,6 +315,33 @@ public class ChatServiceImpl implements ChatService {
                     .map(Reaction::getReactionType)
                     .findFirst()
                     .orElse(null);
+            ReplyMessageDto replyDto = null;
+            if (m.getReplyMessage() != null) {
+                Messages original = m.getReplyMessage();
+
+                // 1. Lấy Content tin nhắn gốc
+                String originalContent = "";
+                if (original.getMessageBody() != null) {
+                    originalContent = original.getMessageBody().getContent();
+                }
+
+                // 2. Check Media tin nhắn gốc
+                boolean hasMedia = original.getMessageMedia() != null && !original.getMessageMedia().isEmpty();
+                String detectedMediaType = null;
+                if (hasMedia) {
+                    // Lấy phần tử đầu tiên an toàn bằng Stream
+                    var firstMedia = original.getMessageMedia().stream().findFirst().orElse(null);
+                    detectedMediaType = firstMedia.getMediaType();
+                }
+
+                replyDto = ReplyMessageDto.builder()
+                        .messageId(original.getMessageId())
+                        .content(originalContent)
+                        .senderName(original.getSender().getFullName())
+                        .hasMedia(hasMedia)
+                        .mediaType(detectedMediaType)
+                        .build();
+            }
             // ----------------------------------------
             return MessageResponse.builder()
                     .messageId(m.getMessageId())
@@ -269,6 +351,7 @@ public class ChatServiceImpl implements ChatService {
                     .sender(SenderDto.fromUser(m.getSender(), nickname))
                     .sentAt(m.getSentAt() != null ? m.getSentAt().toString() : null)
                     .replyToMessageId(m.getReplyMessage() != null ? m.getReplyMessage().getMessageId() : null)
+                    .replyToMessage(replyDto)
                     .isRead(isRead)
                     .isDelivered(isDelivered)
                     .statusSummary(buildStatusSummary(statuses, currentUserId))
@@ -286,70 +369,64 @@ public class ChatServiceImpl implements ChatService {
     @Override
     @Transactional
     public String reactToMessage(String username, ReactionRequest request) {
-        // 1. Lấy User
+        // 1. Validate User
         User user = userRepo.findByUserName(username)
                 .orElseThrow(() -> new RuntimeException("User not found: " + username));
 
-        InteractableItems item = null;
-        Messages message = null;
+        // 2. Lấy InteractableItem (Tách logic tìm kiếm ra hàm riêng)
+        InteractableItems item = findInteractableItem(request);
 
-        // 2. Xác định đối tượng (Dùng Enum TargetType)
-        switch (request.getTargetType()) {
-            case MESSAGE:
-                message = messageRepo.findById((long) request.getTargetId())
-                        .orElseThrow(() -> new RuntimeException("Message not found with id: " + request.getTargetId()));
-                item = message.getInteractableItem();
-                break;
-
-            case POST:
-                // TODO: Logic cho Post
-                break;
-
-            case COMMENT:
-                // TODO: Logic cho Comment
-                break;
-
-            default:
-                throw new IllegalArgumentException("Target type không hỗ trợ: " + request.getTargetType());
-        }
-
-        if (item == null) {
-            throw new RuntimeException("Lỗi dữ liệu: Đối tượng này chưa có InteractableItem");
-        }
-
-        // 3. Xử lý Reaction dùng Optional
+        // 3. Xử lý Logic Reaction
+        // Dùng Composite Key hoặc User + Item để tìm
         Optional<Reaction> existingReactionOpt = reactionRepo
                 .findByInteractableItemsAndUser_Id(item, user.getId());
 
-        String action = "";
+        String action;
+        ReactionType newType = request.getReactionType();
 
         if (existingReactionOpt.isPresent()) {
-            Reaction existingReaction = existingReactionOpt.get();
+            Reaction existing = existingReactionOpt.get();
 
-            // Nếu bấm trùng loại cũ -> XÓA (Toggle Off)
-            if (existingReaction.getReactionType() == request.getReactionType()) {
-                reactionRepo.delete(existingReaction);
+            // CASE 1: Bấm trùng cái cũ -> XÓA (Toggle Off)
+            if (existing.getReactionType() == newType) {
+                reactionRepo.delete(existing);
                 action = "REMOVED";
-            } else {
-                // Nếu bấm loại khác -> CẬP NHẬT cái hiện tại
-                existingReaction.setReactionType(request.getReactionType());
-                existingReaction.setReactedLocalDateTime(LocalDateTime.now());
-                reactionRepo.save(existingReaction);
+            }
+            // CASE 2: Bấm cái khác -> CẬP NHẬT
+            else {
+                existing.setReactionType(newType);
+                existing.setReactedLocalDateTime(LocalDateTime.now());
+                reactionRepo.save(existing);
                 action = "UPDATED";
             }
         } else {
-            // Chưa có -> TẠO MỚI (Dùng hàm helper)
-            if (request.getReactionType() != null) {
-                saveNewReaction(item, user, request.getReactionType());
-                action = "ADDED";
+            // CASE 3: Chưa có -> TẠO MỚI
+            if (newType == null) {
+                throw new IllegalArgumentException("Reaction type cannot be null for new reaction");
             }
+            saveNewReaction(item, user, newType);
+            action = "ADDED";
         }
 
-        // 4. Bắn Socket (Chỉ bắn nếu là Message)
+        // 4. Bắn Socket (Nên gửi kèm danh sách count mới nhất)
         if (request.getTargetType() == TargetType.MESSAGE) {
-            sendReactionSocket(message, user, action, request.getReactionType());
+            // Lấy lại Message để đảm bảo data
+            messageRepo.findById((long) request.getTargetId()).ifPresent(message -> sendReactionSocket(message, user, action, newType));
         }
+
         return action;
+    }
+
+    // Hàm phụ trợ tách ra cho gọn
+    private InteractableItems findInteractableItem(ReactionRequest request) {
+        return switch (request.getTargetType()) {
+            case MESSAGE -> messageRepo.findById((long) request.getTargetId())
+                    .map(Messages::getInteractableItem)
+                    .orElseThrow(() -> new RuntimeException("Message not found or has no interactable item"));
+            case POST -> throw new UnsupportedOperationException("Post reaction not implemented yet");
+            case COMMENT -> throw new UnsupportedOperationException("Comment reaction not implemented yet");
+            default -> throw new IllegalArgumentException("Invalid Target Type");
+        };
     }
 
     // --- CÁC HÀM PHỤ TRỢ (HELPER METHODS) ---
@@ -390,13 +467,35 @@ public class ChatServiceImpl implements ChatService {
 
     private ConversationResponse mapToResponse(ConversationProjection proj) {
         String finalAvatarUrl = null;
-        if (proj.getGroupImageURL() != null) {
-            finalAvatarUrl = minioService.getFileUrl(proj.getGroupImageURL());
+        String finalName = proj.getConversationName();
+
+        if (Boolean.TRUE.equals(proj.getIsGroupChat())) {
+            // TRƯỜNG HỢP GROUP CHAT
+            if (proj.getGroupImageURL() != null) {
+                finalAvatarUrl = minioService.getFileUrl(proj.getGroupImageURL());
+            }
+        } else {
+            // TRƯỜNG HỢP CHAT 1-1
+            // Lấy avatar của đối phương (đã thêm vào Projection ở bước 1)
+            if (proj.getOtherUserAvatar() != null) {
+                // Kiểm tra xem avatar user là link full (Google/Fb) hay tên file MinIO
+                String avatarRaw = proj.getOtherUserAvatar();
+                if (avatarRaw.startsWith("http")) {
+                    finalAvatarUrl = avatarRaw;
+                } else {
+                    finalAvatarUrl = minioService.getFileUrl(avatarRaw);
+                }
+            }
+
+            // Gán tên đối phương nếu tên conversation null
+            if (proj.getOtherUserFullName() != null) {
+                finalName = proj.getOtherUserFullName();
+            }
         }
 
         return ConversationResponse.builder()
                 .conversationId(proj.getConversationID())
-                .conversationName(proj.getConversationName())
+                .conversationName(finalName)
                 .avatarUrl(finalAvatarUrl)
                 .isGroup(proj.getIsGroupChat())
                 .unreadCount(proj.getUnreadCount())

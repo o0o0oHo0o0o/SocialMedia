@@ -1,5 +1,6 @@
 package com.example.SocialMedia.serviceImpl.messageImpl;
 
+import com.example.SocialMedia.constant.MessageType;
 import com.example.SocialMedia.constant.TargetType;
 import com.example.SocialMedia.dto.message.FileUploadResponse;
 import com.example.SocialMedia.dto.response.ReactionResponse;
@@ -119,27 +120,29 @@ public class ConversationServiceImpl implements ConversationService {
 
         // 3. Upload file (MinIO)
         FileUploadResponse uploadResponse = minioService.uploadFile(file);
-        String avatarUrl = uploadResponse.getMediaUrl();
+        String fileName = uploadResponse.getFileName();
 
         // 4. Update DB
-        conversation.setGroupImageURL(avatarUrl);
+        conversation.setGroupImageFile(fileName);
         conversationRepo.save(conversation);
 
         // 5. Tạo thông báo
         String notificationContent = actor.getFullName() + " đã thay đổi ảnh nhóm.";
         createSystemMessage(conversation, actor, notificationContent);
 
+        String presignedUrl = uploadResponse.getMediaUrl();
+
         // 6. Bắn Socket
         Map<String, Object> payload = Map.of(
                 "type", "AVATAR_UPDATE",
                 "conversationId", conversationId,
-                "newAvatar", avatarUrl,
+                "newAvatar", presignedUrl,
                 "updatedBy", requesterUsername
         );
 
         sendSocketEvent(conversationId, payload);
 
-        return avatarUrl;
+        return presignedUrl;
     }
 
     @Override
@@ -199,7 +202,7 @@ public class ConversationServiceImpl implements ConversationService {
         message.setConversation(conversation);
         message.setSender(actor);
         message.setInteractableItem(item);
-        message.setMessageType("NOTIFICATION");
+        message.setMessageType(MessageType.SYSTEM);
         message.setSentAt(LocalDateTime.now());
         message.setSequenceNumber(nextSequence);
         message.setDeleted(false);

@@ -26,6 +26,7 @@ public class ChatSocketController {
         var typingPayload = new TypingPayload(
                 request.getConversationId(),
                 authentication.getName(),
+                request.getAvatarUrl(),
                 request.getUserId(),
                 request.isTyping()
         );

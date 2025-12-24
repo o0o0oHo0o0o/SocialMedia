@@ -1,5 +1,6 @@
 package com.example.SocialMedia.model.messaging_model;
 
+import com.example.SocialMedia.constant.MessageType;
 import com.example.SocialMedia.model.coredata_model.InteractableItems;
 import com.example.SocialMedia.model.coredata_model.Reaction;
 import com.example.SocialMedia.model.coredata_model.User;
@@ -44,8 +45,9 @@ public class Messages {
     @Column(name = "SequenceNumber", nullable = false)
     private Long sequenceNumber;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "MessageType")
-    private String messageType;
+    private MessageType messageType;
 
     @Column(name = "SentAt", nullable = false)
     private LocalDateTime sentAt;

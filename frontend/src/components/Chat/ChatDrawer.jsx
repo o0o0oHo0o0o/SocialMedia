@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import api from '../../services/api';
 import MemberNicknameList from './MemberNicknameList';
 import PhotoGallery from './PhotoGallery';
@@ -9,9 +9,17 @@ import { useConversationPhotos, useConversationFiles, useConversationMembers } f
  * ChatDrawer - Panel bên phải hiển thị thông tin đoạn chat
  * Gồm: Nicknames, Photos, Files
  */
-const ChatDrawer = ({ open, conversationId, onClose, isGroupChat = false, groupName = '', refreshKey = 0, onRenameGroup, onNicknameUpdated }) => {
+const ChatDrawer = ({ open, conversationId, onClose, isGroupChat = false, groupName = '', conversationAvatar = '', groupAvatarUrl = '', refreshKey = 0, onRenameGroup, onNicknameUpdated }) => {
+  console.log('[ChatDrawer] header render', { conversationId, isGroupChat, conversationAvatar, groupAvatarUrl, groupName });
   const [activeTab, setActiveTab] = useState('members'); // 'members', 'photos', 'files'
   const [prevConversationId, setPrevConversationId] = useState(null);
+  const [currentAvatar, setCurrentAvatar] = useState(groupAvatarUrl || conversationAvatar || '');
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef(null);
+
+  useEffect(() => {
+    setCurrentAvatar(groupAvatarUrl || conversationAvatar || '');
+  }, [groupAvatarUrl, conversationAvatar]);
 
   const { members, loadingMembers, fetchMembers, resetMembers } = useConversationMembers(conversationId);
   const { photos, hasMorePhotos, loadingPhotos, fetchPhotos, resetPhotos } = useConversationPhotos(conversationId);
@@ -82,14 +90,14 @@ const ChatDrawer = ({ open, conversationId, onClose, isGroupChat = false, groupN
         top: 0,
         right: 0,
         bottom: 0,
-        width: '320px',
-        background: 'linear-gradient(to bottom, #1a1a2e, #0f3460)',
-        borderLeft: '1px solid rgba(255,255,255,0.1)',
+        width: '360px',
+        background: '#000',
+        borderLeft: '1px solid rgba(25,118,210,0.08)',
         zIndex: 300,
         display: 'flex',
         flexDirection: 'column',
-        boxShadow: '-4px 0 16px rgba(0,0,0,0.3)',
-        animation: 'slideInRight 0.3s ease-out'
+        boxShadow: '-4px 0 24px rgba(0,0,0,0.6)',
+        animation: 'slideInRight 0.28s ease-out'
       }}
     >
       {/* Header */}
@@ -125,8 +133,83 @@ const ChatDrawer = ({ open, conversationId, onClose, isGroupChat = false, groupN
           </button>
         </div>
         {groupName ? (
-          <div style={{ marginTop: '8px', color: '#ddd', fontSize: '13px', width: '100%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-            {groupName}
+          <div style={{ marginTop: '8px', color: '#ddd', fontSize: '13px', width: '100%', display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{ position: 'relative', width: 72, height: 72 }}>
+              <img
+                src={currentAvatar || (isGroupChat ? (groupAvatarUrl || 'https://abs.twimg.com/sticky/default_profile_images/default_profile_400x400.png') : (conversationAvatar || 'https://abs.twimg.com/sticky/default_profile_images/default_profile_400x400.png'))}
+                alt="avatar"
+                loading="lazy"
+                onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = 'https://abs.twimg.com/sticky/default_profile_images/default_profile_400x400.png'; }}
+                style={{ width: '100%', height: '100%', borderRadius: 12, objectFit: 'cover', border: '2px solid rgba(25,118,210,0.14)' }}
+              />
+              {/* Pencil edit button */}
+              <button
+                aria-label="Thay ảnh nhóm"
+                title="Thay ảnh nhóm"
+                onClick={() => fileInputRef.current && fileInputRef.current.click()}
+                style={{
+                  position: 'absolute',
+                  right: -6,
+                  bottom: -6,
+                  width: 28,
+                  height: 28,
+                  borderRadius: '50%',
+                  border: '1.5px solid rgba(255,255,255,0.18)',
+                  background: 'rgba(0,0,0,0.45)',
+                  color: '#ffffff',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  boxShadow: '0 1px 4px rgba(0,0,0,0.5)',
+                  padding: 0,
+                  transition: 'all 0.12s ease'
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(100,116,255,0.18)'; e.currentTarget.style.border = '1.5px solid rgba(100,116,255,0.28)'; e.currentTarget.style.color = '#fff'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(0,0,0,0.45)'; e.currentTarget.style.border = '1.5px solid rgba(255,255,255,0.18)'; e.currentTarget.style.color = '#ffffff'; }}
+              >
+                {uploading ? (
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden>
+                    <circle cx="12" cy="12" r="7" stroke="currentColor" strokeWidth="1.2" strokeOpacity="0.6" />
+                  </svg>
+                ) : (
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden>
+                    <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.003 1.003 0 0 0 0-1.42l-2.34-2.34a1.003 1.003 0 0 0-1.42 0l-1.83 1.83 3.75 3.75 1.84-1.82z" />
+                  </svg>
+                )}
+              </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                style={{ display: 'none' }}
+                onChange={async (e) => {
+                  const f = e.target.files && e.target.files[0];
+                  if (!f) return;
+                  if (!f.type.startsWith('image/')) { alert('Vui lòng chọn file ảnh hợp lệ'); e.target.value = ''; return; }
+                  try {
+                    setUploading(true);
+                    const res = await api.updateConversationAvatar(conversationId, f);
+                    // Backend may return { message, data } or simple url
+                    const newUrl = res?.data || res?.url || (typeof res === 'string' ? res : null) || res?.mediaUrl || null;
+                    if (newUrl) {
+                      setCurrentAvatar(newUrl);
+                      // dispatch a global event so other parts can react
+                      if (typeof window !== 'undefined' && window?.dispatchEvent) {
+                        window.dispatchEvent(new CustomEvent('conversationAvatarUpdated', { detail: { conversationId, avatarUrl: newUrl } }));
+                      }
+                    }
+                  } catch (err) {
+                    console.error('Upload avatar failed', err);
+                    alert('Tải ảnh thất bại: ' + (err?.message || 'Lỗi'));
+                  } finally {
+                    setUploading(false);
+                    if (fileInputRef.current) fileInputRef.current.value = '';
+                  }
+                }}
+              />
+            </div>
+            <div style={{ overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis', color: '#e6f0ff', fontWeight: 600 }}>{groupName}</div>
           </div>
         ) : null}
       </div>

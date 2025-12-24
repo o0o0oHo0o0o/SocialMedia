@@ -9,6 +9,7 @@ import lombok.Data;
 public class TypingPayload {
     private Integer conversationId;
     private String username;
+    private String avatarUrl;
     private int userId;
     @JsonProperty("isTyping")
     private boolean typing;

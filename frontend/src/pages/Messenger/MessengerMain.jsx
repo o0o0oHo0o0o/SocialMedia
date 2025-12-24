@@ -3,6 +3,7 @@ import ChatSidebar from '../../components/Chat/ChatSidebar';
 import MessengerHeader from './MessengerHeader';
 import MessengerMessages from './MessengerMessages';
 import MessengerComposer from './MessengerComposer';
+import SnowBackground from '../../components/Chat/SnowBackground';
 
 export default function MessengerMain(props) {
   const {
@@ -35,7 +36,16 @@ export default function MessengerMain(props) {
     setDrawerOpen,
     drawerOpen,
     readReceipts,
-    conversationRecipient
+    conversationRecipient,
+    onOpenProfile,
+    onReplyClick,
+    replyMessage,
+    onCancelReply,
+    // Lấy 2 hàm này từ props ra để dùng cho gọn
+    onStartCall,
+    onStartVideoCall,
+    onBack,
+    onLogout
   } = props;
 
   return (
@@ -46,18 +56,28 @@ export default function MessengerMain(props) {
         onSelectConversation={(c) => setActiveConv(c)}
         me={me}
         conversationId={conversationId}
+        onOpenProfile={onOpenProfile}
         setConversationId={setConversationId}
         addConversation={handleAddConversationFromInput}
+        onNavigateToFeed={onBack}
+        onLogout={onLogout}
       />
 
       <main className="chat-main">
+        <SnowBackground />
         {activeConv ? (
           <>
+            {/* --- SỬA Ở ĐÂY --- */}
             <MessengerHeader
               activeConv={activeConv}
               me={me}
               onToggleDrawer={() => setDrawerOpen(!drawerOpen)}
+
+              // Truyền đủ cả 2 hàm xuống
+              onStartCall={onStartCall}
+              onStartVideoCall={onStartVideoCall}
             />
+            {/* ----------------- */}
 
             <MessengerMessages
               msgContainerRef={msgContainerRef}
@@ -72,6 +92,7 @@ export default function MessengerMain(props) {
               onImagePreview={() => { }}
               readReceipts={readReceipts}
               conversationRecipient={conversationRecipient}
+              onReplyClick={onReplyClick}
             />
 
             <MessengerComposer
@@ -87,6 +108,8 @@ export default function MessengerMain(props) {
               onPickFiles={onPickFiles}
               removeFile={removeFile}
               sendMessage={sendMessage}
+              replyMessage={replyMessage}
+              onCancelReply={onCancelReply}
             />
           </>
         ) : (

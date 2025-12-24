@@ -17,8 +17,8 @@ public class Conversation {
     @Column(name = "ConversationID")
     private int conversationId;
 
-    @Column(name = "GroupImageURL")
-    private String groupImageURL;
+    @Column(name = "GroupImageFile")
+    private String groupImageFile;
 
     @Column(name = "ConversationName")
     private String conversationName;

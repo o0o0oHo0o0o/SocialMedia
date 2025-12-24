@@ -3,15 +3,21 @@
    to scope styles to the Messenger page. */
 
 .chat-messenger-container {
+  --accent-blue: #1976d2;
+  --accent-blue-strong: #0d47a1;
   display: flex;
   flex-direction: column;
   height: 100%;
+  background: #000;
+  /* pure black */
+  color: #fff;
 }
 
 .chat-messages {
   flex: 1 1 auto;
   overflow: auto;
   padding: 12px;
+  background: transparent;
 }
 
 .chat-global-actions {
@@ -41,39 +47,42 @@
   cursor: pointer;
 }
 
-.reaction-badge.mine {
-  background: linear-gradient(90deg, rgba(100, 120, 255, 0.16), rgba(120, 90, 255, 0.12));
-  box-shadow: 0 6px 18px rgba(100, 120, 255, 0.08);
-}
-
-.reaction-picker button {
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  font-size: 18px;
-  line-height: 1;
-}
-
-/* Modal for reaction details */
-.reaction-dialog-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.45);
-  display: flex;
+.reaction-badge {
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  z-index: 1200;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.03);
+  color: #fff;
+  font-size: 13px;
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  cursor: pointer;
+}
+
+.reaction-badge.mine {
+  background: linear-gradient(90deg, rgba(25, 118, 210, 0.18), rgba(13, 71, 161, 0.12));
+  box-shadow: 0 8px 22px rgba(13, 71, 161, 0.12);
+  border: 1px solid rgba(25, 118, 210, 0.18);
+}
+
+inset: 0;
+background: rgba(0, 0, 0, 0.45);
+display: flex;
+align-items: center;
+justify-content: center;
+z-index: 1200;
 }
 
 .reaction-dialog {
-  background: #0f1720;
+  background: #071022;
   border-radius: 8px;
   padding: 16px;
   min-width: 280px;
   max-width: 420px;
   color: #fff;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.03);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(25, 118, 210, 0.08);
 }
 
 .reaction-dialog h3 {
@@ -99,10 +108,10 @@
 }
 
 .reaction-item .avatar {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
-  background: #667eea;
+  background: var(--accent-blue);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -113,4 +122,58 @@
   margin-top: 10px;
   display: flex;
   justify-content: flex-end;
+}
+
+/* Reply quote block inside chat bubble */
+.reply-quote-block {
+  display: flex;
+  margin-bottom: 6px;
+  background-color: rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
+  padding: 6px 10px;
+  cursor: pointer;
+  position: relative;
+  font-size: 13px;
+  max-width: 100%;
+}
+
+.chat-bubble.me .reply-quote-block {
+  background-color: rgba(0, 0, 0, 0.14);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.chat-bubble.other .reply-quote-block {
+  background-color: rgba(0, 0, 0, 0.04);
+  color: #65676b;
+}
+
+.reply-quote-line {
+  width: 3px;
+  background-color: rgba(255, 255, 255, 0.5);
+  border-radius: 2px;
+  margin-right: 8px;
+}
+
+.chat-bubble.other .reply-quote-line {
+  background-color: #bcc0c4;
+}
+
+.reply-quote-content {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.reply-quote-name {
+  font-weight: 600;
+  font-size: 12px;
+  margin-bottom: 2px;
+  opacity: 0.9;
+}
+
+.reply-quote-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 0.8;
 }

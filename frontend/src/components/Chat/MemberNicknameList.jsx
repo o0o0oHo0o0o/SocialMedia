@@ -120,6 +120,7 @@ const MemberNicknameList = ({ conversationId, members = [], onRefresh, isGroupCh
           <div style={{ color: '#aaa', fontSize: '12px' }}>Không có thành viên</div>
         ) : (
           members.map(member => {
+            console.log('[MemberNicknameList] member', member?.userId, member?.avatarUrl, member?.avatar);
             const displayName = member.nickname || member.fullName || member.username;
             const hasNickname = !!member.nickname;
 
@@ -128,93 +129,105 @@ const MemberNicknameList = ({ conversationId, members = [], onRefresh, isGroupCh
                 background: 'rgba(255,255,255,0.05)',
                 borderRadius: '8px',
                 padding: '10px 12px',
-                fontSize: '12px'
+                fontSize: '12px',
+                display: 'flex',
+                gap: '10px',
+                alignItems: 'center'
               }}>
-                <div style={{ marginBottom: '6px' }}>
-                  <div style={{ color: '#fff', fontWeight: 500 }}>
-                    {displayName}
+                <img
+                  src={member.avatarUrl || member.avatar || 'https://abs.twimg.com/sticky/default_profile_images/default_profile_400x400.png'}
+                  alt="avatar"
+                  loading="lazy"
+                  onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = 'https://abs.twimg.com/sticky/default_profile_images/default_profile_400x400.png'; }}
+                  style={{ width: 40, height: 40, borderRadius: 8, objectFit: 'cover', border: '1px solid rgba(255,255,255,0.06)' }}
+                />
+                <div style={{ flex: 1 }}>
+                  <div style={{ marginBottom: '6px' }}>
+                    <div style={{ color: '#fff', fontWeight: 500 }}>
+                      {displayName}
+                    </div>
+                    {hasNickname && (
+                      <div style={{ color: '#888', fontSize: '11px', marginTop: '2px' }}>
+                        ({member.fullName || member.username})
+                      </div>
+                    )}
                   </div>
-                  {hasNickname && (
-                    <div style={{ color: '#888', fontSize: '11px', marginTop: '2px' }}>
-                      ({member.fullName || member.username})
+                  {editingMemberId === member.userId ? (
+                    <div style={{ display: 'flex', gap: '6px' }}>
+                      <input
+                        type="text"
+                        placeholder="Biệt danh mới..."
+                        value={editingNickname}
+                        onChange={(e) => setEditingNickname(e.target.value)}
+                        autoFocus
+                        style={{
+                          flex: 1,
+                          padding: '4px 8px',
+                          border: '1px solid #667eea',
+                          borderRadius: '4px',
+                          background: 'rgba(255,255,255,0.08)',
+                          color: '#fff',
+                          fontSize: '12px',
+                          outline: 'none'
+                        }}
+                      />
+                      <button
+                        onClick={() => handleSaveNickname(member.userId)}
+                        disabled={saving}
+                        style={{
+                          padding: '4px 8px',
+                          background: '#667eea',
+                          color: '#fff',
+                          border: 'none',
+                          borderRadius: '4px',
+                          cursor: 'pointer',
+                          fontSize: '11px',
+                          fontWeight: 'bold',
+                          opacity: saving ? 0.6 : 1
+                        }}
+                      >
+                        Lưu
+                      </button>
+                      <button
+                        onClick={() => setEditingMemberId(null)}
+                        style={{
+                          padding: '4px 8px',
+                          background: '#444',
+                          color: '#fff',
+                          border: 'none',
+                          borderRadius: '4px',
+                          cursor: 'pointer',
+                          fontSize: '11px'
+                        }}
+                      >
+                        Huỷ
+                      </button>
+                    </div>
+                  ) : (
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ color: '#aaa' }}>
+                        {member.nickname || '(Chưa có biệt danh)'}
+                      </span>
+                      <button
+                        onClick={() => {
+                          setEditingMemberId(member.userId);
+                          setEditingNickname(member.nickname || '');
+                        }}
+                        style={{
+                          padding: '2px 6px',
+                          background: 'transparent',
+                          color: '#667eea',
+                          border: '1px solid #667eea',
+                          borderRadius: '3px',
+                          cursor: 'pointer',
+                          fontSize: '10px'
+                        }}
+                      >
+                        Sửa
+                      </button>
                     </div>
                   )}
                 </div>
-                {editingMemberId === member.userId ? (
-                  <div style={{ display: 'flex', gap: '6px' }}>
-                    <input
-                      type="text"
-                      placeholder="Biệt danh mới..."
-                      value={editingNickname}
-                      onChange={(e) => setEditingNickname(e.target.value)}
-                      autoFocus
-                      style={{
-                        flex: 1,
-                        padding: '4px 8px',
-                        border: '1px solid #667eea',
-                        borderRadius: '4px',
-                        background: 'rgba(255,255,255,0.08)',
-                        color: '#fff',
-                        fontSize: '12px',
-                        outline: 'none'
-                      }}
-                    />
-                    <button
-                      onClick={() => handleSaveNickname(member.userId)}
-                      disabled={saving}
-                      style={{
-                        padding: '4px 8px',
-                        background: '#667eea',
-                        color: '#fff',
-                        border: 'none',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        fontSize: '11px',
-                        fontWeight: 'bold',
-                        opacity: saving ? 0.6 : 1
-                      }}
-                    >
-                      Lưu
-                    </button>
-                    <button
-                      onClick={() => setEditingMemberId(null)}
-                      style={{
-                        padding: '4px 8px',
-                        background: '#444',
-                        color: '#fff',
-                        border: 'none',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        fontSize: '11px'
-                      }}
-                    >
-                      Huỷ
-                    </button>
-                  </div>
-                ) : (
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ color: '#aaa' }}>
-                      {member.nickname || '(Chưa có biệt danh)'}
-                    </span>
-                    <button
-                      onClick={() => {
-                        setEditingMemberId(member.userId);
-                        setEditingNickname(member.nickname || '');
-                      }}
-                      style={{
-                        padding: '2px 6px',
-                        background: 'transparent',
-                        color: '#667eea',
-                        border: '1px solid #667eea',
-                        borderRadius: '3px',
-                        cursor: 'pointer',
-                        fontSize: '10px'
-                      }}
-                    >
-                      Sửa
-                    </button>
-                  </div>
-                )}
               </div>
             );
           })

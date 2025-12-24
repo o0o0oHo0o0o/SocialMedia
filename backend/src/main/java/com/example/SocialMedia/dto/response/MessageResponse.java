@@ -1,7 +1,9 @@
 package com.example.SocialMedia.dto.response;
 
+import com.example.SocialMedia.constant.MessageType;
 import com.example.SocialMedia.constant.ReactionType;
 import com.example.SocialMedia.dto.message.MessageStatusSummary;
+import com.example.SocialMedia.dto.message.ReplyMessageDto;
 import lombok.Builder;
 import lombok.Data;
 
@@ -21,7 +23,8 @@ public class MessageResponse {
     private Boolean isRead;
     private Boolean isDelivered;
     private Map<ReactionType, Long> reactionCounts;
-
+    private ReplyMessageDto replyToMessage;
     private ReactionType myReactionType;
     private MessageStatusSummary statusSummary;
+    private MessageType type;
 }

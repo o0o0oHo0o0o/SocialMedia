@@ -366,6 +366,38 @@ const api = {
     return response.json();
   }
   ,
+  // Update conversation avatar (multipart upload)
+  updateConversationAvatar: async (conversationId, file) => {
+    const url = `${API_BASE}/chat/conversations/${conversationId}/avatar`;
+    const form = new FormData();
+    form.append('file', file);
+    try {
+      let response = await fetch(url, {
+        method: 'PUT',
+        body: form,
+        credentials: 'include'
+      });
+      if (response.status === 401) {
+        const ok = await api.refresh();
+        if (ok) {
+          await new Promise(resolve => setTimeout(resolve, 150));
+          const meData = await api.me();
+          if (meData) {
+            response = await fetch(url, { method: 'PUT', body: form, credentials: 'include' });
+          }
+        }
+      }
+      if (!response.ok) {
+        let message = `Upload avatar failed (HTTP ${response.status})`;
+        try { const j = await response.json(); if (j?.message) message = j.message; } catch (e) { void e; }
+        throw new Error(message);
+      }
+      return response.json();
+    } catch (err) {
+      if (err?.message === 'Failed to fetch') throw new Error('Không thể kết nối tới backend.');
+      throw err;
+    }
+  },
   // React to a message (toggle/add/update/remove)
   reactToMessage: async ({ messageId, reactionType }) => {
     // Backend expects /chat/reactions as defined in controller

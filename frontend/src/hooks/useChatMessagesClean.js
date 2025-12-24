@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import api from '../services/api';
-import { connectSocket, disconnectSocket, subscribeConversation } from '../services/chatSocket';
+import { getClient, subscribeConversation } from '../services/chatSocket';
 
 // Accept wsBase (e.g. API base URL) as prop
-export function useChatMessages({ activeConv, me, wsBase, onMessage, onReaction, onReadReceipt }) {
+export function useChatMessages({ activeConv, me, wsBase, onMessage, onReaction, onReadReceipt, onAvatarUpdate }) {
   const [msgLoading, setMsgLoading] = useState(false);
   const [hasMoreMessages, setHasMoreMessages] = useState(true);
   const [connected, setConnected] = useState(false);
@@ -13,10 +13,12 @@ export function useChatMessages({ activeConv, me, wsBase, onMessage, onReaction,
   const onMessageRef = useRef(onMessage);
   const onReactionRef = useRef(onReaction);
   const onReadReceiptRef = useRef(onReadReceipt);
+  const onAvatarUpdateRef = useRef(onAvatarUpdate);
 
   useEffect(() => { onMessageRef.current = onMessage; }, [onMessage]);
   useEffect(() => { onReactionRef.current = onReaction; }, [onReaction]);
   useEffect(() => { onReadReceiptRef.current = onReadReceipt; }, [onReadReceipt]);
+  useEffect(() => { onAvatarUpdateRef.current = onAvatarUpdate; }, [onAvatarUpdate]);
 
   const wsUrl = useMemo(() => {
     const normalize = (base) => {
@@ -38,30 +40,30 @@ export function useChatMessages({ activeConv, me, wsBase, onMessage, onReaction,
 
 
   useEffect(() => {
+    // Do NOT create a new client here. Use the client created by App (via connectSocket).
+    // Poll for the existing client to become available/connected and update state.
     let mounted = true;
-    (async () => {
-      if (!wsUrl) return;
-      try {
-        const tok = await api.getWebSocketToken();
-        if (tok?.token) {
-          try {
-            await connectSocket(wsUrl, {
-              onConnect: () => {
-                if (mounted) setConnected(true);
-                console.info('[useChatMessages] WebSocket connected');
-              },
-              onError: (err) => { console.error('[useChatMessages] WS error', err); },
-              connectHeaders: { 'X-WS-TOKEN': tok.token }
-            });
-          } catch (e) {
-            console.error('[useChatMessages] Failed to connect socket', e);
-          }
-        }
-      } catch (e) {
-        console.error('[useChatMessages] Failed to get WS token', e);
+    let interval = null;
+
+    const checkClient = () => {
+      const client = getClient();
+      if (!mounted) return;
+      if (client && (client.connected || client.active)) {
+        setConnected(true);
+        console.info('[useChatMessages] Detected existing WebSocket client connected');
+        if (interval) { clearInterval(interval); interval = null; }
+      } else {
+        setConnected(false);
       }
-    })();
-    return () => { mounted = false; setConnected(false); disconnectSocket(); };
+    };
+
+    // Only start polling if we have a wsUrl (config available)
+    if (wsUrl) {
+      checkClient();
+      interval = setInterval(checkClient, 300);
+    }
+
+    return () => { mounted = false; setConnected(false); if (interval) clearInterval(interval); };
   }, [wsUrl]);
 
   useEffect(() => {
@@ -78,6 +80,13 @@ export function useChatMessages({ activeConv, me, wsBase, onMessage, onReaction,
         const result = subscribeConversation(activeConv.conversationId, (evt) => {
           console.info('[useChatMessages] Received socket event', evt?.type || evt?.payload?.type || 'unknown');
           const type = evt?.type;
+          if (type === 'AVATAR_UPDATE') {
+            try {
+              const handler = onAvatarUpdateRef.current;
+              if (typeof handler === 'function') handler(evt.payload || evt);
+            } catch (e) { console.error('[useChatMessages] onAvatarUpdate handler failed', e); }
+            return;
+          }
           if (type === 'READ_RECEIPT') {
             try {
               const handler = onReadReceiptRef.current;
