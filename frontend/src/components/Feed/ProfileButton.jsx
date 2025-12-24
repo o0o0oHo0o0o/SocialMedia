@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import "../../styles/optionButton.css"; // optional, see CSS at the bottom
 
 function ProfileButton({ openUser, user, onLogout, isDark, setIsDark }) {
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
   const toggle = () => {
     if (isDark) {
       localStorage.setItem("theme", "light");
@@ -77,6 +77,23 @@ function ProfileButton({ openUser, user, onLogout, isDark, setIsDark }) {
             }}
             className="post-menu-item"
           >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="48"
+              height="48"
+              viewBox="0 0 16 16"
+            >
+              <g
+                fill="none"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="1.5"
+              >
+                <circle cx="8" cy="6" r="3.25" />
+                <path d="m2.75 14.25c0-2.5 2-5 5.25-5s5.25 2.5 5.25 5" />
+              </g>
+            </svg>
             Profile
           </button>
           <button
@@ -114,6 +131,17 @@ function ProfileButton({ openUser, user, onLogout, isDark, setIsDark }) {
             }}
             className="post-menu-item profile-logout"
           >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+            >
+              <path
+                fill="currentColor"
+                d="m17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5M4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4z"
+              />
+            </svg>
             Log out
           </button>
         </div>
