@@ -200,29 +200,6 @@ VALUES
     ('MEDIA', '2022-01-10 10:05:00');
 INSERT INTO CoreData.PostMedia (PostID, InteractableItemID, FileName, MediaType, Caption, SortOrder)
 VALUES
-    (1, 21, 'https://example.com/media1.jpg', 'IMAGE', N'Ảnh đẹp từ chuyến đi biển', 0),
-    (1, 22, 'https://example.com/media2.jpg', 'IMAGE', N'Chuyến đi tuyệt vời', 1),
-    (2, 23, 'https://example.com/video1.mp4', 'VIDEO', N'Video giới thiệu sản phẩm mới', 0),
-    (2, 24, 'https://example.com/media3.jpg', 'IMAGE', N'Đừng bỏ lỡ sự kiện này!', 0),
-    (3, 25, 'https://example.com/media4.jpg', 'IMAGE', N'Cảnh hoàng hôn tuyệt vời', 0),
-    (3, 26, 'https://example.com/video2.mp4', 'VIDEO', N'Video vui nhộn từ buổi tiệc', 1),
-    (4, 27, 'https://example.com/media5.jpg', 'IMAGE', N'Cảm giác tuyệt vời khi leo núi', 0),
-    (4, 28, 'https://example.com/video3.mp4', 'VIDEO', N'Sự kiện thể thao cuối tuần', 0),
-    (5, 29, 'https://example.com/media6.jpg', 'IMAGE', N'Sản phẩm mới ra mắt', 0),
-    (6, 30, 'https://example.com/media7.jpg', 'IMAGE', N'Khám phá vẻ đẹp của thiên nhiên', 0),
-    (6, 31, 'https://example.com/video4.mp4', 'VIDEO', N'Buổi hòa nhạc mùa hè', 0),
-    (7, 32, 'https://example.com/media8.jpg', 'IMAGE', N'Bữa tiệc sinh nhật vui nhộn', 0),
-    (7, 33, 'https://example.com/video5.mp4', 'VIDEO', N'Phỏng vấn đặc biệt với diễn viên nổi tiếng', 1),
-    (8, 34, 'https://example.com/media9.jpg', 'IMAGE', N'Kỳ nghỉ hè tại Đà Lạt', 0),
-    (8, 35, 'https://example.com/video6.mp4', 'VIDEO', N'Chuyến du lịch sang trọng tại Phú Quốc', 0),
-    (9, 36, 'https://example.com/media10.jpg', 'IMAGE', N'Ảnh chụp từ sự kiện âm nhạc lớn', 0),
-    (9, 37, 'https://example.com/video7.mp4', 'VIDEO', N'Trải nghiệm thử xe mới', 1),
-    (10, 38, 'https://example.com/media11.jpg', 'IMAGE', N'Phong cảnh tuyệt đẹp ở Đà Nẵng', 0),
-    (10, 39, 'https://example.com/video8.mp4', 'VIDEO', N'Hướng dẫn sử dụng phần mềm mới', 0),
-    (11, 40, 'https://example.com/media12.jpg', 'IMAGE', N'Thưởng thức cà phê sáng tại Hà Nội', 0);
-
-INSERT INTO CoreData.PostMedia (PostID, InteractableItemID, FileName, MediaType, Caption, SortOrder)
-VALUES
     (1, 41, 'https://i.imgur.com/65pgF1u.jpeg', 'IMAGE', N'Ảnh đẹp từ chuyến đi biển', 0),
     (1, 42, 'https://i.imgur.com/4o8cGKu.jpeg', 'IMAGE', N'Chuyến đi tuyệt vời', 1),
     (2, 43, 'https://i.imgur.com/PRXq4ct.jpeg', 'VIDEO', N'Video giới thiệu sản phẩm mới', 0),

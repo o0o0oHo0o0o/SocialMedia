@@ -11,7 +11,7 @@ GO
 CREATE TABLE Messaging.Conversations (
     ConversationID INT PRIMARY KEY IDENTITY(1,1),
     ConversationName NVARCHAR(100),
-    GroupImageURL NVARCHAR(255) NULL,
+    GroupImageFile NVARCHAR(255) NULL,
     IsGroupChat BIT NOT NULL DEFAULT 0,
     LastMessageID BIGINT NULL,
     CreatedAt DATETIME NOT NULL DEFAULT GETDATE(),

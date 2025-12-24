@@ -202,7 +202,7 @@
 
 .divider::before,
 .divider::after {
-  content: '';
+  content: "";
   flex: 1;
   border-bottom: 1px solid #333;
 }
@@ -242,7 +242,6 @@
 }
 
 .error-message {
-  background: #fff;
   color: #000;
   border: 1px solid #fff;
 }
@@ -351,7 +350,7 @@
 }
 
 .auth-tab.active::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: -2px;
   left: 0;
@@ -426,7 +425,6 @@
    RESPONSIVE (TABLET & MOBILE)
    ========================================= */
 @media (max-width: 900px) {
-
   /* Reset padding trên mobile để không bị lệch */
   .auth-page {
     padding-right: 2rem;
@@ -455,3 +453,4 @@
     border-top-color: #000;
   }
 }
+
