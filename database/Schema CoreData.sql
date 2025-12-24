@@ -1,6 +1,10 @@
 ﻿-- *******************************************************************
 -- SOCIAL MEDIA DATABASE
 -- *******************************************************************
+USE master;
+GO
+ALTER DATABASE SocialMedia SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+GO
 DROP DATABASE IF EXISTS SocialMedia;
 GO
 
@@ -155,7 +159,7 @@ CREATE TABLE CoreData.PostMedia (
     MediaID BIGINT PRIMARY KEY IDENTITY(1,1),
     PostID INT NOT NULL, 
     InteractableItemID BIGINT UNIQUE NOT NULL,
-    MediaURL NVARCHAR(255) NOT NULL, 
+    FileName NVARCHAR(255) NOT NULL,
     MediaType NVARCHAR(10) NOT NULL 
         CHECK (MediaType IN ('IMAGE', 'VIDEO')),
     Caption NVARCHAR(500),

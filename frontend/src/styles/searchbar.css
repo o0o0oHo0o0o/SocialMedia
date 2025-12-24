@@ -1,5 +1,4 @@
-.feed-container,
-.post-page {
+.content-container {
   padding-top: 56px;
 }
 .header {
@@ -58,9 +57,9 @@
   position: relative;
   border-radius: 1.25rem;
   line-height: 1.25rem;
-  padding-left: 1rem;
   padding-right: 0.25rem;
   background-color: var(--button-color);
+  border: 1px solid var(--accent);
 }
 
 .header__search-input {
@@ -74,10 +73,16 @@
 
 .header__search:focus-within {
   border: var(--border);
-  border-color: var(--accent);
+  border-color: var(--text-color);
   box-shadow: 0 0 5px 3px color-mix(in srgb, var(--accent) 30%, transparent);
 }
 .header__search-button {
+  height: 100%;
+  padding: 0 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
   background-color: transparent;
 }
 
@@ -111,6 +116,21 @@
 .header__nav-button:hover {
   background-color: var(--overlay-color);
   color: var(--text-color);
+}
+.header__right .profile {
+  padding: 0.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  background-color: transparent;
+}
+.header__right .profile:hover {
+  background-color: var(--overlay-color);
+}
+.header__right svg {
+  width: 2rem;
+  height: 2rem;
 }
 
 /* Optional: Mobile responsiveness (hide some items on small screens) */

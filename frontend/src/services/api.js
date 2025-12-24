@@ -366,6 +366,37 @@ const api = {
     return response.json();
   }
   ,
+  // Create or get private conversation with a target user
+  createPrivateChat: async (payload) => {
+    const url = `${API_BASE}/chat/private`;
+    let response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      credentials: 'include'
+    });
+    if (response.status === 401) {
+      const ok = await api.refresh();
+      if (ok) {
+        await new Promise(resolve => setTimeout(resolve, 150));
+        const meData = await api.me();
+        if (meData) {
+          response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+            credentials: 'include'
+          });
+        }
+      }
+    }
+    if (!response.ok) {
+      let message = `Create private chat failed (HTTP ${response.status})`;
+      try { const j = await response.json(); if (j?.message) message = j.message; } catch (e) { void e; }
+      throw new Error(message);
+    }
+    return response.json();
+  },
   // Update conversation avatar (multipart upload)
   updateConversationAvatar: async (conversationId, file) => {
     const url = `${API_BASE}/chat/conversations/${conversationId}/avatar`;

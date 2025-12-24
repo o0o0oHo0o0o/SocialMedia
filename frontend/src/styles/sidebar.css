@@ -2,11 +2,11 @@
   padding: calc(56px + 1rem) 1rem;
 }
 
-.sidebar>* {
+.sidebar > * {
   border-radius: 0.5rem;
 }
 
-.sidebar>*:hover {
+.sidebar > *:hover {
   background-color: var(--overlay-color);
 }
 
@@ -70,7 +70,7 @@
 .switch::before {
   content: "";
   position: absolute;
-  top: 4px;
+  top: 1px;
   left: 4px;
   width: 1.5rem;
   height: 1.5rem;
@@ -80,11 +80,11 @@
 }
 
 /* When ON (right) */
-.sidebar input:checked+.switch {
+.sidebar input:checked + .switch {
   background: var(--accent);
 }
 
-.sidebar input:checked+.switch::before {
+.sidebar input:checked + .switch::before {
   transform: translateX(1rem);
 }
 
@@ -104,3 +104,4 @@
   font-size: 1.2em;
   min-width: 80px;
 }
+

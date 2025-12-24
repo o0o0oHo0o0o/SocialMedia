@@ -14,12 +14,14 @@ import { useWebRTC } from './hooks/useWebRTC';
 import VideoCallUI from './components/VideoCall/VideoCallUI';
 import { connectSocket, disconnectSocket } from './services/chatSocket';
 import { CONFIG } from './config/constants';
+import { set } from 'date-fns';
 
 export default function App() {
   const [isDark, setIsDark] = useState(() => localStorage.getItem('theme') === 'dark');
   const [currentPage, setCurrentPage] = useState('auth');
   const [userId, setUserId] = useState(null);
   const [userMe, setUserMe] = useState(null);
+  const [userInfo, setUserInfo] = useState(null);
 
   // State socket & cờ kết nối
   const [stompClient, setStompClient] = useState(null);
@@ -99,6 +101,7 @@ export default function App() {
       const me = await api.me();
       if (me) {
         setUserId(me.userId || me.id);
+        setUserInfo(me);
         setUserMe(me);
       }
     } catch (e) { console.error(e); }
@@ -173,7 +176,7 @@ export default function App() {
           setUserId(me.userId || me.id);
           setUserMe(me);
           setCurrentPage('feed');
-          // Không cần gọi initSocket() ở đây nữa, useEffect[userId] sẽ lo
+          setUserInfo(me);
         }
       } catch (e) { }
     })();
@@ -186,12 +189,19 @@ export default function App() {
   const handleNavigateToMessenger = () => setCurrentPage('messenger');
   const handleNavigateToFeed = () => setCurrentPage('feed');
 
+  // Global event: navigate to messenger (used by other components)
+  useEffect(() => {
+    const handler = () => setCurrentPage('messenger');
+    window.addEventListener('navigateToMessenger', handler);
+    return () => window.removeEventListener('navigateToMessenger', handler);
+  }, []);
+
   const renderPage = () => {
     switch (currentPage) {
       case 'auth': return <AuthPage isDark={isDark} onToggleDark={() => setIsDark(!isDark)} onAuthSuccess={handleAuthSuccess} />;
       case 'oauth2-callback': return <OAuth2Callback onAuthSuccess={handleAuthSuccess} />;
       case 'feed':
-        return <FeedPage userId={userId} isDark={isDark} setIsDark={setIsDark} onNavigateToMessenger={handleNavigateToMessenger} onLogout={handleLogout} onStartCall={startCall} />;
+        return <FeedPage userInfo={userInfo} isDark={isDark} setIsDark={setIsDark} onNavigateToMessenger={handleNavigateToMessenger} onLogout={handleLogout} onStartCall={startCall} />;
       case 'messenger':
         return <Messenger onBack={handleNavigateToFeed} onStartVideoCall={startCall} stompClient={stompClient} currentUser={userMe} />;
       default: return null;

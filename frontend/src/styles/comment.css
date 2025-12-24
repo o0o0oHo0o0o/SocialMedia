@@ -19,6 +19,7 @@
   display: grid;
   grid-template-columns: 32px minmax(0px, 1fr);
   padding-bottom: 2px;
+  cursor: pointer;
 }
 .comment-author {
   font-weight: 700;
@@ -47,4 +48,13 @@
 .comment-body {
   padding-left: 32px;
   border-left: var(--border);
+}
+.comment-item {
+  position: relative;
+}
+.close-reply-btn {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: transparent;
 }

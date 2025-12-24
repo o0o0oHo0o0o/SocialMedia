@@ -7,6 +7,8 @@ import com.example.SocialMedia.dto.message.MessageStatusSummary;
 import com.example.SocialMedia.dto.message.ReplyMessageDto;
 import com.example.SocialMedia.dto.message.UserReadStatus;
 import com.example.SocialMedia.dto.projection.ConversationProjection;
+import com.example.SocialMedia.dto.request.CreateConversationRequest;
+import com.example.SocialMedia.dto.request.CreatePrivateChatRequest;
 import com.example.SocialMedia.dto.request.ReactionRequest;
 import com.example.SocialMedia.dto.request.SendMessageRequest;
 import com.example.SocialMedia.dto.response.*;
@@ -415,6 +417,97 @@ public class ChatServiceImpl implements ChatService {
         }
 
         return action;
+    }
+
+    @Override
+    public ConversationResponse createConversation(String username, CreateConversationRequest request) {
+        return null;
+    }
+
+    @Override
+    @Transactional
+    public ConversationResponse createPrivateConversation(String myUsername, CreatePrivateChatRequest request) {
+        // 1. Lấy thông tin 2 người
+        User me = userRepo.findByUserName(myUsername)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        User target = userRepo.findById(request.getTargetUserId())
+                .orElseThrow(() -> new RuntimeException("Target user not found"));
+
+        // 2. Kiểm tra xem đã có đoạn chat 1-1 nào tồn tại chưa
+        // Nếu có rồi -> Trả về luôn, KHÔNG TẠO MỚI
+        Optional<Conversation> existing = conversationRepo.findExistingPrivateConversation(me.getId(), target.getId());
+        if (existing.isPresent()) {
+            return mapEntityToResponse(existing.get(), me.getId()); // Hàm map bạn đã có
+        }
+
+        // 3. Nếu chưa có -> Tạo Conversation mới
+        Conversation conv = new Conversation();
+        conv.setGroupChat(false);
+        // Chat 1-1 thì ConversationName để null, Frontend tự hiển thị tên đối phương
+        conv.setConversationName(null);
+        conv.setLastMessageID(0);
+        Conversation savedConv = conversationRepo.save(conv);
+
+        // 4. Lưu 2 thành viên vào bảng ConversationMember
+        // Role để là "MEMBER" hoặc null tùy DB của bạn cho phép
+        saveMember(savedConv, me);
+        saveMember(savedConv, target);
+
+        return mapEntityToResponse(savedConv, me.getId());
+    }
+    // --- HÀM PHỤ TRỢ: CHUYỂN ĐỔI ENTITY -> RESPONSE ---
+    private ConversationResponse mapEntityToResponse(Conversation conv, int currentUserId) {
+        String name = conv.getConversationName();
+        String avatar = null;
+
+        // Lưu ý: Dùng Boolean.TRUE.equals để tránh NullPointerException nếu field là null
+        if (Boolean.TRUE.equals(conv.isGroupChat())) {
+            // TRƯỜNG HỢP GROUP
+            if (conv.getGroupImageFile() != null) {
+                avatar = minioService.getFileUrl(conv.getGroupImageFile());
+            }
+        } else {
+            // TRƯỜNG HỢP 1-1: Phải tìm thông tin người kia
+            Optional<ConversationMember> otherMemberOpt = conversationMemberRepo.findByConversation_ConversationId(conv.getConversationId())
+                    .stream()
+                    .filter(m -> m.getUser().getId() != currentUserId)
+                    .findFirst();
+
+            if (otherMemberOpt.isPresent()) {
+                User other = otherMemberOpt.get().getUser();
+                name = other.getFullName(); // Hoặc getNickname() nếu có logic nickname
+
+                String rawAvatar = other.getProfilePictureURL();
+                if (rawAvatar != null) {
+                    if (rawAvatar.startsWith("http")) {
+                        avatar = rawAvatar;
+                    } else {
+                        avatar = minioService.getFileUrl(rawAvatar);
+                    }
+                }
+            }
+        }
+
+        return ConversationResponse.builder()
+                .conversationId(conv.getConversationId())
+                .conversationName(name)
+                .avatarUrl(avatar)
+                .isGroup(conv.isGroupChat())
+                .unreadCount(0) // Mới tạo nên chưa có tin chưa đọc
+                .lastMessageContent("Bắt đầu cuộc trò chuyện")
+                // Nếu Entity không có field createdAt, bạn có thể dùng LocalDateTime.now() tạm
+                .lastMessageTime(LocalDateTime.now().toString())
+                .build();
+    }
+    // Hàm phụ lưu member cho gọn code
+    private void saveMember(Conversation conv, User user) {
+        ConversationMember member = new ConversationMember();
+        member.setConversation(conv);
+        member.setUser(user);
+        member.setRole("MEMBER"); // Lưu cho có lệ, không quan trọng với chat 1-1
+        member.setJoinedLocalDateTime(LocalDateTime.now());
+        conversationMemberRepo.save(member);
     }
 
     // Hàm phụ trợ tách ra cho gọn

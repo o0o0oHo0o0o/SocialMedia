@@ -56,7 +56,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public PostResponse getPostById(Integer id) {
-        Post post = postRepository.findByPostId(id)
+        Post post = postRepository.findByInteractableItem_InteractableItemId(id)
                 .orElseThrow(() -> new PostNotFoundException("Post not found"));
         return postMapper.toPostResponse(post);
     }
@@ -86,11 +86,11 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public List<PostResponse> getPostByUserId(Integer userId, Pageable pageable) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + userId));
+    public List<PostResponse> getPostByUserName(String userName, Pageable pageable) {
+        User user = userRepository.findByUserName(userName)
+                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + userName));
 
-        Page<Post> posts = postRepository.findByUserAndDeletedFalse(user, pageable);
+        Page<Post> posts = postRepository.findByUserAndIsDeletedIsFalse(user, pageable);
 
         return posts.getContent().stream()
                 .map(postMapper::toPostResponse) // Gọi sang class Mapper
@@ -133,5 +133,13 @@ public class PostServiceImpl implements PostService {
                 .orElseThrow(() -> new PostNotFoundException("Post not found"));
         post.setDeleted(true);
         return postMapper.toPostResponse(post);
+    }
+
+    @Override
+    public List<PostResponse> getPostsByKeyword(String keyword, Pageable pageable) {
+        Page<Post> posts = postRepository.findByContentContainingIgnoreCase(keyword, pageable);
+        return posts.getContent().stream()
+                .map(postMapper::toPostResponse) // Gọi sang class Mapper
+                .collect(Collectors.toList());
     }
 }

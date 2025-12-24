@@ -30,12 +30,12 @@ public class CommentController {
     }
 
     // Lấy comment của user
-    @GetMapping("/user/{userId}")
+    @GetMapping("/user/{userName}")
     public ResponseEntity<List<CommentResponse>> getUserComments(
-            @PathVariable int userId,
+            @PathVariable String userName,
             Pageable pageable
     ) {
-        return ResponseEntity.ok(commentService.getCommentsByUserId(userId, pageable));
+        return ResponseEntity.ok(commentService.getCommentsByUserName(userName, pageable));
     }
 
     // Lấy replies của 1 comment
@@ -60,5 +60,13 @@ public class CommentController {
     @DeleteMapping("/{id}")
     public ResponseEntity<CommentResponse> deleteComment(@PathVariable int id) {
         return ResponseEntity.ok(commentService.deleteComment(id));
+    }
+
+    @GetMapping("/search/{keyword}")
+    public ResponseEntity<List<CommentResponse>> getCommentByKeyword(
+            @PathVariable String keyword,
+            Pageable pageable
+    ) {
+        return ResponseEntity.ok(commentService.getCommentsByKeyword(keyword, pageable));
     }
 }

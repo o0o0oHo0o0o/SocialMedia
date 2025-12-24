@@ -5,6 +5,7 @@ import com.example.SocialMedia.dto.auth.LoginRequest;
 import com.example.SocialMedia.dto.auth.LoginResponse;
 import com.example.SocialMedia.dto.auth.RegisterRequest;
 import com.example.SocialMedia.dto.auth.RegisterResponse;
+import com.example.SocialMedia.exception.ResourceNotFound.UserNotFoundException;
 import com.example.SocialMedia.model.coredata_model.RefreshToken;
 import com.example.SocialMedia.model.coredata_model.User;
 import com.example.SocialMedia.service.auth.AuthService;
@@ -110,6 +111,10 @@ public class AuthController {
         if(currentUser == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
+        User user = authService.findUserByIdentifier(currentUser.getEmail())
+                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + currentUser.getUsername()));
+        currentUser.setUserName(user.getUsername());
+        currentUser.setCreatedLocalDateTime(user.getCreatedLocalDateTime());
         return ResponseEntity.ok(currentUser.toUserProfileDto());
     }
     @PostMapping("/refresh")

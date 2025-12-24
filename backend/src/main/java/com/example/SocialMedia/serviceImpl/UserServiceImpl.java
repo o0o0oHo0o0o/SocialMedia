@@ -1,14 +1,18 @@
 package com.example.SocialMedia.serviceImpl;
 
+import com.example.SocialMedia.dto.response.ShortUserResponse;
 import com.example.SocialMedia.model.coredata_model.User;
 import com.example.SocialMedia.repository.UserRepository;
 import com.example.SocialMedia.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import com.example.SocialMedia.constant.OtpChannel;
 import com.example.SocialMedia.constant.UsernameConstants;
 
 import java.security.SecureRandom;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -50,5 +54,17 @@ public class UserServiceImpl implements UserService {
     @Override
     public User saveUser(User user) {
         return userRepository.save(user);
+    }
+
+    @Override
+    public List<ShortUserResponse> getUserByKeyword(String keyword, Pageable pageable){
+        Page<User> users = userRepository.findByUserNameContainingIgnoreCase(keyword, pageable);
+        return users.getContent().stream().map((user)->
+                new ShortUserResponse(
+                        user.getId(),
+                        user.getFullName(),
+                        user.getUsername(),
+                        user.getProfilePictureURL(),
+                        user.getCreatedLocalDateTime())).toList();
     }
 }

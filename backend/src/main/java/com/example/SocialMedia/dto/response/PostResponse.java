@@ -18,8 +18,7 @@ public class PostResponse {
     private String content;
     private String postTopic;
     private String location;
-    private String username;
-    private String avatarUrl; // Thêm avatar cho đẹp
+    private ShortUserResponse user;
     private Integer interactableItemId;
 
     private Map<String, Long> reactionCounts;

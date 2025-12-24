@@ -3,6 +3,7 @@ package com.example.SocialMedia.mapper;
 import com.example.SocialMedia.dto.response.PostMediaResponse;
 import com.example.SocialMedia.dto.response.PostResponse;
 import com.example.SocialMedia.dto.response.ReactionStat;
+import com.example.SocialMedia.dto.response.ShortUserResponse;
 import com.example.SocialMedia.model.coredata_model.Post;
 import com.example.SocialMedia.model.coredata_model.PostMedia;
 import com.example.SocialMedia.repository.CommentRepository;
@@ -70,8 +71,12 @@ public class PostMapper {
                 .content(post.getContent())
                 .postTopic(post.getPostTopic())
                 .location(post.getLocation())
-                .username(post.getUser().getUsername())
-                .avatarUrl(post.getUser().getProfilePictureURL())
+                .user(new ShortUserResponse(
+                        post.getUser().getId(),
+                        post.getUser().getFullName(),
+                        post.getUser().getUsername(),
+                        post.getUser().getProfilePictureURL(),
+                        post.getUser().getCreatedLocalDateTime()))
                 .interactableItemId(post.getInteractableItem().getInteractableItemId())
                 .createdAt(post.getCreatedLocalDateTime())
                 .updatedAt(post.getUpdatedLocalDateTime())

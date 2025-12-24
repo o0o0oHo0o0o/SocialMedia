@@ -1,5 +1,7 @@
 package com.example.SocialMedia.service.message;
 
+import com.example.SocialMedia.dto.request.CreateConversationRequest;
+import com.example.SocialMedia.dto.request.CreatePrivateChatRequest;
 import com.example.SocialMedia.dto.request.ReactionRequest;
 import com.example.SocialMedia.dto.request.SendMessageRequest;
 import com.example.SocialMedia.dto.response.ConversationResponse;
@@ -16,4 +18,8 @@ public interface ChatService {
 
     @Transactional
     String reactToMessage(String username, ReactionRequest request);
+
+    ConversationResponse createConversation(String username, CreateConversationRequest request);
+
+    ConversationResponse createPrivateConversation(String username, CreatePrivateChatRequest request);
 }

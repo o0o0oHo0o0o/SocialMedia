@@ -2,8 +2,7 @@ package com.example.SocialMedia.controller;
 
 import com.example.SocialMedia.dto.message.ConversationMemberDTO;
 import com.example.SocialMedia.dto.message.WebSocketTokenResponse;
-import com.example.SocialMedia.dto.request.MarkReadRequest;
-import com.example.SocialMedia.dto.request.SendMessageRequest;
+import com.example.SocialMedia.dto.request.*;
 import com.example.SocialMedia.dto.response.ConversationResponse;
 import com.example.SocialMedia.dto.response.MessageResponse;
 import com.example.SocialMedia.dto.response.ReactionResponse;
@@ -24,7 +23,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import com.example.SocialMedia.dto.request.ReactionRequest;
 
 import java.util.List;
 import java.util.Map;
@@ -39,7 +37,6 @@ public class ChatController {
     private final WebSocketSessionService webSocketSessionService;
     private final UserRepository userRepository;
     private final ConversationService conversationService;
-
 
     // 1. Endpoint Thả Reaction (Toggle: Add/Remove/Update)
     @PostMapping("/reactions")
@@ -224,7 +221,21 @@ public class ChatController {
         var data = chatService.getUserConversations(username, page, size);
         return ResponseEntity.ok(data);
     }
+    @PostMapping("/conversations")
+    public ResponseEntity<ConversationResponse> createConversation(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestBody CreateConversationRequest request) {
+        return ResponseEntity.ok(chatService.createConversation(userDetails.getUsername(), request));
+    }
 
+
+    @PostMapping("/private")
+    public ResponseEntity<ConversationResponse> createPrivateChat(
+            @AuthenticationPrincipal UserDetails userDetails, // Lấy user đang đăng nhập
+            @RequestBody CreatePrivateChatRequest request) {
+        // Gọi service xử lý
+        return ResponseEntity.ok(chatService.createPrivateConversation(userDetails.getUsername(), request));
+    }
     @GetMapping("/conversations/{conversationId}/messages")
     public ResponseEntity<List<MessageResponse>> listMessages(
             @PathVariable int conversationId,

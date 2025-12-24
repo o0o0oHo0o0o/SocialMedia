@@ -1,15 +1,17 @@
 package com.example.SocialMedia.dto.response;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
-@Getter
-@Setter
+import java.time.LocalDateTime;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ShortUserResponse {
-    int id;
-    String name;
-    public ShortUserResponse(int id, String name) {
-        this.id = id;
-        this.name = name;
-    }
+    private int id;
+    private String name;
+    private String username;
+    private String avatarUrl;
+    private LocalDateTime createdAt;
 }

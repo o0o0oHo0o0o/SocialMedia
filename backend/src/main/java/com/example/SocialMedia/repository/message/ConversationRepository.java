@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ConversationRepository extends JpaRepository<Conversation, Integer> {
@@ -43,4 +44,12 @@ public interface ConversationRepository extends JpaRepository<Conversation, Inte
             "FROM ConversationMember cm " +
             "WHERE cm.conversation.conversationId = ?1 AND cm.user.id = ?2")
     boolean existsConversationMember(int conversationId, int userId);
+
+    @Query("SELECT c FROM Conversation c " +
+            "JOIN ConversationMember m1 ON c.conversationId = m1.conversation.conversationId " +
+            "JOIN ConversationMember m2 ON c.conversationId = m2.conversation.conversationId " +
+            "WHERE c.isGroupChat = false " +
+            "AND m1.user.id = :userId1 " +
+            "AND m2.user.id = :userId2")
+    Optional<Conversation> findExistingPrivateConversation(@Param("userId1") int userId1, @Param("userId2") int userId2);
 }

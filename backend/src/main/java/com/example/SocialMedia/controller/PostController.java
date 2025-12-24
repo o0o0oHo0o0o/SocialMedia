@@ -64,9 +64,9 @@ public class PostController {
         return ResponseEntity.ok(postService.createPost(userDetails.getUsername(), postRequest, files));
     }
 
-    @GetMapping("/user/{id}")
-    public ResponseEntity<List<PostResponse>> getPostByUserId(@PathVariable Integer id, Pageable pageable) {
-        return ResponseEntity.ok(postService.getPostByUserId(id, pageable));
+    @GetMapping("/user/{name}")
+    public ResponseEntity<List<PostResponse>> getPostByUserName(@PathVariable String name, Pageable pageable) {
+        return ResponseEntity.ok(postService.getPostByUserName(name, pageable));
     }
 
     // UPDATE: Multipart Form (Json + Files mới + IDs file xóa)
@@ -100,5 +100,10 @@ public class PostController {
     @DeleteMapping("/{id}")
     public ResponseEntity<PostResponse> deletePost(@PathVariable Integer id) {
         return ResponseEntity.ok(postService.deletePost(id));
+    }
+
+    @GetMapping("/search/{keyword}")
+    public ResponseEntity<List<PostResponse>> getPostsByKeyword(@PathVariable String keyword, Pageable pageable) {
+        return  ResponseEntity.ok(postService.getPostsByKeyword(keyword, pageable));
     }
 }

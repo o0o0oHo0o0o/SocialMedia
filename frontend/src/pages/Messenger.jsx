@@ -156,6 +156,25 @@ export default function Messenger({ onBack, onStartVideoCall }) {
     if (chatHooks.typingUsers) setTypingUsers(chatHooks.typingUsers);
   }, [chatHooks]);
 
+  // If another page requested opening a specific conversation (Start Chat), pick it up here
+  useEffect(() => {
+    const openId = (() => {
+      try { return localStorage.getItem('openConversationId'); } catch (e) { return null; }
+    })();
+    if (!openId) return;
+    (async () => {
+      try {
+        const list = await refreshConversations();
+        const convList = Array.isArray(list) ? list : (list?.items || []);
+        const found = convList.find(c => String(c.conversationId) === String(openId));
+        if (found) {
+          setActiveConv(found);
+        }
+      } catch (e) { console.error('Open conversation failed', e); }
+      try { localStorage.removeItem('openConversationId'); } catch (e) { }
+    })();
+  }, [refreshConversations, setActiveConv]);
+
   // Scroll helper: only scroll if user near bottom or when forced
   const scrollToBottom = useCallback((force = false, cb) => {
     const el = msgContainerRef.current;

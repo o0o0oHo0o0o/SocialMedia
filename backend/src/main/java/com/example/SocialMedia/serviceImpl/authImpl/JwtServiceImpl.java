@@ -22,7 +22,7 @@ public class JwtServiceImpl implements JwtService {
     @Value("${jwt.secret}")
     private String secretKey;
 
-    @Value("${jwt.access.token.ttl}")
+    @Value("${jwt.access.token.ttl:86400000}")
     private long accessExpiration;
 
     private  <T> T extractClaims(String token, Function<Claims, T> claimsResolver) {
