@@ -28,3 +28,8 @@
 .page-controller .active {
   background-color: var(--overlay-color);
 }
+.user-container .more-info-bar {
+  display: flex;
+  align-items: start;
+  padding-top: 0;
+}

@@ -28,6 +28,12 @@ const Comment = ({
           ? parentComment?.fetched === false // If we have a parent comment, fetch if not fetched
           : !commentList.some((comment) => comment.parentcommentId == null); // If no root comment exists, fetch root comments
 
+        console.log(
+          "call api comment",
+          shouldFetch,
+          parentCommentId,
+          parentComment?.fetched,
+        );
         if (shouldFetch) {
           const response = await (parentCommentId
             ? CommentApi.getFromComment(parentCommentId)

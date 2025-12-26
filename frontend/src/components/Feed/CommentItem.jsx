@@ -25,10 +25,12 @@ const CommentItem = ({
     try {
       const response = await CommentApi.createForComment(replyData);
       const data = await response.json();
-      comment.showReplies = true;
+      comment.replied = true;
       // setCommentList([...commentList]);
-      comment.fetched == true &&
-        setCommentList([...commentList, { ...data, showReplies: false }]);
+      comment.fetched == true
+        ? setCommentList([...commentList, { ...data, showReplies: false }])
+        : setCommentList([...commentList]);
+
       console.log(commentList);
     } catch (err) {
       console.log("Something went wrong", err);

@@ -97,6 +97,7 @@ svg {
 
 .content-container {
   display: grid;
+  overflow: scroll;
   grid-template-columns: 5fr 2fr;
 }
 /* Feed Container */
@@ -418,6 +419,7 @@ button:hover {
 .more-info-bar {
   display: flex;
   padding-top: 10rem;
+  overflow: scroll;
   justify-content: center;
   align-items: center;
   border-left: 1px solid var(--text-color);

@@ -8,7 +8,10 @@ const Post = ({ userId, post, openUser, openPost, goBack, otherPosts }) => {
   const handlePostReply = async (replyData) => {
     const response = await CommentApi.createForPost(replyData);
     const data = await response.json();
-    setCommentList([...commentList, { ...data, showReplies: false }]);
+    setCommentList([
+      ...commentList,
+      { ...data, showReplies: false, fetched: false },
+    ]);
   };
   return (
     <div className="content-container other-posts">

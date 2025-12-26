@@ -34,7 +34,7 @@ function UserPage({ userInfo, target, openPost }) {
   }, [target, currentPage]);
 
   return (
-    <div className="content-container">
+    <div className="content-container user-container">
       <div className="user-page">
         <div className="profile-info">
           <AvatarAndName target={target}></AvatarAndName>

@@ -24,7 +24,7 @@ svg {
 }
 .dark {
   --button-color: #11111b;
-  --border: 0.0625rem solid var(--text-color);
+  --border: 0.0625rem solid var(--overlay-color);
   --text-color: #cdd6f4;
   --accent: #d20f39;
   --background-color: #1e1e2e;
