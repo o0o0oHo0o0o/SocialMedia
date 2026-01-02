@@ -11,7 +11,7 @@ spring:
     host: localhost
     port: 5672
     username: admin
-    password: admin
+    password: admin123
     stomp:
       port: 1613
 
@@ -95,8 +95,8 @@ spring:
         - "Authorization"
   servlet:
     multipart:
-      max-file-size: 10MB
-      max-request-size: 10MB
+      max-file-size: 100MB
+      max-request-size: 100MB
 
 # --- MINIO ---
 minio:

@@ -44,8 +44,11 @@ svg {
   height: 100vh;
   overflow: scroll;
   display: grid;
-  grid-template-rows: 1fr;
   grid-template-columns: 1fr 5fr;
+}
+.content-container {
+  width: 80vw;
+  min-width: 700px;
 }
 
 .app {
@@ -159,7 +162,6 @@ svg {
 /* Sidebar */
 .sidebar {
   height: 100%;
-  border-right: var(--border);
 }
 
 /* Collection Card Hover */

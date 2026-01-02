@@ -176,7 +176,9 @@ const FeedItem = ({ userId, post, openPost, openUser, goBack, small }) => {
             {content}
           </p>
         </div>
-        {post.medias.length > 0 ? (
+        {post.medias.some((media) => {
+          media.mediaType == "IMAGE";
+        }) ? (
           <div className="post-media">
             <Carousel showArrows={true} showThumbs={false} showStatus={false}>
               {post.medias
@@ -193,14 +195,40 @@ const FeedItem = ({ userId, post, openPost, openUser, goBack, small }) => {
                       src={media.mediaURL}
                       alt=""
                       onError={(e) => {
-                        return (e.target.src = `${media.fileName}`);
+                        // Prevent fallback if already trying the fallback image
+                        if (e.target.src !== media.fileName) {
+                          e.target.src = media.fileName || ""; // Fallback to fileName if mediaURL fails
+                        }
                       }}
                     />
                   </div>
                 ))}
             </Carousel>
           </div>
-        ) : null}
+        ) : (
+          post.medias.map((media) => {
+            return (
+              <div className="post-media">
+                <div
+                  className="background-image"
+                  style={{
+                    backgroundImage: `url(${media.mediaURL}), url(${media.fileName})`,
+                  }}
+                ></div>
+                <video
+                  src={media.mediaURL}
+                  onError={(e) => {
+                    // Prevent fallback if already trying the fallback image
+                    if (e.target.src !== media.fileName) {
+                      e.target.src = media.fileName || ""; // Fallback to fileName if mediaURL fails
+                    }
+                  }}
+                  controls
+                ></video>
+              </div>
+            );
+          })
+        )}
       </div>
       <div className="post-footer">
         {!small && (

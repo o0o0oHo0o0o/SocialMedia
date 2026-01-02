@@ -42,15 +42,16 @@ svg {
   width: 100vw;
   height: 100vh;
   overflow: scroll;
-  display: grid;
-  grid-template-rows: 1fr;
-  grid-template-columns: 2fr 5fr 2fr;
 }
 .app {
   color: var(--text-color);
 }
 .app *:not(.carousel) {
   color: inherit;
+}
+.content-container {
+  width: 80vw;
+  min-width: 700px;
 }
 .card-title {
   font-size: 1.125rem;

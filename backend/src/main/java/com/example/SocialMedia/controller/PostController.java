@@ -24,7 +24,7 @@ import java.util.List;
 public class PostController {
 
     private final PostService postService;
-    private static final long MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
+    private static final long MAX_FILE_SIZE = 100 * 1024 * 1024; // 10 MB
     private static final int MAX_FILE = 10;
 
     // --- VALIDATION HELPER ---
@@ -36,7 +36,7 @@ public class PostController {
         }
         for (MultipartFile f : files) {
             if (f.getSize() > MAX_FILE_SIZE) {
-                throw new FileTooLargeException("File exceeds maximum size limit of 10MB");
+                throw new FileTooLargeException("File exceeds maximum size limit of 100MB");
             }
         }
     }

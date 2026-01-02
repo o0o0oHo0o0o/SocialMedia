@@ -4,16 +4,13 @@ import "../../styles/modal.css";
 import { Carousel } from "react-responsive-carousel";
 import { PostApi } from "../../utils/ultis";
 
-function Modal({
-  userId,
-  postId,
-  titleInput,
-  textInput,
-  medias,
-  isOpen,
-  onClose,
-}) {
-  const [imagePreviews, setImagePreviews] = useState(
+function Modal({ postId, titleInput, textInput, medias, isOpen, onClose }) {
+  const MAX_IMAGES = 10;
+  const MAX_VIDEOS = 1;
+  const MAX_FILE_SIZE_MB = 100;
+  const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
+
+  const [mediaPreviews, setMediaPreviews] = useState(
     medias ? medias.map((media) => media.mediaURL) : [],
   );
   const [title, setTitle] = useState(titleInput ? titleInput : "");
@@ -21,18 +18,81 @@ function Modal({
   const [selectedFiles, setSelectedFiles] = useState([]); // actual File objects for upload
   const [selectedFlair, setSelectedFlair] = useState(null);
   const [currentSlide, setCurrentSlide] = useState(0);
-  const MAX_IMAGES = 10;
+  const currentMediaType =
+    mediaPreviews.length > 0 ? mediaPreviews[0].type : "none";
+  const imageCount = mediaPreviews.filter((m) => m.type === "image").length;
+  const videoCount = mediaPreviews.filter((m) => m.type === "video").length;
+  const canAddImage = currentMediaType !== "video" && imageCount < MAX_IMAGES;
+  const canAddVideo = currentMediaType !== "image" && videoCount < MAX_VIDEOS;
 
   useEffect(() => {
-    medias && setImagePreviews(medias.map((media) => media.mediaURL));
+    medias && setMediaPreviews(medias.map((media) => media.mediaURL));
   }, [medias]);
   if (!isOpen) return null;
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // File size check (applies to both image and video)
+    if (file.size > MAX_FILE_SIZE_BYTES) {
+      alert(`File size exceeds ${MAX_FILE_SIZE_MB}MB limit.`);
+      return;
+    }
+
+    const type = file.type.startsWith("image/") ? "image" : "video";
+
+    // Additional validation based on current content
+    if (type === "image" && !canAddImage) {
+      alert(
+        `You can only upload up to ${MAX_IMAGES} images. Remove the video first if you want to upload images.`,
+      );
+      return;
+    }
+    if (type === "video" && !canAddVideo) {
+      alert(
+        "You can only upload 1 video. Remove existing images first if you want to upload a video.",
+      );
+      return;
+    } // If switching type, clear previous media
+    if (mediaPreviews.length > 0 && mediaPreviews[0].type !== type) {
+      if (
+        !window.confirm(
+          `You already have ${mediaPreviews[0].type}s uploaded. Adding a ${type} will remove them. Continue?`,
+        )
+      ) {
+        return;
+      }
+      setCurrentSlide(0);
+      setMediaPreviews([]);
+    }
+    if (type == "image") {
+      handleImageChange(e);
+    }
+    if (type == "video") {
+      handleVideoChange(e);
+    }
+  };
+  function handleVideoChange(e) {
+    const file = Array.from(e.target.files)[0];
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setMediaPreviews((prev) => [...prev, reader.result]);
+    };
+    reader.readAsDataURL(file);
+    // Save actual file for upload
+    console.log(file);
+    setSelectedFiles((prev) => [...prev, file]);
+  }
+
+  const removeMedia = (index) => {
+    setMediaPreviews((prev) => prev.filter((_, i) => i !== index));
+  };
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
 
     files.forEach((file) => {
-      if (imagePreviews.length + files.length >= MAX_IMAGES) {
+      if (mediaPreviews.length + files.length >= MAX_IMAGES) {
         alert(`You can only upload up to ${MAX_IMAGES} images.`);
         return;
       }
@@ -40,7 +100,8 @@ function Modal({
       if (file && file.type.startsWith("image/")) {
         const reader = new FileReader();
         reader.onloadend = () => {
-          setImagePreviews((prev) => [...prev, reader.result]);
+          console.log(reader.result.type);
+          setMediaPreviews((prev) => [...prev, reader.result]);
         };
         reader.readAsDataURL(file);
         // Save actual file for upload
@@ -53,10 +114,10 @@ function Modal({
   };
 
   const removeImage = (index) => {
-    if (!imagePreviews[index].includes("localhost")) {
+    if (!mediaPreviews[index].includes("localhost")) {
       setSelectedFiles((prev) => prev.filter((_, i) => i !== index)); // Also update the current slide if needed
     }
-    setImagePreviews((prev) => {
+    setMediaPreviews((prev) => {
       const newPreviews = prev.filter((_, i) => i !== index);
 
       // Also update the current slide if needed
@@ -77,12 +138,12 @@ function Modal({
   const handleCancel = () => {
     setTitle("");
     setText("");
-    setImagePreviews([]);
+    setMediaPreviews([]);
     onClose();
   };
   const handlePost = async () => {
     // Basic validation
-    if (!title.trim() && !text.trim() && imagePreviews.length === 0) {
+    if (!title.trim() && !text.trim() && mediaPreviews.length === 0) {
       alert("Add some content or an image!");
       return;
     }
@@ -121,8 +182,7 @@ function Modal({
     medias &&
       medias
         .filter((media) => {
-          console.log(imagePreviews);
-          return !imagePreviews.includes(media.mediaURL);
+          return !mediaPreviews.includes(media.mediaURL);
         })
         .forEach((media) => {
           formData.append("deleteFile", media.id);
@@ -138,12 +198,12 @@ function Modal({
         // Reset + close modal
         setTitle("");
         setText("");
-        setImagePreviews([]);
+        setMediaPreviews([]);
         setSelectedFiles([]); // important!
         setSelectedFlair(null);
         onClose();
         // Trigger feed refresh
-        window.dispatchEvent(new CustomEvent('postCreated'));
+        window.dispatchEvent(new CustomEvent("postCreated"));
       } else {
         const errorText = await response.text();
         console.error("Post failed:", response.status, errorText);
@@ -188,7 +248,7 @@ function Modal({
           />
           {/* ====== FLAIR SELECTOR (NEW!) ====== */}
           <div className="flair-selector" style={{ margin: "12px 0" }}>
-            <label>Flair (optional)</label>
+            <label>Flair</label>
             <div>
               {[
                 "Health",
@@ -231,47 +291,75 @@ function Modal({
               selectedItem={currentSlide}
               onChange={setCurrentSlide}
             >
-              {imagePreviews.map((media, index) => (
+              {mediaPreviews.map((media, index) => (
                 <div className="image-container image-preview-container">
-                  <div
-                    className="background-image"
-                    style={{ backgroundImage: `url(${media})` }}
-                  ></div>
-                  <img src={media} alt="" />
-                  <button
-                    className="remove-image-btn"
-                    onClick={() => removeImage(index)}
-                  >
-                    <svg
-                      rpl=""
-                      fill="white"
-                      height="16"
-                      icon-name="delete"
-                      viewBox="0 0 20 20"
-                      width="16"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      {" "}
-                      <path d="M15.2 15.7c0 .83-.67 1.5-1.5 1.5H6.3c-.83 0-1.5-.67-1.5-1.5V7.6H3v8.1C3 17.52 4.48 19 6.3 19h7.4c1.82 0 3.3-1.48 3.3-3.3V7.6h-1.8v8.1zM17.5 5.8c.5 0 .9-.4.9-.9S18 4 17.5 4h-3.63c-.15-1.68-1.55-3-3.27-3H9.4C7.68 1 6.28 2.32 6.13 4H2.5c-.5 0-.9.4-.9.9s.4.9.9.9h15zM7.93 4c.14-.68.75-1.2 1.47-1.2h1.2c.72 0 1.33.52 1.47 1.2H7.93z"></path>
-                    </svg>
-                  </button>
+                  {media.startsWith("data:image/") ? (
+                    <>
+                      <div
+                        className="background-image"
+                        style={{ backgroundImage: `url(${media})` }}
+                      ></div>
+                      <img src={media} alt="" />
+                      <button
+                        className="remove-image-btn"
+                        onClick={() => removeImage(index)}
+                      >
+                        <svg
+                          rpl=""
+                          fill="white"
+                          height="16"
+                          icon-name="delete"
+                          viewBox="0 0 20 20"
+                          width="16"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          {" "}
+                          <path d="M15.2 15.7c0 .83-.67 1.5-1.5 1.5H6.3c-.83 0-1.5-.67-1.5-1.5V7.6H3v8.1C3 17.52 4.48 19 6.3 19h7.4c1.82 0 3.3-1.48 3.3-3.3V7.6h-1.8v8.1zM17.5 5.8c.5 0 .9-.4.9-.9S18 4 17.5 4h-3.63c-.15-1.68-1.55-3-3.27-3H9.4C7.68 1 6.28 2.32 6.13 4H2.5c-.5 0-.9.4-.9.9s.4.9.9.9h15zM7.93 4c.14-.68.75-1.2 1.47-1.2h1.2c.72 0 1.33.52 1.47 1.2H7.93z"></path>
+                        </svg>
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <video
+                        controls
+                        style={{ maxWidth: "100%", height: "auto" }}
+                      >
+                        <source src={media} />
+                        Your browser does not support the video tag.
+                      </video>
+                      <button
+                        className="remove-image-btn"
+                        onClick={() => removeMedia(index)}
+                      >
+                        <svg
+                          fill="white"
+                          height="16"
+                          viewBox="0 0 20 20"
+                          width="16"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path d="M15.2 15.7c0 .83-.67 1.5-1.5 1.5H6.3c-.83 0-1.5-.67-1.5-1.5V7.6H3v8.1C3 17.52 4.48 19 6.3 19h7.4c1.82 0 3.3-1.48 3.3-3.3V7.6h-1.8v8.1zM17.5 5.8c.5 0 .9-.4.9-.9S18 4 17.5 4h-3.63c-.15-1.68-1.55-3-3.27-3H9.4C7.68 1 6.28 2.32 6.13 4H2.5c-.5 0-.9.4-.9.9s.4.9.9.9h15zM7.93 4c.14-.68.75-1.2 1.47-1.2h1.2c.72 0 1.33.52 1.47 1.2H7.93z"></path>
+                        </svg>
+                      </button>
+                    </>
+                  )}
                 </div>
               ))}
             </Carousel>
 
             {/* Image Upload Area */}
-            {imagePreviews.length < MAX_IMAGES && (
+            {mediaPreviews.length < MAX_IMAGES && (
               <div
-                className={`image-upload-area ${imagePreviews.length > 0 && "upload-btn"}`}
+                className={`image-upload-area ${mediaPreviews.length > 0 && "upload-btn"}`}
               >
                 <label className="image-upload-label">
                   <input
                     type="file"
-                    accept="image/*"
-                    onChange={handleImageChange}
+                    accept="image/*,video/*"
+                    onChange={handleFileChange}
                     style={{ display: "none" }}
                   />
-                  {imagePreviews.length > 0 ? (
+                  {mediaPreviews.length > 0 ? (
                     <div className="upload-placeholder">
                       <svg
                         rpl=""
@@ -299,7 +387,7 @@ function Modal({
                         <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z" />
                       </svg>
                       <p>
-                        Drag and drop an image or <span>browse</span>
+                        Drag and drop an image/video or <span>browse</span>
                       </p>
                     </div>
                   )}
@@ -324,6 +412,13 @@ function Modal({
           </button>
         </div>
       </div>
+      {!canAddImage && !canAddVideo && (
+        <div style={{ textAlign: "center", color: "#666", marginTop: "16px" }}>
+          {currentMediaType === "video"
+            ? "Maximum 1 video reached."
+            : `Maximum ${MAX_IMAGES} images reached.`}
+        </div>
+      )}
     </>
   );
 }

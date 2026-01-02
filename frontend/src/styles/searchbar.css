@@ -3,9 +3,9 @@
 }
 .header {
   position: fixed;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  justify-items: center;
   padding: 8px 16px;
   box-sizing: border-box;
   background-color: var(--background-color);
@@ -17,6 +17,7 @@
 }
 
 .app .header__left {
+  justify-self: start;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -52,7 +53,6 @@
   align-items: center;
   height: 2.5rem;
   max-width: 700px; /* Reddit uses a wider search on desktop */
-  width: 560px;
   margin: 0 16px;
   position: relative;
   border-radius: 1.25rem;
@@ -92,11 +92,11 @@
   gap: 0.5rem;
   flex-shrink: 0;
   height: 100%;
+  justify-self: end;
 }
 
 .app .header__nav-button {
   font-weight: 600;
-  height: 100%;
   background: var(--accent);
   padding: 6px 0.75rem;
   border-radius: 1.25rem;
@@ -131,6 +131,9 @@
 .header__right svg {
   width: 2rem;
   height: 2rem;
+}
+.header .sidebar {
+  display: flex;
 }
 
 /* Optional: Mobile responsiveness (hide some items on small screens) */

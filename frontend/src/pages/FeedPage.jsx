@@ -111,16 +111,12 @@ const FeedPage = ({
         openSearch={openSearch}
         onLogout={onLogout}
         isDark={isDark}
-        setIsDark={setIsDark}
-      />
-      <Sidebar
-        isDark={isDark}
-        setIsDark={setIsDark}
         currentView={currentView}
         setCurrentView={setCurrentView}
+        setIsDark={setIsDark}
         onNavigateToMessenger={onNavigateToMessenger}
-        onLogout={onLogout}
       />
+      <div></div>
       {currentView == "post" ? (
         <Post
           userId={userId}
